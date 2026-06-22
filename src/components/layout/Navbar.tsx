@@ -14,6 +14,9 @@ export default function Navbar() {
         <Link href="/planner" className="hover:text-[#0d1f3c] transition-colors font-semibold text-[#0d1f3c]">
           📊 Planer
         </Link>
+        <Link href="/converter" className="hover:text-[#0d1f3c] transition-colors font-semibold text-[#0d1f3c]">
+          💱 Währungen
+        </Link>
       </div>
       <div className="flex items-center gap-3">
         <Link
