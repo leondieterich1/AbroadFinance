@@ -4,6 +4,14 @@ export type Currency = {
   symbol: string;
 };
 
+export type ExpenseCategory =
+  | "miete"
+  | "essen"
+  | "transport"
+  | "freizeit"
+  | "gesundheit"
+  | "sonstiges";
+
 export type Expense = {
   id: string;
   title: string;
@@ -12,14 +20,6 @@ export type Expense = {
   category: ExpenseCategory;
   date: string;
 };
-
-export type ExpenseCategory =
-  | "miete"
-  | "essen"
-  | "transport"
-  | "freizeit"
-  | "gesundheit"
-  | "sonstiges";
 
 export type Budget = {
   category: ExpenseCategory;
