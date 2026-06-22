@@ -1,8 +1,8 @@
-export default function DashboardPage() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">Übersicht</h1>
-      <p className="text-[#0d1f3c]/50">Dashboard kommt bald.</p>
-    </div>
-  );
+import { auth } from "@/auth";
+import DashboardOverview from "@/components/dashboard/DashboardOverview";
+
+export default async function DashboardPage() {
+  const session = await auth();
+  const name = session?.user?.name ?? "Nutzer";
+  return <DashboardOverview userName={name} />;
 }
