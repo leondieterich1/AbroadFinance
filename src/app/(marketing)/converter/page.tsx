@@ -53,7 +53,7 @@ export default function ConverterPage() {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch(`https://api.frankfurter.app/latest?from=${base}`);
+      const res = await fetch(`/api/rates?from=${base}`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       setRates({ ...data.rates, [base]: 1 });
@@ -237,7 +237,7 @@ export default function ConverterPage() {
 
         {/* Info */}
         <p className="text-center text-xs text-[#0d1f3c]/30 pb-4">
-          Kurse von <strong>Frankfurter API</strong> (Europäische Zentralbank) · täglich aktualisiert · nur zur Information
+          Kurse von <strong>Frankfurter</strong> (Europäische Zentralbank) · stündlich aktualisiert · nur zur Information
         </p>
       </div>
     </div>
