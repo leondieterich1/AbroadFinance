@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const NAV = [
+const NAV: { href: string; icon: string; label: string; badge?: string }[] = [
   { href: "/dashboard", icon: "⊞", label: "Übersicht" },
   { href: "/dashboard/budget", icon: "📊", label: "Budget" },
   { href: "/dashboard/transactions", icon: "💸", label: "Ausgaben" },
+  { href: "/dashboard/accounts", icon: "🏦", label: "Konten", badge: "NEU" },
   { href: "/dashboard/converter", icon: "💱", label: "Währungen" },
+  { href: "/dashboard/checklist", icon: "✅", label: "Checkliste" },
   { href: "/dashboard/settings", icon: "⚙️", label: "Einstellungen" },
 ];
 
@@ -45,6 +47,11 @@ export default function Sidebar({ user }: { user: { name: string; email: string 
             >
               <span className="text-base w-5 text-center">{item.icon}</span>
               {item.label}
+              {item.badge && (
+                <span className="ml-auto bg-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           );
         })}
