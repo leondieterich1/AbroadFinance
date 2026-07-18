@@ -220,13 +220,6 @@ export default function ChecklistPage() {
                             {item.label}
                           </p>
                           {item.hint && <p className="text-xs text-[#0d1f3c]/30 mt-0.5">{item.hint}</p>}
-                          {item.link && (
-                            <a href={item.link} target="_blank" rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-[10px] text-blue-400 hover:text-blue-600 transition-colors font-semibold mt-0.5 inline-block">
-                              Mehr erfahren →
-                            </a>
-                          )}
                         </div>
                         <button
                           onClick={(e) => { e.preventDefault(); removeItem(section.title, item); }}
