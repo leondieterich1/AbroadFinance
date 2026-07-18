@@ -10,24 +10,24 @@ const CHECKLIST: Section[] = [
     title: "Vor der Abreise", icon: "📋", color: "#0d1f3c",
     items: [
       { id: "passport", label: "Reisepass / Ausweis gültig (mind. 6 Monate)", hint: "Viele Länder verlangen mind. 6 Monate Restgültigkeit" },
-      { id: "visa", label: "Visum beantragt (falls nötig)", link: "https://www.auswaertiges-amt.de/de/visa-service", hint: "Auswärtiges Amt prüfen" },
-      { id: "insurance", label: "Auslandskrankenversicherung abgeschlossen", link: "https://www.verbraucherzentrale.de/wissen/reise-freizeit/reiseplanung-und-buchung/auslandskrankenversicherung-was-leistet-sie-wirklich-12441" },
-      { id: "ehic", label: "Europäische Krankenversicherungskarte (EHIC) beantragt", hint: "Für EU-Länder, kostenlos bei deiner Krankenkasse", link: "https://www.krankenkasseninfo.de/wissen/ehic-karte/" },
-      { id: "liability", label: "Haftpflichtversicherung gilt im Ausland (prüfen)", link: "https://www.test.de/Haftpflichtversicherung-im-Test-1830737-0/" },
+      { id: "visa", label: "Visum beantragt (falls nötig)", link: "https://www.auswaertiges-amt.de", hint: "Auswärtiges Amt: Einreise- und Visabestimmungen nach Zielland" },
+      { id: "insurance", label: "Auslandskrankenversicherung abgeschlossen", link: "https://www.verbraucherzentrale.de", hint: "Verbraucherzentrale: Vergleich & Beratung zu Auslandskrankenversicherungen" },
+      { id: "ehic", label: "Europäische Krankenversicherungskarte (EHIC) beantragt", hint: "Für EU-Länder, kostenlos bei deiner Krankenkasse", link: "https://europa.eu/youreurope/citizens/health/unplanned-healthcare/temporary-stays/index_de.htm" },
+      { id: "liability", label: "Haftpflichtversicherung gilt im Ausland (prüfen)", link: "https://www.test.de", hint: "Stiftung Warentest: unabhängige Versicherungstests" },
       { id: "deregister", label: "Wohnsitz abmelden (bei dauerhaftem Wegzug)", hint: "Spart GEZ-Beitrag und kann steuerliche Vorteile bringen" },
       { id: "gez", label: "Rundfunkbeitrag abgemeldet", link: "https://www.rundfunkbeitrag.de" },
-      { id: "taxid", label: "Steuer-ID notiert (bleibt lebenslang gültig)" },
-      { id: "vaccinations", label: "Impfungen aufgefrischt (falls nötig)", link: "https://www.auswaertiges-amt.de/de/gesundheitsinfos" },
+      { id: "taxid", label: "Steuer-ID notiert (bleibt lebenslang gültig)", link: "https://www.bzst.de", hint: "Bundeszentralamt für Steuern" },
+      { id: "vaccinations", label: "Impfungen aufgefrischt (falls nötig)", link: "https://www.auswaertiges-amt.de", hint: "Auswärtiges Amt: länderspezifische Gesundheitshinweise" },
     ],
   },
   {
     title: "Banking & Geld", icon: "🏦", color: "#4285F4",
     items: [
-      { id: "bank_foreign", label: "Konto mit kostenloser Auslands-VISA eröffnet", hint: "z. B. DKB oder ING", link: "https://www.test.de/Girokonto-im-Ausland-nutzen-4715701-0/" },
+      { id: "bank_foreign", label: "Konto mit kostenloser Auslands-VISA eröffnet", hint: "z. B. DKB oder ING", link: "https://www.test.de" },
       { id: "bank_notify", label: "Bank über Auslandsaufenthalt informiert", hint: "Verhindert Sperrung der Karte" },
       { id: "cash", label: "Etwas Bargeld in Lokalwährung besorgt", hint: "Für Ankunft und Notfälle" },
-      { id: "emergency_fund", label: "Notgroschen (3 Monate Ausgaben) auf separatem Konto", link: "https://www.verbraucherzentrale.de/wissen/geld-versicherungen/sparen-und-anlegen/notgroschen-warum-und-wie-viel-sparen-11090" },
-      { id: "wise", label: "Wise / Revolut-Karte für günstige Auslandsüberweisungen", link: "https://www.test.de/Geldtransfer-ins-Ausland-Die-besten-Anbieter-im-Vergleich-5047783-0/" },
+      { id: "emergency_fund", label: "Notgroschen (3 Monate Ausgaben) auf separatem Konto", link: "https://www.verbraucherzentrale.de", hint: "Verbraucherzentrale: warum und wie viel sparen" },
+      { id: "wise", label: "Wise / Revolut-Karte für günstige Auslandsüberweisungen", link: "https://www.test.de", hint: "Stiftung Warentest: Geldtransfer-Anbieter im Vergleich" },
       { id: "pin", label: "PIN aller Karten auswendig gewusst (kein Foto davon!)" },
       { id: "backupcard", label: "Zweite Karte als Backup eingepackt" },
     ],
@@ -35,20 +35,20 @@ const CHECKLIST: Section[] = [
   {
     title: "Studium & Arbeit", icon: "🎓", color: "#34A853",
     items: [
-      { id: "bafög", label: "BAföG-Auslandsantrag gestellt (falls zutreffend)", link: "https://www.daad.de/de/studieren-und-forschen-in-deutschland/stipendien-finden/bafög/" },
-      { id: "stipendium", label: "Stipendien recherchiert (DAAD, Erasmus, etc.)", link: "https://www.daad.de/de/studieren-und-forschen-in-deutschland/stipendien-finden/stipendiendatenbank/" },
-      { id: "erasmus", label: "Erasmus-Formular ausgefüllt (falls zutreffend)", link: "https://www.daad.de/de/im-ausland-studieren/erasmus/" },
+      { id: "bafög", label: "BAföG-Auslandsantrag gestellt (falls zutreffend)", link: "https://www.bafög.de", hint: "Offizielles BAföG-Portal mit Förderrechner" },
+      { id: "stipendium", label: "Stipendien recherchiert (DAAD, Erasmus, etc.)", link: "https://www.daad.de", hint: "DAAD-Stipendiendatenbank" },
+      { id: "erasmus", label: "Erasmus-Formular ausgefüllt (falls zutreffend)", link: "https://www.daad.de", hint: "DAAD: Erasmus+ Informationen" },
       { id: "creditrecognition", label: "Leistungsanerkennung mit Heimathochschule geklärt" },
       { id: "workvisa", label: "Arbeitserlaubnis geprüft (Stunden-Limits beachten)" },
       { id: "socialsecurity", label: "Sozialversicherung im Zielland recherchiert" },
-      { id: "taxabroad", label: "Doppelbesteuerungsabkommen geprüft", link: "https://www.bundesfinanzministerium.de/Web/DE/Themen/Steuern/Internationales_Steuerrecht/Staatenbezogene_Informationen/staatenbezogene_informationen.html" },
+      { id: "taxabroad", label: "Doppelbesteuerungsabkommen geprüft", link: "https://www.bundesfinanzministerium.de", hint: "Bundesfinanzministerium: internationales Steuerrecht" },
     ],
   },
   {
     title: "Wohnen", icon: "🏠", color: "#FF6200",
     items: [
       { id: "housing", label: "Unterkunft für die ersten Wochen gesichert" },
-      { id: "deposit", label: "Mietkaution-Regeln im Zielland geprüft", link: "https://www.verbraucherzentrale.de/wissen/wohnen/mieten/mietkaution-so-viel-darf-der-vermieter-verlangen-10656" },
+      { id: "deposit", label: "Mietkaution-Regeln im Zielland geprüft", link: "https://www.verbraucherzentrale.de", hint: "Verbraucherzentrale: wie viel Mietkaution zulässig ist" },
       { id: "rentalcontract", label: "Mietvertrag vollständig gelesen und verstanden" },
       { id: "inventory", label: "Übergabeprotokoll erstellt (Fotos machen!)" },
       { id: "internet", label: "Internet / SIM-Karte organisiert" },
@@ -59,7 +59,7 @@ const CHECKLIST: Section[] = [
     title: "Dokumente & Digitales", icon: "📄", color: "#9333ea",
     items: [
       { id: "copies", label: "Alle wichtigen Dokumente digital gesichert (Cloud)", hint: "Pass, Versicherungen, Verträge" },
-      { id: "embassy", label: "Deutsche Botschaft im Zielland notiert", link: "https://www.auswaertiges-amt.de/de/aussenpolitik/laender" },
+      { id: "embassy", label: "Deutsche Botschaft im Zielland notiert", link: "https://www.auswaertiges-amt.de", hint: "Auswärtiges Amt: Botschaften und Konsulate weltweit" },
       { id: "emergency_contacts", label: "Notfallkontakte gespeichert (Familie, Botschaft, Arzt)" },
       { id: "vpn", label: "VPN installiert (für sicheres Banking in fremden WLANs)" },
       { id: "elster", label: "ELSTER-Zugang eingerichtet (für Steuererklärung)", link: "https://www.elster.de" },
@@ -71,6 +71,7 @@ const CHECKLIST: Section[] = [
 export default function ChecklistPage() {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [customItems, setCustomItems] = useState<Record<string, CheckItem[]>>({});
+  const [removedDefaults, setRemovedDefaults] = useState<Set<string>>(new Set());
   const [newTaskInputs, setNewTaskInputs] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(CHECKLIST.map((s) => s.title)));
@@ -81,6 +82,8 @@ export default function ChecklistPage() {
       if (c) setChecked(new Set(JSON.parse(c)));
       const ci = localStorage.getItem("fa_checklist_custom");
       if (ci) setCustomItems(JSON.parse(ci));
+      const rd = localStorage.getItem("fa_checklist_removed");
+      if (rd) setRemovedDefaults(new Set(JSON.parse(rd)));
     } catch {}
     setLoaded(true);
   }, []);
@@ -94,6 +97,11 @@ export default function ChecklistPage() {
     if (!loaded) return;
     localStorage.setItem("fa_checklist_custom", JSON.stringify(customItems));
   }, [customItems, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    localStorage.setItem("fa_checklist_removed", JSON.stringify([...removedDefaults]));
+  }, [removedDefaults, loaded]);
 
   function toggle(id: string) {
     setChecked((prev) => {
@@ -119,21 +127,28 @@ export default function ChecklistPage() {
     setNewTaskInputs((prev) => ({ ...prev, [sectionTitle]: "" }));
   }
 
-  function removeCustomTask(sectionTitle: string, id: string) {
-    setCustomItems((prev) => ({
-      ...prev,
-      [sectionTitle]: (prev[sectionTitle] ?? []).filter((i) => i.id !== id),
-    }));
+  function removeItem(sectionTitle: string, item: CheckItem) {
+    if (item.custom) {
+      setCustomItems((prev) => ({
+        ...prev,
+        [sectionTitle]: (prev[sectionTitle] ?? []).filter((i) => i.id !== item.id),
+      }));
+    } else {
+      setRemovedDefaults((prev) => new Set(prev).add(item.id));
+    }
     setChecked((prev) => {
       const next = new Set(prev);
-      next.delete(id);
+      next.delete(item.id);
       return next;
     });
   }
 
   const sections: Section[] = CHECKLIST.map((s) => ({
     ...s,
-    items: [...s.items, ...(customItems[s.title] ?? [])],
+    items: [
+      ...s.items.filter((i) => !removedDefaults.has(i.id)),
+      ...(customItems[s.title] ?? []),
+    ],
   }));
 
   const totalItems = sections.reduce((s, sec) => s + sec.items.length, 0);
@@ -213,15 +228,13 @@ export default function ChecklistPage() {
                             </a>
                           )}
                         </div>
-                        {item.custom && (
-                          <button
-                            onClick={(e) => { e.preventDefault(); removeCustomTask(section.title, item.id); }}
-                            className="flex-shrink-0 text-[#0d1f3c]/20 hover:text-rose-500 transition-colors text-lg leading-none"
-                            title="Löschen"
-                          >
-                            ×
-                          </button>
-                        )}
+                        <button
+                          onClick={(e) => { e.preventDefault(); removeItem(section.title, item); }}
+                          className="flex-shrink-0 text-[#0d1f3c]/20 hover:text-rose-500 transition-colors text-lg leading-none"
+                          title="Löschen"
+                        >
+                          ×
+                        </button>
                       </label>
                     );
                   })}
@@ -250,11 +263,17 @@ export default function ChecklistPage() {
         })}
       </div>
 
-      <div className="mt-4 text-center">
+      <div className="mt-4 text-center space-x-4">
         <button onClick={() => setChecked(new Set())}
           className="text-xs text-[#0d1f3c]/20 hover:text-[#0d1f3c]/40 transition-colors">
-          Alle zurücksetzen
+          Häkchen zurücksetzen
         </button>
+        {removedDefaults.size > 0 && (
+          <button onClick={() => setRemovedDefaults(new Set())}
+            className="text-xs text-[#0d1f3c]/20 hover:text-[#0d1f3c]/40 transition-colors">
+            Gelöschte Vorschläge wiederherstellen ({removedDefaults.size})
+          </button>
+        )}
       </div>
     </div>
   );
