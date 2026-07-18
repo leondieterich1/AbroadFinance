@@ -1,17 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -24,20 +22,42 @@ export default function SignupPage() {
 
     setLoading(true);
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      name,
-      redirect: false,
+    const res = await fetch("/api/auth/send-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, name }),
     });
 
     setLoading(false);
 
-    if (res?.error) {
-      setError("Registrierung fehlgeschlagen. Bitte versuche es erneut.");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Fehler beim Senden. Bitte versuche es erneut.");
     } else {
-      router.push("/dashboard");
+      setSent(true);
     }
+  }
+
+  if (sent) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 w-full max-w-md text-center">
+        <div className="text-5xl mb-5">📬</div>
+        <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">Schau in dein Postfach!</h1>
+        <p className="text-[#0d1f3c]/50 text-sm mb-1">
+          Wir haben einen Bestätigungslink an
+        </p>
+        <p className="font-bold text-[#0d1f3c] mb-6">{email}</p>
+        <p className="text-[#0d1f3c]/40 text-xs">
+          Der Link ist 24 Stunden gültig. Kein E-Mail bekommen?{" "}
+          <button
+            onClick={() => setSent(false)}
+            className="text-[#0d1f3c] font-semibold hover:underline"
+          >
+            Erneut senden
+          </button>
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -88,9 +108,16 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#0d1f3c] text-white font-semibold py-3 rounded-xl hover:bg-[#162d54] transition-colors mt-2 disabled:opacity-50"
+          className="w-full bg-[#0d1f3c] text-white font-semibold py-3 rounded-xl hover:bg-[#162d54] transition-colors mt-2 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {loading ? "Wird erstellt…" : "Konto erstellen"}
+          {loading ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Wird gesendet…
+            </>
+          ) : (
+            "Bestätigungsmail senden →"
+          )}
         </button>
       </form>
 
