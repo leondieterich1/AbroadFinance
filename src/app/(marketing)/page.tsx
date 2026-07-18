@@ -5,28 +5,28 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-8 pt-24 pb-20 flex flex-col items-center text-center">
-        <div className="inline-flex items-center gap-2 bg-[#0d1f3c]/5 text-[#0d1f3c] text-xs font-semibold px-4 py-2 rounded-full mb-8 tracking-widest uppercase">
+      <section className="max-w-6xl mx-auto px-5 md:px-8 pt-16 md:pt-24 pb-16 md:pb-20 flex flex-col items-center text-center">
+        <div className="inline-flex items-center gap-2 bg-[#0d1f3c]/5 text-[#0d1f3c] text-xs font-semibold px-4 py-2 rounded-full mb-6 md:mb-8 tracking-widest uppercase">
           ✈️ Plan. Budget. Explore.
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold text-[#0d1f3c] leading-tight tracking-tight max-w-4xl mb-6">
+        <h1 className="text-4xl md:text-7xl font-extrabold text-[#0d1f3c] leading-tight tracking-tight max-w-4xl mb-5 md:mb-6">
           Deine Finanzen.<br />
           <span className="text-[#0d1f3c]/40">Weltweit im Griff.</span>
         </h1>
-        <p className="text-lg md:text-xl text-[#0d1f3c]/60 max-w-2xl mb-10 leading-relaxed">
+        <p className="text-base md:text-xl text-[#0d1f3c]/60 max-w-2xl mb-8 md:mb-10 leading-relaxed px-2">
           FinanceAbroad hilft Studierenden und Expats, ihre Ausgaben im Ausland zu planen,
           Budgets einzuhalten und Währungen im Blick zu behalten – alles in einer App.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
           <Link
             href="/signup"
-            className="bg-[#0d1f3c] text-white font-semibold px-8 py-4 rounded-full text-base hover:bg-[#162d54] transition-colors shadow-lg shadow-[#0d1f3c]/20"
+            className="bg-[#0d1f3c] text-white font-semibold px-8 py-4 rounded-full text-base hover:bg-[#162d54] transition-colors shadow-lg shadow-[#0d1f3c]/20 text-center"
           >
             Jetzt kostenlos starten
           </Link>
-          <button className="border border-[#0d1f3c]/20 text-[#0d1f3c] font-semibold px-8 py-4 rounded-full text-base hover:bg-[#0d1f3c]/5 transition-colors">
-            Demo ansehen
-          </button>
+          <Link href="/login" className="border border-[#0d1f3c]/20 text-[#0d1f3c] font-semibold px-8 py-4 rounded-full text-base hover:bg-[#0d1f3c]/5 transition-colors text-center">
+            Anmelden
+          </Link>
         </div>
         <div className="mt-20 flex items-center justify-center">
           <Image src="/logo-full.png" alt="FinanceAbroad" width={280} height={280} className="opacity-90" />

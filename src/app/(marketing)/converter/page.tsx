@@ -50,6 +50,22 @@ export default function ConverterPage() {
   const [error, setError] = useState(false);
 
   const fetchRates = useCallback(async (base: string) => {
+    // Check localStorage cache — skip fetch if rates for today already exist
+    const cacheKey = `fa_rates_${base}`;
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { date: cachedDate, rates: cachedRates } = JSON.parse(cached);
+        const today = new Date().toISOString().slice(0, 10);
+        if (cachedDate === today) {
+          setRates({ ...cachedRates, [base]: 1 });
+          setDate(cachedDate);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch { /* ignore parse errors */ }
+
     setLoading(true);
     setError(false);
     try {
@@ -58,6 +74,8 @@ export default function ConverterPage() {
       const data = await res.json();
       setRates({ ...data.rates, [base]: 1 });
       setDate(data.date);
+      // Cache for today
+      localStorage.setItem(cacheKey, JSON.stringify({ date: data.date, rates: data.rates }));
     } catch {
       setError(true);
     } finally {
@@ -117,7 +135,7 @@ export default function ConverterPage() {
           </div>
 
           {/* From / Swap / To */}
-          <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-end mb-6">
+          <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 items-end mb-6">
             <div>
               <label className="block text-xs font-semibold text-[#0d1f3c]/50 uppercase tracking-wider mb-2">Von</label>
               <select
@@ -237,7 +255,7 @@ export default function ConverterPage() {
 
         {/* Info */}
         <p className="text-center text-xs text-[#0d1f3c]/30 pb-4">
-          Kurse von <strong>Frankfurter</strong> (Europäische Zentralbank) · stündlich aktualisiert · nur zur Information
+          Kurse von <strong>Frankfurter</strong> (Europäische Zentralbank) · täglich aktualisiert · nur zur Information
         </p>
       </div>
     </div>

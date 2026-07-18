@@ -39,24 +39,24 @@ export default function PlannerPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-[#0d1f3c] text-white px-6 py-10">
+      <div className="bg-[#0d1f3c] text-white px-5 md:px-6 py-8 md:py-10">
         <div className="max-w-4xl mx-auto">
           <p className="text-white/50 text-sm font-medium uppercase tracking-widest mb-1">✈️ FinanceAbroad</p>
-          <h1 className="text-3xl font-extrabold mb-6">Finanzplaner</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold mb-5 md:mb-6">Finanzplaner</h1>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white/10 rounded-2xl p-5">
-              <p className="text-white/50 text-xs font-medium uppercase tracking-wider mb-1">Monatsbudget</p>
-              <p className="text-2xl font-extrabold">{formatCurrency(totalBudget, currency)}</p>
+          <div className="grid grid-cols-3 gap-2 md:gap-4">
+            <div className="bg-white/10 rounded-xl md:rounded-2xl p-3 md:p-5">
+              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">Budget</p>
+              <p className="text-base md:text-2xl font-extrabold">{formatCurrency(totalBudget, currency)}</p>
             </div>
-            <div className="bg-white/10 rounded-2xl p-5">
-              <p className="text-white/50 text-xs font-medium uppercase tracking-wider mb-1">Ausgegeben</p>
-              <p className="text-2xl font-extrabold text-rose-300">{formatCurrency(totalSpent, currency)}</p>
+            <div className="bg-white/10 rounded-xl md:rounded-2xl p-3 md:p-5">
+              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">Ausgaben</p>
+              <p className="text-base md:text-2xl font-extrabold text-rose-300">{formatCurrency(totalSpent, currency)}</p>
             </div>
-            <div className={`rounded-2xl p-5 ${totalRemaining < 0 ? "bg-rose-500/30" : "bg-emerald-500/20"}`}>
-              <p className="text-white/50 text-xs font-medium uppercase tracking-wider mb-1">Verbleibend</p>
-              <p className={`text-2xl font-extrabold ${totalRemaining < 0 ? "text-rose-300" : "text-emerald-300"}`}>
+            <div className={`rounded-xl md:rounded-2xl p-3 md:p-5 ${totalRemaining < 0 ? "bg-rose-500/30" : "bg-emerald-500/20"}`}>
+              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">Rest</p>
+              <p className={`text-base md:text-2xl font-extrabold ${totalRemaining < 0 ? "text-rose-300" : "text-emerald-300"}`}>
                 {formatCurrency(totalRemaining, currency)}
               </p>
             </div>

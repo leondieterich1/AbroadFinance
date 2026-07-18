@@ -11,7 +11,7 @@ export default function Footer() {
         </Link>
         <div className="hidden md:flex items-center gap-6 text-sm text-[#0d1f3c]/50">
           <a href="#features" className="hover:text-[#0d1f3c] transition-colors">Features</a>
-          <a href="#pricing" className="hover:text-[#0d1f3c] transition-colors">Preise</a>
+          <a href="#how" className="hover:text-[#0d1f3c] transition-colors">So funktionierts</a>
           <Link href="/login" className="hover:text-[#0d1f3c] transition-colors">Anmelden</Link>
         </div>
         <p className="text-sm text-[#0d1f3c]/40">© 2026 FinanceAbroad · Plan. Budget. Explore.</p>
