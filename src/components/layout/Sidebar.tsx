@@ -15,6 +15,7 @@ const NAV: { href: string; icon: string; label: string; badge?: string }[] = [
   { href: "/dashboard/goals", icon: "🎯", label: "Sparziele" },
   { href: "/dashboard/subscriptions", icon: "📦", label: "Abos" },
   { href: "/dashboard/checklist", icon: "✅", label: "Checkliste" },
+  { href: "/dashboard/costs", icon: "🌍", label: "Lebenskosten" },
   { href: "/dashboard/settings", icon: "⚙️", label: "Einstellungen" },
 ];
 
