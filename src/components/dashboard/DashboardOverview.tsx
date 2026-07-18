@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePlanner } from "@/hooks/usePlanner";
 import { formatCurrency, CATEGORY_LABELS, CATEGORY_ICONS, CATEGORY_COLORS } from "@/lib/utils";
+import BudgetRing from "@/components/ui/BudgetRing";
+import DotPattern from "@/components/ui/DotPattern";
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -38,6 +40,8 @@ export default function DashboardOverview({ userName }: { userName: string }) {
     );
   }
 
+  const ringColor = pct >= 100 ? "#f43f5e" : pct >= 80 ? "#fbbf24" : "#34d399";
+
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto">
       {/* Header */}
@@ -49,46 +53,30 @@ export default function DashboardOverview({ userName }: { userName: string }) {
         <p className="text-[#0d1f3c]/50 mt-1">Hier ist deine Finanzübersicht für diesen Monat.</p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-[#0d1f3c] text-white rounded-2xl p-5">
-          <p className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Monatsbudget</p>
-          <p className="text-3xl font-extrabold">{formatCurrency(totalBudget, currency)}</p>
-          <p className="text-white/40 text-xs mt-2">Gesamt verfügbar</p>
-        </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <p className="text-[#0d1f3c]/50 text-xs font-semibold uppercase tracking-wider mb-2">Ausgegeben</p>
-          <p className="text-3xl font-extrabold text-rose-500">{formatCurrency(totalSpent, currency)}</p>
-          <p className="text-[#0d1f3c]/30 text-xs mt-2">{pct.toFixed(0)}% des Budgets</p>
-        </div>
-        <div className={`rounded-2xl p-5 shadow-sm ${remaining < 0 ? "bg-rose-50" : "bg-emerald-50"}`}>
-          <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${remaining < 0 ? "text-rose-400" : "text-emerald-600/70"}`}>
-            Verbleibend
-          </p>
-          <p className={`text-3xl font-extrabold ${remaining < 0 ? "text-rose-500" : "text-emerald-600"}`}>
-            {formatCurrency(remaining, currency)}
-          </p>
-          <p className={`text-xs mt-2 ${remaining < 0 ? "text-rose-400" : "text-emerald-600/50"}`}>
-            {remaining < 0 ? "Budget überzogen!" : "noch verfügbar"}
-          </p>
-        </div>
-      </div>
-
-      {/* Progress bar */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm mb-6">
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-sm font-semibold text-[#0d1f3c]">Budget-Fortschritt</span>
-          <span className="text-sm text-[#0d1f3c]/40">{pct.toFixed(1)}%</span>
-        </div>
-        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-700 ${pct >= 100 ? "bg-rose-500" : pct >= 80 ? "bg-amber-400" : "bg-emerald-500"}`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-        <div className="flex justify-between text-xs text-[#0d1f3c]/30 mt-2">
-          <span>0</span>
-          <span>{formatCurrency(totalBudget, currency)}</span>
+      {/* Budget overview */}
+      <div className="relative overflow-hidden bg-[#0d1f3c] text-white rounded-2xl p-6 mb-8">
+        <DotPattern className="text-white" />
+        <div className="relative flex flex-wrap items-center gap-6">
+          <div className="relative flex items-center justify-center flex-shrink-0">
+            <BudgetRing pct={pct} progressColor={ringColor} size={96} />
+            <span className="absolute text-xl font-extrabold">{pct.toFixed(0)}%</span>
+          </div>
+          <div className="flex flex-wrap gap-x-10 gap-y-3">
+            <div>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Gesamtbudget</p>
+              <p className="text-2xl font-extrabold">{formatCurrency(totalBudget, currency)}</p>
+            </div>
+            <div>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Ausgegeben</p>
+              <p className="text-2xl font-extrabold text-rose-300">{formatCurrency(totalSpent, currency)}</p>
+            </div>
+            <div>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Verbleibend</p>
+              <p className={`text-2xl font-extrabold ${remaining < 0 ? "text-rose-300" : "text-emerald-300"}`}>
+                {formatCurrency(remaining, currency)}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
