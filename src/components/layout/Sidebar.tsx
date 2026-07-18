@@ -12,6 +12,7 @@ const NAV: { href: string; icon: string; label: string; badge?: string }[] = [
   { href: "/dashboard/accounts", icon: "🏦", label: "Konten", badge: "NEU" },
   { href: "/dashboard/split", icon: "🤝", label: "Splittr" },
   { href: "/dashboard/converter", icon: "💱", label: "Währungen" },
+  { href: "/dashboard/goals", icon: "🎯", label: "Sparziele" },
   { href: "/dashboard/checklist", icon: "✅", label: "Checkliste" },
   { href: "/dashboard/settings", icon: "⚙️", label: "Einstellungen" },
 ];
