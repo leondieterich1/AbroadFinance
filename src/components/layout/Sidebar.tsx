@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const NAV: { href: string; icon: string; label: string; badge?: string }[] = [
+const NAV: { href: string; icon: string; label: string; badge?: string; external?: boolean }[] = [
   { href: "/dashboard", icon: "⊞", label: "Übersicht" },
   { href: "/dashboard/budget", icon: "📊", label: "Budget" },
   { href: "/dashboard/analytics", icon: "📈", label: "Analyse", badge: "NEU" },
@@ -28,7 +28,7 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
     : user.email[0].toUpperCase();
 
   const nav = user.isAdmin
-    ? [...NAV, { href: "/dashboard/admin", icon: "🛡️", label: "Admin" }]
+    ? [...NAV, { href: "https://abroad-finance-admin.vercel.app", icon: "🛡️", label: "Admin", external: true }]
     : NAV;
 
   return (
@@ -45,16 +45,11 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {nav.map((item) => {
           const active = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                active
-                  ? "bg-white/15 text-white"
-                  : "text-white/50 hover:text-white hover:bg-white/8"
-              }`}
-            >
+          const className = `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            active ? "bg-white/15 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
+          }`;
+          const content = (
+            <>
               <span className="text-base w-5 text-center">{item.icon}</span>
               {item.label}
               {item.badge && (
@@ -62,6 +57,16 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
                   {item.badge}
                 </span>
               )}
+              {item.external && <span className="ml-auto text-white/30 text-xs">↗</span>}
+            </>
+          );
+          return item.external ? (
+            <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer" className={className}>
+              {content}
+            </a>
+          ) : (
+            <Link key={item.href} href={item.href} className={className}>
+              {content}
             </Link>
           );
         })}
