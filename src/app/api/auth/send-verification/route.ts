@@ -1,19 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createVerificationToken } from "@/lib/verification";
+import { beginSignup } from "@/lib/users";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: NextRequest) {
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ error: "E-Mail-Versand nicht konfiguriert." }, { status: 503 });
   }
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const { email, name } = await req.json();
+  const { email, name, password } = await req.json();
 
-  if (!email || typeof email !== "string") {
-    return NextResponse.json({ error: "E-Mail fehlt" }, { status: 400 });
+  if (!email || typeof email !== "string" || !EMAIL_RE.test(email)) {
+    return NextResponse.json({ error: "Ungültige E-Mail-Adresse." }, { status: 400 });
+  }
+  if (!password || typeof password !== "string" || password.length < 8) {
+    return NextResponse.json({ error: "Passwort muss mindestens 8 Zeichen lang sein." }, { status: 400 });
   }
 
-  const token = await createVerificationToken(email, name ?? email.split("@")[0]);
+  const signupName = typeof name === "string" && name.trim() ? name.trim() : email.split("@")[0];
+  const result = await beginSignup(email, signupName, password);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 409 });
+  }
+
+  const token = await createVerificationToken(email, signupName);
   const baseUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
   const verifyUrl = `${baseUrl}/verify?token=${encodeURIComponent(token)}`;
 

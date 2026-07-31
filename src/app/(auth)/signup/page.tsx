@@ -15,8 +15,8 @@ export default function SignupPage() {
     e.preventDefault();
     setError("");
 
-    if (password.length < 6) {
-      setError("Passwort muss mindestens 6 Zeichen lang sein.");
+    if (password.length < 8) {
+      setError("Passwort muss mindestens 8 Zeichen lang sein.");
       return;
     }
 
@@ -25,7 +25,7 @@ export default function SignupPage() {
     const res = await fetch("/api/auth/send-verification", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name }),
+      body: JSON.stringify({ email, name, password }),
     });
 
     setLoading(false);
@@ -98,7 +98,7 @@ export default function SignupPage() {
           <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">Passwort</label>
           <input
             type="password"
-            placeholder="Mindestens 6 Zeichen"
+            placeholder="Mindestens 8 Zeichen"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

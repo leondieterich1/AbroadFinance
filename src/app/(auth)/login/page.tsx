@@ -59,7 +59,7 @@ export default function LoginPage() {
           <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">Passwort</label>
           <input
             type="password"
-            placeholder="Mindestens 6 Zeichen"
+            placeholder="Passwort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

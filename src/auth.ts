@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { verifyVerificationToken } from "@/lib/verification";
+import { markEmailVerified, verifyPassword } from "@/lib/users";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -9,36 +10,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
-        name: { label: "Name", type: "text" },
         verificationToken: { label: "Verification Token", type: "text" },
       },
       async authorize(credentials) {
         // Email-verification magic link login
         if (credentials?.verificationToken) {
           try {
-            const { email, name } = await verifyVerificationToken(credentials.verificationToken as string);
-            return { id: email, email, name };
+            const { email } = await verifyVerificationToken(credentials.verificationToken as string);
+            const user = await markEmailVerified(email);
+            if (!user) return null;
+            return { id: user.id, email: user.email, name: user.name };
           } catch {
             return null;
           }
         }
 
-        // Normal password login
-        const email = credentials?.email as string;
-        const password = credentials?.password as string;
-        const name = credentials?.name as string;
+        // Password login — verified against the bcrypt hash in the database,
+        // with account lockout after repeated failed attempts.
+        const email = credentials?.email as string | undefined;
+        const password = credentials?.password as string | undefined;
+        if (!email || !password) return null;
 
-        if (!email || !password || password.length < 6) return null;
-
-        return {
-          id: email,
-          email,
-          name: name || email.split("@")[0],
-        };
+        const result = await verifyPassword(email, password);
+        if ("error" in result) return null;
+        return { id: result.user.id, email: result.user.email, name: result.user.name };
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 },
   pages: {
     signIn: "/login",
   },
