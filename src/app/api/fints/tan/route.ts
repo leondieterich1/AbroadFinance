@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { sessions, fetchStatements } from "../connect/route";
 import type { AccountResult } from "../connect/route";
+import { requireSession, requireSameOrigin } from "@/lib/api-guards";
 
 export async function POST(request: Request) {
+  const originError = requireSameOrigin(request);
+  if (originError) return originError;
+  const { error: authError } = await requireSession();
+  if (authError) return authError;
+
   let body: { sessionId?: string; tan?: string };
   try {
     body = await request.json();

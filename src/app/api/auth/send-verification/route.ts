@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createVerificationToken } from "@/lib/verification";
 import { beginSignup } from "@/lib/users";
+import { requireSameOrigin } from "@/lib/api-guards";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: NextRequest) {
+  const originError = requireSameOrigin(req);
+  if (originError) return originError;
+
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ error: "E-Mail-Versand nicht konfiguriert." }, { status: 503 });
   }

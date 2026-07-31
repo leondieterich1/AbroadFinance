@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { FinTSClient, FinTSConfig } from "lib-fints";
 import { lookupBlz, candidateUrls } from "@/lib/blz-database";
+import { requireSession, requireSameOrigin } from "@/lib/api-guards";
 
 const PRODUCT_ID = "00000000000000000000";
 const PRODUCT_VERSION = "1.0";
@@ -29,6 +30,11 @@ async function probeUrl(url: string, blz: string): Promise<boolean> {
 }
 
 export async function POST(request: Request) {
+  const originError = requireSameOrigin(request);
+  if (originError) return originError;
+  const { error: authError } = await requireSession();
+  if (authError) return authError;
+
   let body: { blz?: string; iban?: string };
   try {
     body = await request.json();

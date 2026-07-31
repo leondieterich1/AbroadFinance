@@ -7,6 +7,7 @@ import {
   isConfigured,
   type GCTransaction,
 } from "@/lib/gocardless";
+import { requireSession, requireSameOrigin } from "@/lib/api-guards";
 
 function pickBalance(balances: { balanceAmount: { amount: string; currency: string }; balanceType: string }[]): number {
   // Prefer closingBooked, then interimAvailable, then first
@@ -35,6 +36,11 @@ function txDate(tx: GCTransaction): string {
 }
 
 export async function POST(request: Request) {
+  const originError = requireSameOrigin(request);
+  if (originError) return originError;
+  const { error: authError } = await requireSession();
+  if (authError) return authError;
+
   if (!isConfigured()) {
     return NextResponse.json({ error: "not_configured" }, { status: 503 });
   }

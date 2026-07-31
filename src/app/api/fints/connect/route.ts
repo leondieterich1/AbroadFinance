@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { FinTSClient, FinTSConfig } from "lib-fints";
 import type { Statement, Transaction } from "lib-fints";
+import { requireSession, requireSameOrigin } from "@/lib/api-guards";
 
 // Product ID — register at https://www.fints.org/de/hersteller/produktregistrierung
 // Using a dev placeholder; replace with a registered ID for production use
@@ -76,6 +77,11 @@ export async function fetchStatements(
 }
 
 export async function POST(request: Request) {
+  const originError = requireSameOrigin(request);
+  if (originError) return originError;
+  const { error: authError } = await requireSession();
+  if (authError) return authError;
+
   let body: { bankUrl?: string; blz?: string; username?: string; pin?: string };
   try {
     body = await request.json();
