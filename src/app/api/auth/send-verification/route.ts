@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "E-Mail-Versand nicht konfiguriert." }, { status: 503 });
   }
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const { email, name, password } = await req.json();
+  const { email, name, password, birthDate } = await req.json();
 
   if (!email || typeof email !== "string" || !EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "Ungültige E-Mail-Adresse." }, { status: 400 });
@@ -22,9 +22,12 @@ export async function POST(req: NextRequest) {
   if (!password || typeof password !== "string" || password.length < 8) {
     return NextResponse.json({ error: "Passwort muss mindestens 8 Zeichen lang sein." }, { status: 400 });
   }
+  if (!birthDate || typeof birthDate !== "string") {
+    return NextResponse.json({ error: "Bitte gib dein Geburtsdatum an." }, { status: 400 });
+  }
 
   const signupName = typeof name === "string" && name.trim() ? name.trim() : email.split("@")[0];
-  const result = await beginSignup(email, signupName, password);
+  const result = await beginSignup(email, signupName, password, birthDate);
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 409 });
   }

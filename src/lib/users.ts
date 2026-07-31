@@ -10,6 +10,7 @@ export type DbUser = {
   failed_login_attempts: number;
   locked_until: string | null;
   last_verification_sent_at: string | null;
+  birth_date: string | null;
 };
 
 const MAX_FAILED_ATTEMPTS = 5;
@@ -26,23 +27,47 @@ export async function findUserByEmail(email: string): Promise<DbUser | null> {
   return (rows[0] as DbUser) ?? null;
 }
 
+const MIN_SIGNUP_AGE = 16;
+const MAX_SIGNUP_AGE = 120;
+
+/** Validates a "YYYY-MM-DD" birth date string: must be a real, past date and imply a plausible age. */
+export function isValidBirthDate(birthDate: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) return false;
+  const date = new Date(birthDate + "T00:00:00Z");
+  if (Number.isNaN(date.getTime())) return false;
+  if (date.toISOString().slice(0, 10) !== birthDate) return false; // rejects e.g. 2024-02-30
+
+  const now = new Date();
+  let age = now.getUTCFullYear() - date.getUTCFullYear();
+  const hasHadBirthdayThisYear =
+    now.getUTCMonth() > date.getUTCMonth() ||
+    (now.getUTCMonth() === date.getUTCMonth() && now.getUTCDate() >= date.getUTCDate());
+  if (!hasHadBirthdayThisYear) age -= 1;
+
+  return age >= MIN_SIGNUP_AGE && age <= MAX_SIGNUP_AGE;
+}
+
 /** Create or update an unverified signup. Refuses if the email already belongs to a verified account. */
 export async function beginSignup(
   email: string,
   name: string,
-  password: string
+  password: string,
+  birthDate: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const normalizedEmail = normalizeEmail(email);
   const existing = await findUserByEmail(normalizedEmail);
   if (existing?.email_verified) {
     return { ok: false, error: "Für diese E-Mail existiert bereits ein Konto. Bitte melde dich an." };
   }
+  if (!isValidBirthDate(birthDate)) {
+    return { ok: false, error: `Bitte gib ein gültiges Geburtsdatum an (Mindestalter ${MIN_SIGNUP_AGE} Jahre).` };
+  }
 
   const passwordHash = await bcrypt.hash(password, PASSWORD_HASH_ROUNDS);
   if (existing) {
-    await sql`UPDATE users SET name = ${name}, password_hash = ${passwordHash} WHERE email = ${normalizedEmail}`;
+    await sql`UPDATE users SET name = ${name}, password_hash = ${passwordHash}, birth_date = ${birthDate} WHERE email = ${normalizedEmail}`;
   } else {
-    await sql`INSERT INTO users (email, name, password_hash) VALUES (${normalizedEmail}, ${name}, ${passwordHash})`;
+    await sql`INSERT INTO users (email, name, password_hash, birth_date) VALUES (${normalizedEmail}, ${name}, ${passwordHash}, ${birthDate})`;
   }
   return { ok: true };
 }

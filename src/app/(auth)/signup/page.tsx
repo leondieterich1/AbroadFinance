@@ -3,10 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const MIN_SIGNUP_AGE = 16;
+
+function maxBirthDate(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - MIN_SIGNUP_AGE);
+  return d.toISOString().slice(0, 10);
+}
+
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -19,13 +28,21 @@ export default function SignupPage() {
       setError("Passwort muss mindestens 8 Zeichen lang sein.");
       return;
     }
+    if (!birthDate) {
+      setError("Bitte gib dein Geburtsdatum an.");
+      return;
+    }
+    if (birthDate > maxBirthDate()) {
+      setError(`Du musst mindestens ${MIN_SIGNUP_AGE} Jahre alt sein, um ein Konto zu erstellen.`);
+      return;
+    }
 
     setLoading(true);
 
     const res = await fetch("/api/auth/send-verification", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, password }),
+      body: JSON.stringify({ email, name, password, birthDate }),
     });
 
     setLoading(false);
@@ -101,6 +118,17 @@ export default function SignupPage() {
             placeholder="Mindestens 8 Zeichen"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">Geburtsdatum</label>
+          <input
+            type="date"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+            max={maxBirthDate()}
             required
             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
           />
