@@ -8,8 +8,9 @@ import { signOut } from "next-auth/react";
 const NAV: { href: string; icon: string; label: string; badge?: string }[] = [
   { href: "/dashboard", icon: "⊞", label: "Übersicht" },
   { href: "/dashboard/budget", icon: "📊", label: "Budget" },
+  { href: "/dashboard/analytics", icon: "📈", label: "Analyse", badge: "NEU" },
   { href: "/dashboard/transactions", icon: "💸", label: "Ausgaben" },
-  { href: "/dashboard/accounts", icon: "🏦", label: "Konten", badge: "NEU" },
+  { href: "/dashboard/accounts", icon: "🏦", label: "Konten" },
   { href: "/dashboard/split", icon: "🤝", label: "Splittr" },
   { href: "/dashboard/converter", icon: "💱", label: "Währungen" },
   { href: "/dashboard/goals", icon: "🎯", label: "Sparziele" },

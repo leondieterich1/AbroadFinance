@@ -162,9 +162,10 @@ export default function DashboardOverview({ userName }: { userName: string }) {
       </div>
 
       {/* Quick Links */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-6">
         {[
           { href: "/dashboard/transactions", icon: "➕", label: "Ausgabe hinzufügen" },
+          { href: "/dashboard/analytics", icon: "📈", label: "Budget-Analyse" },
           { href: "/dashboard/budget", icon: "⚙️", label: "Budget anpassen" },
           { href: "/dashboard/converter", icon: "💱", label: "Währung umrechnen" },
           { href: "/dashboard/settings", icon: "👤", label: "Profil bearbeiten" },
