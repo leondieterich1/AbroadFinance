@@ -9,10 +9,12 @@ export type DbUser = {
   email_verified: boolean;
   failed_login_attempts: number;
   locked_until: string | null;
+  last_verification_sent_at: string | null;
 };
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_MINUTES = 15;
+const VERIFICATION_COOLDOWN_SECONDS = 60;
 const PASSWORD_HASH_ROUNDS = 12;
 
 function normalizeEmail(email: string): string {
@@ -43,6 +45,23 @@ export async function beginSignup(
     await sql`INSERT INTO users (email, name, password_hash) VALUES (${normalizedEmail}, ${name}, ${passwordHash})`;
   }
   return { ok: true };
+}
+
+/**
+ * Enforces a cooldown between verification emails to the same address, so
+ * the signup endpoint can't be used to bomb someone's inbox. Records the
+ * send immediately (before the email actually goes out) to avoid a race
+ * where two quick requests both pass the check.
+ */
+export async function canSendVerificationEmail(email: string): Promise<boolean> {
+  const normalizedEmail = normalizeEmail(email);
+  const user = await findUserByEmail(normalizedEmail);
+  if (user?.last_verification_sent_at) {
+    const elapsedSeconds = (Date.now() - new Date(user.last_verification_sent_at).getTime()) / 1000;
+    if (elapsedSeconds < VERIFICATION_COOLDOWN_SECONDS) return false;
+  }
+  await sql`UPDATE users SET last_verification_sent_at = now() WHERE email = ${normalizedEmail}`;
+  return true;
 }
 
 export async function markEmailVerified(email: string): Promise<DbUser | null> {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createVerificationToken } from "@/lib/verification";
-import { beginSignup } from "@/lib/users";
+import { beginSignup, canSendVerificationEmail } from "@/lib/users";
 import { requireSameOrigin } from "@/lib/api-guards";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
   const result = await beginSignup(email, signupName, password);
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 409 });
+  }
+
+  if (!(await canSendVerificationEmail(email))) {
+    return NextResponse.json(
+      { error: "Bitte warte kurz, bevor du eine weitere Bestätigungsmail anforderst." },
+      { status: 429 }
+    );
   }
 
   const token = await createVerificationToken(email, signupName);
