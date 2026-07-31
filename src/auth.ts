@@ -19,7 +19,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             const { email } = await verifyVerificationToken(credentials.verificationToken as string);
             const user = await markEmailVerified(email);
             if (!user) return null;
-            return { id: user.id, email: user.email, name: user.name };
+            return { id: user.id, email: user.email, name: user.name, isAdmin: user.is_admin };
           } catch {
             return null;
           }
@@ -33,7 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const result = await verifyPassword(email, password);
         if ("error" in result) return null;
-        return { id: result.user.id, email: result.user.email, name: result.user.name };
+        return { id: result.user.id, email: result.user.email, name: result.user.name, isAdmin: result.user.is_admin };
       },
     }),
   ],
@@ -46,6 +46,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.name = user.name;
         token.email = user.email;
+        token.isAdmin = user.isAdmin ?? false;
       }
       return token;
     },
@@ -53,6 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.name = token.name as string;
         session.user.email = token.email as string;
+        session.user.isAdmin = token.isAdmin ?? false;
       }
       return session;
     },

@@ -21,11 +21,15 @@ const NAV: { href: string; icon: string; label: string; badge?: string }[] = [
   { href: "/dashboard/settings", icon: "⚙️", label: "Einstellungen" },
 ];
 
-export default function Sidebar({ user }: { user: { name: string; email: string } }) {
+export default function Sidebar({ user }: { user: { name: string; email: string; isAdmin?: boolean } }) {
   const pathname = usePathname();
   const initials = user.name
     ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : user.email[0].toUpperCase();
+
+  const nav = user.isAdmin
+    ? [...NAV, { href: "/dashboard/admin", icon: "🛡️", label: "Admin" }]
+    : NAV;
 
   return (
     <aside className="w-60 flex-shrink-0 bg-[#0d1f3c] flex flex-col min-h-screen">
@@ -39,7 +43,7 @@ export default function Sidebar({ user }: { user: { name: string; email: string 
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const active = pathname === item.href;
           return (
             <Link

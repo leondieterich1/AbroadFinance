@@ -11,7 +11,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar – nur Desktop */}
       <div className="hidden md:flex">
-        <Sidebar user={{ name: session.user?.name ?? "", email: session.user?.email ?? "" }} />
+        <Sidebar user={{ name: session.user?.name ?? "", email: session.user?.email ?? "", isAdmin: session.user?.isAdmin }} />
       </div>
 
       {/* Main content – auf Mobile extra Padding unten für die Tab-Leiste */}
