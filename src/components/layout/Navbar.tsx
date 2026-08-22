@@ -3,13 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { Wallet, Coins, Handshake, type LucideIcon } from "lucide-react";
 
-const LINKS = [
+const LINKS: { href: string; label: string; icon?: LucideIcon; badge?: string }[] = [
   { href: "/#features", label: "Features" },
   { href: "/#how", label: "Wie es funktioniert" },
-  { href: "/planner", label: "📊 Planer" },
-  { href: "/converter", label: "💱 Währungen" },
-  { href: "/split", label: "🤝 Splittr", badge: "NEU" },
+  { href: "/planner", label: "Planer", icon: Wallet },
+  { href: "/converter", label: "Währungen", icon: Coins },
+  { href: "/split", label: "Splittr", icon: Handshake, badge: "NEU" },
 ];
 
 export default function Navbar() {
@@ -28,6 +29,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-[#0d1f3c]/70">
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="hover:text-[#0d1f3c] transition-colors flex items-center gap-1.5 font-semibold text-[#0d1f3c]">
+              {l.icon && <l.icon className="w-4 h-4" />}
               {l.label}
               {l.badge && <span className="bg-[#0d1f3c] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{l.badge}</span>}
             </Link>
@@ -62,7 +64,7 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
               className="flex items-center justify-between px-3 py-3 rounded-xl text-sm font-semibold text-[#0d1f3c] hover:bg-gray-50 transition-colors"
             >
-              <span className="flex items-center gap-2">{l.label}</span>
+              <span className="flex items-center gap-2">{l.icon && <l.icon className="w-4 h-4" />} {l.label}</span>
               {l.badge && <span className="bg-[#0d1f3c] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{l.badge}</span>}
             </Link>
           ))}

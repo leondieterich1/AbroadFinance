@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { LayoutDashboard, Wallet, Receipt, Landmark, Target, ListChecks, LogOut } from "lucide-react";
 
 const TABS = [
-  { href: "/dashboard", icon: "⊞", label: "Home" },
-  { href: "/dashboard/budget", icon: "📊", label: "Budget" },
-  { href: "/dashboard/transactions", icon: "💸", label: "Ausgaben" },
-  { href: "/dashboard/accounts", icon: "🏦", label: "Konten" },
-  { href: "/dashboard/goals", icon: "🎯", label: "Ziele" },
-  { href: "/dashboard/checklist", icon: "✅", label: "Check" },
+  { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
+  { href: "/dashboard/budget", icon: Wallet, label: "Budget" },
+  { href: "/dashboard/transactions", icon: Receipt, label: "Ausgaben" },
+  { href: "/dashboard/accounts", icon: Landmark, label: "Konten" },
+  { href: "/dashboard/goals", icon: Target, label: "Ziele" },
+  { href: "/dashboard/checklist", icon: ListChecks, label: "Check" },
 ];
 
 export default function MobileNav() {
@@ -29,9 +30,7 @@ export default function MobileNav() {
                 active ? "text-[#0d1f3c]" : "text-gray-400"
               }`}
             >
-              <span className={`text-xl leading-none transition-transform ${active ? "scale-110" : ""}`}>
-                {tab.icon}
-              </span>
+              <tab.icon className={`w-5 h-5 transition-transform ${active ? "scale-110" : ""}`} />
               <span className={`text-[10px] font-semibold truncate ${active ? "text-[#0d1f3c]" : "text-gray-400"}`}>
                 {tab.label}
               </span>
@@ -43,7 +42,7 @@ export default function MobileNav() {
           onClick={() => signOut({ callbackUrl: "/" })}
           className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-400"
         >
-          <span className="text-xl leading-none">→</span>
+          <LogOut className="w-5 h-5" />
           <span className="text-[10px] font-semibold">Logout</span>
         </button>
       </div>

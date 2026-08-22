@@ -4,21 +4,26 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import {
+  LayoutDashboard, Wallet, TrendingUp, Receipt, Landmark, Handshake, Coins,
+  Target, Package, ListChecks, Globe, Newspaper, Settings, Shield, ExternalLink, LogOut,
+  type LucideIcon,
+} from "lucide-react";
 
-const NAV: { href: string; icon: string; label: string; badge?: string; external?: boolean }[] = [
-  { href: "/dashboard", icon: "⊞", label: "Übersicht" },
-  { href: "/dashboard/budget", icon: "📊", label: "Budget" },
-  { href: "/dashboard/analytics", icon: "📈", label: "Analyse", badge: "NEU" },
-  { href: "/dashboard/transactions", icon: "💸", label: "Ausgaben" },
-  { href: "/dashboard/accounts", icon: "🏦", label: "Konten" },
-  { href: "/dashboard/split", icon: "🤝", label: "Splittr" },
-  { href: "/dashboard/converter", icon: "💱", label: "Währungen" },
-  { href: "/dashboard/goals", icon: "🎯", label: "Sparziele" },
-  { href: "/dashboard/subscriptions", icon: "📦", label: "Abos" },
-  { href: "/dashboard/checklist", icon: "✅", label: "Checkliste" },
-  { href: "/dashboard/costs", icon: "🌍", label: "Lebenskosten" },
-  { href: "/dashboard/newsletter", icon: "📰", label: "Newsletter" },
-  { href: "/dashboard/settings", icon: "⚙️", label: "Einstellungen" },
+const NAV: { href: string; icon: LucideIcon; label: string; badge?: string; external?: boolean }[] = [
+  { href: "/dashboard", icon: LayoutDashboard, label: "Übersicht" },
+  { href: "/dashboard/budget", icon: Wallet, label: "Budget" },
+  { href: "/dashboard/analytics", icon: TrendingUp, label: "Analyse", badge: "NEU" },
+  { href: "/dashboard/transactions", icon: Receipt, label: "Ausgaben" },
+  { href: "/dashboard/accounts", icon: Landmark, label: "Konten" },
+  { href: "/dashboard/split", icon: Handshake, label: "Splittr" },
+  { href: "/dashboard/converter", icon: Coins, label: "Währungen" },
+  { href: "/dashboard/goals", icon: Target, label: "Sparziele" },
+  { href: "/dashboard/subscriptions", icon: Package, label: "Abos" },
+  { href: "/dashboard/checklist", icon: ListChecks, label: "Checkliste" },
+  { href: "/dashboard/costs", icon: Globe, label: "Lebenskosten" },
+  { href: "/dashboard/newsletter", icon: Newspaper, label: "Newsletter" },
+  { href: "/dashboard/settings", icon: Settings, label: "Einstellungen" },
 ];
 
 export default function Sidebar({ user }: { user: { name: string; email: string; isAdmin?: boolean } }) {
@@ -28,7 +33,7 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
     : user.email[0].toUpperCase();
 
   const nav = user.isAdmin
-    ? [...NAV, { href: "https://abroad-finance-admin.vercel.app", icon: "🛡️", label: "Admin", external: true }]
+    ? [...NAV, { href: "https://abroad-finance-admin.vercel.app", icon: Shield, label: "Admin", external: true }]
     : NAV;
 
   return (
@@ -50,14 +55,14 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
           }`;
           const content = (
             <>
-              <span className="text-base w-5 text-center">{item.icon}</span>
+              <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
               {item.label}
               {item.badge && (
                 <span className="ml-auto bg-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                   {item.badge}
                 </span>
               )}
-              {item.external && <span className="ml-auto text-white/30 text-xs">↗</span>}
+              {item.external && <ExternalLink className="ml-auto w-3.5 h-3.5 text-white/30" />}
             </>
           );
           return item.external ? (
@@ -87,7 +92,7 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
           onClick={() => signOut({ callbackUrl: "/" })}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/8 transition-all"
         >
-          <span className="text-base w-5 text-center">→</span>
+          <LogOut className="w-[18px] h-[18px] flex-shrink-0" />
           Abmelden
         </button>
       </div>
