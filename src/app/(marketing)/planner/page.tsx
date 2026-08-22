@@ -6,10 +6,10 @@ import {
   formatCurrency,
   formatDate,
   CATEGORY_LABELS,
-  CATEGORY_ICONS,
   CATEGORY_COLORS,
   CURRENCIES,
 } from "@/lib/utils";
+import CategoryIcon from "@/components/ui/CategoryIcon";
 import type { ExpenseCategory } from "@/types";
 
 type Tab = "overview" | "budget" | "add";
@@ -128,7 +128,7 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
               <div key={b.category} className="bg-white rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-xl">{CATEGORY_ICONS[b.category]}</span>
+                    <CategoryIcon category={b.category} className="w-5 h-5 text-[#0d1f3c]/70" />
                     <span className="font-semibold text-[#0d1f3c]">{CATEGORY_LABELS[b.category]}</span>
                     {over && (
                       <span className="text-xs bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full font-medium">Überzogen</span>
@@ -176,10 +176,10 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
               <div key={e.id} className="flex items-center justify-between px-5 py-4 hover:bg-gray-50/50 transition-colors group">
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: `${CATEGORY_COLORS[e.category]}18` }}
                   >
-                    {CATEGORY_ICONS[e.category]}
+                    <CategoryIcon category={e.category} className="w-4 h-4" style={{ color: CATEGORY_COLORS[e.category] }} />
                   </div>
                   <div>
                     <p className="font-semibold text-[#0d1f3c] text-sm">{e.title}</p>
@@ -293,7 +293,7 @@ function AddExpenseTab({
                       : "border-gray-200 text-[#0d1f3c]/60 hover:border-[#0d1f3c]/30"
                   }`}
                 >
-                  <span>{CATEGORY_ICONS[cat]}</span>
+                  <CategoryIcon category={cat} className="w-4 h-4" />
                   <span className="truncate text-xs">{CATEGORY_LABELS[cat].split(" ")[0]}</span>
                 </button>
               ))}
@@ -370,7 +370,7 @@ function BudgetTab({ planner, currency }: { planner: ReturnType<typeof usePlanne
           {CATEGORIES.map((cat) => (
             <div key={cat}>
               <label className="flex items-center gap-2 text-sm font-semibold text-[#0d1f3c] mb-1.5">
-                <span>{CATEGORY_ICONS[cat]}</span>
+                <CategoryIcon category={cat} className="w-4 h-4" />
                 <span>{CATEGORY_LABELS[cat]}</span>
               </label>
               <div className="relative">

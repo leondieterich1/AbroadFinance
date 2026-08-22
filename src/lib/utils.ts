@@ -1,3 +1,5 @@
+import { Home, UtensilsCrossed, Bus, PartyPopper, Pill, Package, type LucideIcon } from "lucide-react";
+
 export function formatCurrency(amount: number, currency: string, locale = "de-DE"): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount);
 }
@@ -19,13 +21,13 @@ export const CATEGORY_LABELS: Record<string, string> = {
   sonstiges: "Sonstiges",
 };
 
-export const CATEGORY_ICONS: Record<string, string> = {
-  miete: "🏠",
-  essen: "🍽️",
-  transport: "🚌",
-  freizeit: "🎉",
-  gesundheit: "💊",
-  sonstiges: "📦",
+export const CATEGORY_ICON_COMPONENTS: Record<string, LucideIcon> = {
+  miete: Home,
+  essen: UtensilsCrossed,
+  transport: Bus,
+  freizeit: PartyPopper,
+  gesundheit: Pill,
+  sonstiges: Package,
 };
 
 export const CATEGORY_COLORS: Record<string, string> = {

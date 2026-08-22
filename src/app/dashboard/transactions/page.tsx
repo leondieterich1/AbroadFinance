@@ -3,9 +3,11 @@
 import { useState, useMemo } from "react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { usePlanner } from "@/hooks/usePlanner";
-import { CATEGORY_LABELS, CATEGORY_ICONS, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
+import { CATEGORY_LABELS, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
 import { categorize } from "@/lib/categorize";
 import type { ExpenseCategory } from "@/types";
+import CategoryIcon from "@/components/ui/CategoryIcon";
+import { Receipt, ArrowDown, ArrowUp, Check } from "lucide-react";
 
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
 
@@ -37,7 +39,7 @@ function CategoryBar({ category, amount, total, color }: { category: ExpenseCate
   const pct = total > 0 ? Math.round((amount / total) * 100) : 0;
   return (
     <div className="flex items-center gap-3">
-      <span className="text-base w-6 text-center flex-shrink-0">{CATEGORY_ICONS[category]}</span>
+      <span className="w-6 flex justify-center flex-shrink-0"><CategoryIcon category={category} className="w-4 h-4" style={{ color }} /></span>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-center mb-1">
           <span className="text-xs font-semibold text-[#0d1f3c]">{CATEGORY_LABELS[category]}</span>
@@ -233,7 +235,7 @@ export default function TransactionsPage() {
                     {CATEGORIES.map((cat) => (
                       <button key={cat} type="button" onClick={() => { setFormCategory(cat); setFormAutocat(false); }}
                         className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${formCategory === cat ? "border-[#0d1f3c] bg-[#0d1f3c] text-white" : "border-gray-200 text-[#0d1f3c]/60 hover:border-[#0d1f3c]/30"}`}>
-                        {CATEGORY_ICONS[cat]} {CATEGORY_LABELS[cat].split(" ")[0]}
+                        <CategoryIcon category={cat} className="w-3.5 h-3.5" /> {CATEGORY_LABELS[cat].split(" ")[0]}
                         {formCategory === cat && formAutocat && <span className="text-[9px] bg-white/20 px-1 rounded">AUTO</span>}
                       </button>
                     ))}
@@ -242,7 +244,7 @@ export default function TransactionsPage() {
                     className="border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-[#0d1f3c] focus:outline-none ml-auto" />
                   <button type="submit"
                     className={`px-5 py-1.5 rounded-xl text-sm font-bold transition-all ${formSuccess ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}>
-                    {formSuccess ? "✓ Gespeichert" : "Speichern"}
+                    {formSuccess ? <span className="inline-flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Gespeichert</span> : "Speichern"}
                   </button>
                 </div>
               </form>
@@ -261,22 +263,24 @@ export default function TransactionsPage() {
                 if (cat !== "alle" && count === 0) return null;
                 return (
                   <button key={cat} onClick={() => setFilterCategory(cat as typeof filterCategory)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${filterCategory === cat ? "bg-[#0d1f3c] text-white" : "bg-white text-[#0d1f3c]/50 hover:text-[#0d1f3c] border border-gray-100"}`}>
-                    {cat === "alle" ? `Alle (${allTx.length})` : `${CATEGORY_ICONS[cat]} ${CATEGORY_LABELS[cat].split(" ")[0]} (${count})`}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${filterCategory === cat ? "bg-[#0d1f3c] text-white" : "bg-white text-[#0d1f3c]/50 hover:text-[#0d1f3c] border border-gray-100"}`}>
+                    {cat !== "alle" && <CategoryIcon category={cat} className="w-3.5 h-3.5" />}
+                    {cat === "alle" ? `Alle (${allTx.length})` : `${CATEGORY_LABELS[cat].split(" ")[0]} (${count})`}
                   </button>
                 );
               })}
             </div>
             <button onClick={() => setSortDesc((v) => !v)}
-              className="text-xs border border-gray-100 bg-white px-3 py-1.5 rounded-full text-[#0d1f3c]/50 hover:text-[#0d1f3c] transition-colors font-semibold">
-              {sortDesc ? "↓ Neueste" : "↑ Älteste"}
+              className="flex items-center gap-1 text-xs border border-gray-100 bg-white px-3 py-1.5 rounded-full text-[#0d1f3c]/50 hover:text-[#0d1f3c] transition-colors font-semibold">
+              {sortDesc ? <ArrowDown className="w-3.5 h-3.5" /> : <ArrowUp className="w-3.5 h-3.5" />}
+              {sortDesc ? "Neueste" : "Älteste"}
             </button>
           </div>
 
           {/* Transaction list */}
           {allTx.length === 0 ? (
             <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-16 text-center">
-              <p className="text-4xl mb-4">💸</p>
+              <Receipt className="w-9 h-9 mx-auto mb-4 text-[#0d1f3c]/20" />
               <p className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Ausgaben</p>
               <p className="text-[#0d1f3c]/40 text-sm">Verbinde dein Bankkonto oder erfasse Ausgaben manuell.</p>
             </div>
@@ -296,9 +300,9 @@ export default function TransactionsPage() {
                   <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50 overflow-hidden">
                     {txns.map((tx) => (
                       <div key={tx.id} className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50/60 transition-colors group">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                           style={{ background: `${CATEGORY_COLORS[tx.category]}18` }}>
-                          {CATEGORY_ICONS[tx.category]}
+                          <CategoryIcon category={tx.category} className="w-5 h-5" style={{ color: CATEGORY_COLORS[tx.category] }} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-[#0d1f3c] truncate">{tx.description}</p>

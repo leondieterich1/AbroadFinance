@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePlanner } from "@/hooks/usePlanner";
-import { formatCurrency, CATEGORY_LABELS, CATEGORY_ICONS, CATEGORY_COLORS } from "@/lib/utils";
+import { formatCurrency, CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/utils";
+import CategoryIcon from "@/components/ui/CategoryIcon";
 import BudgetRing from "@/components/ui/BudgetRing";
 import DotPattern from "@/components/ui/DotPattern";
 
@@ -99,7 +100,7 @@ export default function DashboardOverview({ userName }: { userName: string }) {
                   <div key={cat.category}>
                     <div className="flex justify-between items-center mb-1.5">
                       <span className="text-sm font-medium text-[#0d1f3c] flex items-center gap-1.5">
-                        {CATEGORY_ICONS[cat.category]} {CATEGORY_LABELS[cat.category]}
+                        <CategoryIcon category={cat.category} className="w-4 h-4" /> {CATEGORY_LABELS[cat.category]}
                       </span>
                       <span className="text-xs text-[#0d1f3c]/50">
                         {formatCurrency(cat.spent, currency)} / {formatCurrency(cat.limit, currency)}
@@ -143,10 +144,10 @@ export default function DashboardOverview({ userName }: { userName: string }) {
                 <div key={e.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: `${CATEGORY_COLORS[e.category]}15` }}
                     >
-                      {CATEGORY_ICONS[e.category]}
+                      <CategoryIcon category={e.category} className="w-4 h-4" style={{ color: CATEGORY_COLORS[e.category] }} />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-[#0d1f3c] leading-tight">{e.title}</p>

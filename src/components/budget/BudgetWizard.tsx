@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { formatCurrency, CATEGORY_LABELS, CATEGORY_ICONS, CURRENCIES } from "@/lib/utils";
+import { formatCurrency, CATEGORY_LABELS, CURRENCIES } from "@/lib/utils";
+import CategoryIcon from "@/components/ui/CategoryIcon";
 import type { ExpenseCategory } from "@/types";
 import type { usePlanner } from "@/hooks/usePlanner";
+import { Wallet, Compass, MessageCircle, Scale, Sprout, PartyPopper, Shield, Frown, Smile, Laugh, ArrowRight, ArrowLeft, Check, Lightbulb, type LucideIcon } from "lucide-react";
 
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
 
@@ -19,17 +21,17 @@ const BENCHMARK: Record<ExpenseCategory, number> = {
 
 type Priority = "ausgewogen" | "sparen" | "geniessen" | "sicherheit";
 
-const PRIORITIES: { id: Priority; label: string; icon: string; desc: string; adjust: Partial<Record<ExpenseCategory, number>> }[] = [
-  { id: "ausgewogen", label: "Ausgewogen", icon: "⚖️", desc: "Ein bisschen von allem", adjust: {} },
-  { id: "sparen", label: "Mehr sparen", icon: "🌱", desc: "Rücklagen aufbauen", adjust: { freizeit: -5, sonstiges: 5 } },
-  { id: "geniessen", label: "Leben genießen", icon: "🎉", desc: "Freizeit hat Priorität", adjust: { freizeit: 5, sonstiges: -5 } },
-  { id: "sicherheit", label: "Sicherheit", icon: "🛡️", desc: "Puffer für Unerwartetes", adjust: { freizeit: -5, gesundheit: 2, sonstiges: 3 } },
+const PRIORITIES: { id: Priority; label: string; icon: LucideIcon; desc: string; adjust: Partial<Record<ExpenseCategory, number>> }[] = [
+  { id: "ausgewogen", label: "Ausgewogen", icon: Scale, desc: "Ein bisschen von allem", adjust: {} },
+  { id: "sparen", label: "Mehr sparen", icon: Sprout, desc: "Rücklagen aufbauen", adjust: { freizeit: -5, sonstiges: 5 } },
+  { id: "geniessen", label: "Leben genießen", icon: PartyPopper, desc: "Freizeit hat Priorität", adjust: { freizeit: 5, sonstiges: -5 } },
+  { id: "sicherheit", label: "Sicherheit", icon: Shield, desc: "Puffer für Unerwartetes", adjust: { freizeit: -5, gesundheit: 2, sonstiges: 3 } },
 ];
 
 const REFLECTIONS = [
-  { id: "eng", label: "Fühlt sich eng an", icon: "😬", note: "Vielleicht lohnt sich ein zweiter Blick auf die größten Posten – oder das Ziel etwas lockerer angehen." },
-  { id: "passt", label: "Passt gut", icon: "🙂", note: "Guter Rahmen. Schau in ein paar Wochen nochmal rein, ob die Realität mit dem Plan übereinstimmt." },
-  { id: "luft", label: "Viel Luft", icon: "😌", note: "Du hast Spielraum – vielleicht ein gutes Zeichen, mehr davon Richtung Sparen oder Ziele zu verschieben." },
+  { id: "eng", label: "Fühlt sich eng an", icon: Frown, note: "Vielleicht lohnt sich ein zweiter Blick auf die größten Posten – oder das Ziel etwas lockerer angehen." },
+  { id: "passt", label: "Passt gut", icon: Smile, note: "Guter Rahmen. Schau in ein paar Wochen nochmal rein, ob die Realität mit dem Plan übereinstimmt." },
+  { id: "luft", label: "Viel Luft", icon: Laugh, note: "Du hast Spielraum – vielleicht ein gutes Zeichen, mehr davon Richtung Sparen oder Ziele zu verschieben." },
 ] as const;
 
 type Step = "income" | "priority" | "allocate" | "reflect";
@@ -94,7 +96,7 @@ export default function BudgetWizard({
           {/* Step 1: Income */}
           {step === "income" && (
             <div>
-              <p className="text-4xl mb-4">💶</p>
+              <Wallet className="w-9 h-9 text-[#0d1f3c] mb-4" />
               <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Wie viel Geld hast du monatlich?</h2>
               <p className="text-[#0d1f3c]/50 text-sm mb-6">
                 Dein Netto-Budget – nach Steuern, inkl. BAföG/Stipendium/Nebenjob. Das ist die Basis für alles Weitere.
@@ -127,7 +129,7 @@ export default function BudgetWizard({
                   onClick={() => setStep("priority")}
                   className="bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  Weiter →
+                  <span className="inline-flex items-center gap-1.5">Weiter <ArrowRight className="w-4 h-4" /></span>
                 </button>
               </div>
             </div>
@@ -136,7 +138,7 @@ export default function BudgetWizard({
           {/* Step 2: Priority */}
           {step === "priority" && (
             <div>
-              <p className="text-4xl mb-4">🧭</p>
+              <Compass className="w-9 h-9 text-[#0d1f3c] mb-4" />
               <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Was ist dir gerade am wichtigsten?</h2>
               <p className="text-[#0d1f3c]/50 text-sm mb-6">
                 Es gibt kein falsches Ziel – das hilft nur, einen sinnvollen Startpunkt für deine Verteilung zu finden.
@@ -150,7 +152,7 @@ export default function BudgetWizard({
                       priority === p.id ? "border-[#0d1f3c] bg-[#0d1f3c]/5" : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
-                    <div className="text-2xl mb-2">{p.icon}</div>
+                    <div className="mb-2"><p.icon className="w-6 h-6 text-[#0d1f3c]" /></div>
                     <p className="font-bold text-sm text-[#0d1f3c]">{p.label}</p>
                     <p className="text-xs text-[#0d1f3c]/40">{p.desc}</p>
                   </button>
@@ -158,13 +160,13 @@ export default function BudgetWizard({
               </div>
               <div className="flex justify-between">
                 <button onClick={() => setStep("income")} className="text-sm font-semibold text-[#0d1f3c]/40 hover:text-[#0d1f3c] px-4 py-2">
-                  ← Zurück
+                  <span className="inline-flex items-center gap-1.5"><ArrowLeft className="w-4 h-4" /> Zurück</span>
                 </button>
                 <button
                   onClick={startAllocation}
                   className="bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors"
                 >
-                  Weiter →
+                  <span className="inline-flex items-center gap-1.5">Weiter <ArrowRight className="w-4 h-4" /></span>
                 </button>
               </div>
             </div>
@@ -193,7 +195,7 @@ export default function BudgetWizard({
                     <div key={cat}>
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-sm font-semibold text-[#0d1f3c] flex items-center gap-1.5">
-                          {CATEGORY_ICONS[cat]} {CATEGORY_LABELS[cat]}
+                          <CategoryIcon category={cat} className="w-4 h-4" /> {CATEGORY_LABELS[cat]}
                         </span>
                         <span className="text-sm font-bold text-[#0d1f3c]">
                           {pct}% · {formatCurrency((incomeNum * pct) / 100, cur)}
@@ -216,8 +218,9 @@ export default function BudgetWizard({
                         />
                       </div>
                       {deviates && (
-                        <p className="text-[11px] text-amber-600 mt-1">
-                          🤔 {pct > benchmark ? "Deutlich mehr" : "Deutlich weniger"} als der Richtwert ({benchmark}%) — passt das zu dir, oder lohnt sich ein zweiter Blick?
+                        <p className="text-[11px] text-amber-600 mt-1 flex items-start gap-1">
+                          <Lightbulb className="w-3.5 h-3.5 flex-shrink-0 mt-px" />
+                          <span>{pct > benchmark ? "Deutlich mehr" : "Deutlich weniger"} als der Richtwert ({benchmark}%) — passt das zu dir, oder lohnt sich ein zweiter Blick?</span>
                         </p>
                       )}
                     </div>
@@ -227,13 +230,13 @@ export default function BudgetWizard({
 
               <div className="flex justify-between">
                 <button onClick={() => setStep("priority")} className="text-sm font-semibold text-[#0d1f3c]/40 hover:text-[#0d1f3c] px-4 py-2">
-                  ← Zurück
+                  <span className="inline-flex items-center gap-1.5"><ArrowLeft className="w-4 h-4" /> Zurück</span>
                 </button>
                 <button
                   onClick={() => setStep("reflect")}
                   className="bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors"
                 >
-                  Weiter →
+                  <span className="inline-flex items-center gap-1.5">Weiter <ArrowRight className="w-4 h-4" /></span>
                 </button>
               </div>
             </div>
@@ -242,7 +245,7 @@ export default function BudgetWizard({
           {/* Step 4: Reflect + save */}
           {step === "reflect" && (
             <div>
-              <p className="text-4xl mb-4">💭</p>
+              <MessageCircle className="w-9 h-9 text-[#0d1f3c] mb-4" />
               <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Wie fühlt sich dieses Budget an?</h2>
               <p className="text-[#0d1f3c]/50 text-sm mb-6">Kurz und ehrlich – das hilft dir mehr als jede Formel.</p>
 
@@ -255,7 +258,7 @@ export default function BudgetWizard({
                       reflection === r.id ? "border-[#0d1f3c] bg-[#0d1f3c]/5" : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
-                    <span className="text-2xl">{r.icon}</span>
+                    <r.icon className="w-6 h-6 text-[#0d1f3c]" />
                     <span className="font-semibold text-sm text-[#0d1f3c]">{r.label}</span>
                   </button>
                 ))}
@@ -269,13 +272,13 @@ export default function BudgetWizard({
 
               <div className="flex justify-between">
                 <button onClick={() => setStep("allocate")} className="text-sm font-semibold text-[#0d1f3c]/40 hover:text-[#0d1f3c] px-4 py-2">
-                  ← Zurück
+                  <span className="inline-flex items-center gap-1.5"><ArrowLeft className="w-4 h-4" /> Zurück</span>
                 </button>
                 <button
                   onClick={handleFinish}
                   className="bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors"
                 >
-                  Budget übernehmen ✓
+                  <span className="inline-flex items-center gap-1.5">Budget übernehmen <Check className="w-4 h-4" /></span>
                 </button>
               </div>
             </div>

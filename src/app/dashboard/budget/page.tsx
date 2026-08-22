@@ -1,10 +1,11 @@
 "use client";
 
 import { usePlanner } from "@/hooks/usePlanner";
-import { formatCurrency, CATEGORY_LABELS, CATEGORY_ICONS, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
+import { formatCurrency, CATEGORY_LABELS, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
 import { useState } from "react";
 import type { ExpenseCategory } from "@/types";
 import BudgetWizard from "@/components/budget/BudgetWizard";
+import CategoryIcon from "@/components/ui/CategoryIcon";
 
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
 
@@ -65,7 +66,7 @@ export default function BudgetPage() {
               <div key={b.category}>
                 <div className="flex justify-between mb-1.5">
                   <span className="text-sm font-semibold text-[#0d1f3c] flex items-center gap-1.5">
-                    {CATEGORY_ICONS[b.category]} {CATEGORY_LABELS[b.category]}
+                    <CategoryIcon category={b.category} className="w-4 h-4" /> {CATEGORY_LABELS[b.category]}
                     {over && <span className="text-xs bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full ml-1">Überzogen</span>}
                   </span>
                   <span className="text-xs text-[#0d1f3c]/50">
@@ -103,7 +104,7 @@ export default function BudgetPage() {
           {CATEGORIES.map((cat) => (
             <div key={cat}>
               <label className="flex items-center gap-2 text-sm font-semibold text-[#0d1f3c] mb-1.5">
-                {CATEGORY_ICONS[cat]} {CATEGORY_LABELS[cat]}
+                <CategoryIcon category={cat} className="w-4 h-4" /> {CATEGORY_LABELS[cat]}
               </label>
               <div className="relative">
                 <input

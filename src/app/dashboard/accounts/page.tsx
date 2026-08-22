@@ -3,9 +3,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAccounts } from "@/hooks/useAccounts";
 import { parseCSV, categorize } from "@/lib/categorize";
-import { CATEGORY_LABELS, CATEGORY_ICONS } from "@/lib/utils";
+import { CATEGORY_LABELS } from "@/lib/utils";
 import { ibanToBlz } from "@/lib/blz-database";
 import type { ExpenseCategory } from "@/types";
+import CategoryIcon from "@/components/ui/CategoryIcon";
+import { Landmark, ArrowRight, Check, X, Upload, Lightbulb, Lock, KeyRound } from "lucide-react";
 
 const DEMO_TX = [
   { date: "2026-07-04", description: "REWE Sagt. Danke",      amount: -32.40 },
@@ -258,17 +260,17 @@ export default function AccountsPage() {
             <p className="text-3xl font-extrabold">{fmt(totalBalance)}</p>
             <p className="text-white/40 text-xs mt-1">{acc.accounts.length} Konto{acc.accounts.length !== 1 ? "en" : ""} verknüpft</p>
           </div>
-          <div className="text-5xl opacity-20">🏦</div>
+          <Landmark className="w-12 h-12 opacity-20" />
         </div>
       )}
 
       {/* Account cards */}
       {acc.accounts.length === 0 ? (
         <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center mb-6">
-          <div className="text-5xl mb-4">🏦</div>
+          <Landmark className="w-12 h-12 mb-4 mx-auto text-[#0d1f3c]/30" />
           <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch kein Konto verknüpft</h3>
           <p className="text-[#0d1f3c]/40 text-sm mb-6 max-w-sm mx-auto">Gib einfach deine IBAN ein — wir erkennen deine Bank automatisch und stellen die Verbindung her.</p>
-          <button onClick={openConnect} className="bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">Bank verbinden →</button>
+          <button onClick={openConnect} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">Bank verbinden <ArrowRight className="w-4 h-4" /></button>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4 mb-6">
@@ -310,8 +312,8 @@ export default function AccountsPage() {
                         + Ausgabe
                       </button>
                     )}
-                    <button onClick={() => { setActiveAccountId(account.id); setModal("transactions"); }} className="text-xs bg-white/20 hover:bg-white/30 transition-colors px-3 py-1.5 rounded-lg font-semibold">
-                      Verlauf →
+                    <button onClick={() => { setActiveAccountId(account.id); setModal("transactions"); }} className="flex items-center gap-1 text-xs bg-white/20 hover:bg-white/30 transition-colors px-3 py-1.5 rounded-lg font-semibold">
+                      Verlauf <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -338,7 +340,7 @@ export default function AccountsPage() {
                   {icon}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-[#0d1f3c]">{isApple ? "Apple Pay" : "Google Pay"}</p>
-                    <p className="text-xs text-emerald-500 font-semibold">✓ Verbunden</p>
+                    <p className="text-xs text-emerald-500 font-semibold flex items-center gap-1"><Check className="w-3 h-3" /> Verbunden</p>
                   </div>
                   <button onClick={() => openQuickLog(walletAccount.id)} className="text-xs bg-[#0d1f3c] text-white px-3 py-1.5 rounded-lg font-bold hover:bg-[#162d54] transition-colors flex-shrink-0">
                     + Ausgabe
@@ -359,7 +361,7 @@ export default function AccountsPage() {
           <div className="divide-y divide-gray-50">
             {acc.transactions.slice(0, 8).map((txn) => (
               <div key={txn.id} className="flex items-center gap-3 px-5 py-3.5">
-                <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-base flex-shrink-0">{CATEGORY_ICONS[txn.category]}</div>
+                <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0"><CategoryIcon category={txn.category} className="w-4 h-4" /></div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-[#0d1f3c] truncate">{txn.description}</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
@@ -381,7 +383,7 @@ export default function AccountsPage() {
         <div className="mt-4">
           <button onClick={() => { setModal("csv"); setCsvPreview([]); setCsvDone(false); setActiveAccountId(acc.accounts[0]?.id ?? null); }}
             className="w-full border border-dashed border-gray-200 rounded-2xl py-4 text-sm font-semibold text-[#0d1f3c]/40 hover:border-[#0d1f3c]/30 hover:text-[#0d1f3c]/60 transition-colors flex items-center justify-center gap-2">
-            📂 Kontoauszug als CSV importieren
+            <Upload className="w-4 h-4" /> Kontoauszug als CSV importieren
           </button>
         </div>
       )}
@@ -415,15 +417,16 @@ export default function AccountsPage() {
                       onKeyDown={(e) => { if (e.key === "Enter" && ibanValid) handleIbanSubmit(); }}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-lg font-mono tracking-wide text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
                     />
-                    {ibanValid && <p className="text-xs text-emerald-500 font-semibold mt-1.5">✓ Gültige IBAN</p>}
+                    {ibanValid && <p className="text-xs text-emerald-500 font-semibold mt-1.5 flex items-center gap-1"><Check className="w-3 h-3" /> Gültige IBAN</p>}
                     {connectError && <p className="text-xs text-rose-500 mt-1.5">{connectError}</p>}
                   </div>
-                  <div className="bg-gray-50 rounded-xl p-3">
-                    <p className="text-xs text-[#0d1f3c]/50">💡 Deine IBAN findest du auf deiner Bankkarte oder im Online-Banking unter Kontodetails.</p>
+                  <div className="bg-gray-50 rounded-xl p-3 flex items-start gap-2">
+                    <Lightbulb className="w-4 h-4 flex-shrink-0 text-[#0d1f3c]/40 mt-px" />
+                    <p className="text-xs text-[#0d1f3c]/50">Deine IBAN findest du auf deiner Bankkarte oder im Online-Banking unter Kontodetails.</p>
                   </div>
                   <button onClick={handleIbanSubmit} disabled={!ibanValid}
-                    className="w-full bg-[#0d1f3c] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                    Bank automatisch erkennen →
+                    className="w-full flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                    Bank automatisch erkennen <ArrowRight className="w-4 h-4" />
                   </button>
                   <button onClick={handleDemoImport} className="w-full text-xs text-[#0d1f3c]/30 hover:text-[#0d1f3c]/50 transition-colors py-1">
                     Demo-Daten laden
@@ -479,13 +482,15 @@ export default function AccountsPage() {
                       onKeyDown={(e) => { if (e.key === "Enter") handleConnect(); }}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
                   </div>
-                  <p className="text-[10px] text-[#0d1f3c]/30 text-center">🔒 Zugangsdaten werden nur für diese Verbindung verwendet und niemals gespeichert.</p>
+                  <p className="text-[10px] text-[#0d1f3c]/30 text-center flex items-center justify-center gap-1">
+                    <Lock className="w-3 h-3 flex-shrink-0" /> Zugangsdaten werden nur für diese Verbindung verwendet und niemals gespeichert.
+                  </p>
                 </div>
                 <div className="p-5 border-t border-gray-100 flex gap-3">
                   <button onClick={handleDemoImport} className="text-xs border border-gray-200 px-4 py-3 rounded-xl font-semibold text-[#0d1f3c]/40 hover:bg-gray-50 transition-colors">Demo</button>
                   <button onClick={handleConnect} disabled={!username.trim() || !pin.trim() || (notFound && !manualUrl.trim())}
-                    className="flex-1 bg-[#0d1f3c] text-white rounded-xl py-3 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                    Verbinden →
+                    className="flex-1 flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                    Verbinden <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -506,7 +511,7 @@ export default function AccountsPage() {
             {step === "tan" && (
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-xl">🔐</div>
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center"><KeyRound className="w-5 h-5 text-amber-600" /></div>
                   <div><h2 className="font-extrabold text-[#0d1f3c]">TAN erforderlich</h2><p className="text-xs text-[#0d1f3c]/40">{discoveredBank?.name}</p></div>
                 </div>
                 <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
@@ -516,8 +521,8 @@ export default function AccountsPage() {
                   onChange={(e) => setTan(e.target.value.replace(/\D/g, ""))}
                   onKeyDown={(e) => { if (e.key === "Enter") handleTan(); }}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-xl text-center tracking-widest font-mono text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
-                <button onClick={handleTan} disabled={!tan.trim()} className="w-full bg-[#0d1f3c] text-white rounded-xl py-3 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30">
-                  Bestätigen →
+                <button onClick={handleTan} disabled={!tan.trim()} className="w-full flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30">
+                  Bestätigen <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             )}
@@ -525,7 +530,7 @@ export default function AccountsPage() {
             {/* ── Done ─────────────────────────────────────────────────────── */}
             {step === "done" && (
               <div className="p-12 flex flex-col items-center gap-4">
-                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-3xl">✓</div>
+                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center"><Check className="w-8 h-8 text-emerald-600" /></div>
                 <p className="font-extrabold text-[#0d1f3c] text-xl">Verbunden!</p>
                 <p className="text-[#0d1f3c]/40 text-sm text-center">Transaktionen importiert und automatisch kategorisiert.</p>
               </div>
@@ -534,7 +539,7 @@ export default function AccountsPage() {
             {/* ── Error ────────────────────────────────────────────────────── */}
             {step === "error" && (
               <div className="p-8 flex flex-col items-center gap-4">
-                <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-3xl">✕</div>
+                <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center"><X className="w-8 h-8 text-rose-600" /></div>
                 <p className="font-extrabold text-[#0d1f3c] text-lg">Verbindung fehlgeschlagen</p>
                 <div className="w-full bg-rose-50 border border-rose-100 rounded-xl p-3">
                   <p className="text-rose-600 text-sm">{connectError}</p>
@@ -566,7 +571,7 @@ export default function AccountsPage() {
                 </select>
               </div>
               <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-[#0d1f3c]/30 transition-colors mb-4">
-                <p className="text-3xl mb-3">📂</p>
+                <Upload className="w-8 h-8 mb-3 mx-auto text-[#0d1f3c]/30" />
                 <p className="font-bold text-[#0d1f3c] mb-1">CSV-Datei hier ablegen</p>
                 <p className="text-xs text-[#0d1f3c]/40">Sparkasse · DKB · ING · Commerzbank · Deutsche Bank</p>
                 <input ref={fileRef} type="file" accept=".csv,.txt" onChange={handleFileChange} className="hidden" />
@@ -581,7 +586,7 @@ export default function AccountsPage() {
                   <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
                     {csvPreview.map((row, i) => (
                       <div key={i} className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
-                        <span className="text-base flex-shrink-0">{CATEGORY_ICONS[row.category]}</span>
+                        <span className="flex-shrink-0"><CategoryIcon category={row.category} className="w-4 h-4" /></span>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold text-[#0d1f3c] truncate">{row.description}</p>
                           <select value={row.category} onChange={(e) => { const n = [...csvPreview]; n[i] = { ...n[i], category: e.target.value as ExpenseCategory, auto: false }; setCsvPreview(n); }} className="text-[10px] text-[#0d1f3c]/60 bg-transparent border-none outline-none cursor-pointer">
@@ -597,8 +602,8 @@ export default function AccountsPage() {
             </div>
             {csvPreview.length > 0 && (
               <div className="p-5 border-t border-gray-100 flex-shrink-0">
-                <button onClick={handleCsvImport} className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all ${csvDone ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}>
-                  {csvDone ? "✓ Importiert!" : `${csvPreview.length} Transaktionen importieren`}
+                <button onClick={handleCsvImport} className={`w-full flex items-center justify-center gap-1.5 py-3.5 rounded-xl font-bold text-sm transition-all ${csvDone ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}>
+                  {csvDone ? <><Check className="w-4 h-4" /> Importiert!</> : `${csvPreview.length} Transaktionen importieren`}
                 </button>
               </div>
             )}
@@ -625,7 +630,7 @@ export default function AccountsPage() {
                   ? <div className="p-10 text-center text-[#0d1f3c]/30 text-sm">Keine Transaktionen</div>
                   : txns.map((txn) => (
                     <div key={txn.id} className="flex items-center gap-3 px-5 py-3.5 group">
-                      <span className="text-xl flex-shrink-0">{CATEGORY_ICONS[txn.category]}</span>
+                      <span className="flex-shrink-0"><CategoryIcon category={txn.category} className="w-5 h-5" /></span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-[#0d1f3c] truncate">{txn.description}</p>
                         <div className="flex items-center gap-1.5">
@@ -670,7 +675,7 @@ export default function AccountsPage() {
 
               {quickDone ? (
                 <div className="p-12 flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-2xl">✓</div>
+                  <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center"><Check className="w-7 h-7 text-emerald-600" /></div>
                   <p className="font-extrabold text-[#0d1f3c]">Ausgabe gespeichert!</p>
                 </div>
               ) : (
@@ -711,7 +716,7 @@ export default function AccountsPage() {
                     <div className="flex-1">
                       <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Kategorie</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base">{CATEGORY_ICONS[quickCategory]}</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2"><CategoryIcon category={quickCategory} className="w-4 h-4" /></span>
                         <select value={quickCategory} onChange={(e) => { setQuickCategory(e.target.value as ExpenseCategory); setQuickAutocat(false); }}
                           className="w-full border border-gray-100 rounded-xl pl-9 pr-3 py-3 text-sm text-[#0d1f3c] bg-gray-50 focus:outline-none appearance-none cursor-pointer">
                           {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}

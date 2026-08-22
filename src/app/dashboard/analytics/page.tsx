@@ -1,7 +1,8 @@
 "use client";
 
 import { usePlanner } from "@/hooks/usePlanner";
-import { formatCurrency, CATEGORY_LABELS, CATEGORY_ICONS, CATEGORY_COLORS } from "@/lib/utils";
+import { formatCurrency, CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/utils";
+import CategoryIcon from "@/components/ui/CategoryIcon";
 import { forecastCurrentMonth, forecastByCategory, monthlyTotals, generateInsights } from "@/lib/analytics";
 import BudgetRing from "@/components/ui/BudgetRing";
 import DonutChart from "@/components/ui/DonutChart";
@@ -159,7 +160,7 @@ export default function AnalyticsPage() {
                 <div key={c.category}>
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-sm font-medium text-[#0d1f3c] flex items-center gap-1.5">
-                      {CATEGORY_ICONS[c.category]} {CATEGORY_LABELS[c.category]}
+                      <CategoryIcon category={c.category} className="w-4 h-4" /> {CATEGORY_LABELS[c.category]}
                     </span>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${STATUS_COLOR[c.status]}`}>
                       {STATUS_LABEL[c.status]}
