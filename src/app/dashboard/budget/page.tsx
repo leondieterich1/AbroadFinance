@@ -4,6 +4,7 @@ import { usePlanner } from "@/hooks/usePlanner";
 import { formatCurrency, CATEGORY_LABELS, CATEGORY_ICONS, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
 import { useState } from "react";
 import type { ExpenseCategory } from "@/types";
+import BudgetWizard from "@/components/budget/BudgetWizard";
 
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
 
@@ -15,8 +16,14 @@ export default function BudgetPage() {
     Object.fromEntries(planner.budgets.map((b) => [b.category, String(b.limit)]))
   );
   const [saved, setSaved] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const total = CATEGORIES.reduce((sum, cat) => sum + (parseFloat(values[cat]) || 0), 0);
+
+  function syncValuesFromPlanner() {
+    setValues(Object.fromEntries(planner.budgets.map((b) => [b.category, String(b.limit)])));
+    setCur(planner.budgets[0]?.currency ?? currency);
+  }
 
   function handleSave() {
     CATEGORIES.forEach((cat) => {
@@ -31,7 +38,20 @@ export default function BudgetPage() {
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
       <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-1">Budget verwalten</h1>
-      <p className="text-[#0d1f3c]/40 text-sm mb-8">Lege dein monatliches Budget pro Kategorie fest.</p>
+      <p className="text-[#0d1f3c]/40 text-sm mb-6">Lege dein monatliches Budget pro Kategorie fest.</p>
+
+      {/* Wizard CTA */}
+      <button
+        onClick={() => setWizardOpen(true)}
+        className="w-full text-left bg-[#0d1f3c] text-white rounded-2xl p-5 mb-6 flex items-center gap-4 hover:bg-[#162d54] transition-colors"
+      >
+        <span className="text-3xl">🧭</span>
+        <div className="flex-1">
+          <p className="font-extrabold">Budget-Kompass</p>
+          <p className="text-white/50 text-sm">In 4 kurzen Schritten dein Budget durchdenken statt nur eintippen.</p>
+        </div>
+        <span className="text-white/40">→</span>
+      </button>
 
       {/* Category bars */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
@@ -110,6 +130,20 @@ export default function BudgetPage() {
           {saved ? "✓ Budget gespeichert!" : "Budget speichern"}
         </button>
       </div>
+
+      {wizardOpen && (
+        <BudgetWizard
+          planner={planner}
+          currency={cur}
+          onClose={() => setWizardOpen(false)}
+          onSaved={() => {
+            setWizardOpen(false);
+            syncValuesFromPlanner();
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+          }}
+        />
+      )}
     </div>
   );
 }
