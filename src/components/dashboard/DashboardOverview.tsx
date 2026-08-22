@@ -6,6 +6,7 @@ import { formatCurrency, CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/utils";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 import BudgetRing from "@/components/ui/BudgetRing";
 import DotPattern from "@/components/ui/DotPattern";
+import { ArrowRight, Receipt, Plus, TrendingUp, Settings, Coins, User } from "lucide-react";
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -87,7 +88,7 @@ export default function DashboardOverview({ userName }: { userName: string }) {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-extrabold text-[#0d1f3c]">Top Kategorien</h2>
             <Link href="/dashboard/budget" className="text-xs text-[#0d1f3c]/40 hover:text-[#0d1f3c] transition-colors">
-              Alle →
+              <span className="inline-flex items-center gap-0.5">Alle <ArrowRight className="w-3 h-3" /></span>
             </Link>
           </div>
           {topCategories.every((c) => c.spent === 0) ? (
@@ -124,12 +125,12 @@ export default function DashboardOverview({ userName }: { userName: string }) {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-extrabold text-[#0d1f3c]">Letzte Ausgaben</h2>
             <Link href="/dashboard/transactions" className="text-xs text-[#0d1f3c]/40 hover:text-[#0d1f3c] transition-colors">
-              Alle →
+              <span className="inline-flex items-center gap-0.5">Alle <ArrowRight className="w-3 h-3" /></span>
             </Link>
           </div>
           {recentExpenses.length === 0 ? (
             <div className="text-center py-6">
-              <p className="text-2xl mb-2">💸</p>
+              <Receipt className="w-6 h-6 mx-auto mb-2 text-[#0d1f3c]/20" />
               <p className="text-[#0d1f3c]/30 text-sm">Noch keine Ausgaben.</p>
               <Link
                 href="/dashboard/transactions"
@@ -165,18 +166,18 @@ export default function DashboardOverview({ userName }: { userName: string }) {
       {/* Quick Links */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-6">
         {[
-          { href: "/dashboard/transactions", icon: "➕", label: "Ausgabe hinzufügen" },
-          { href: "/dashboard/analytics", icon: "📈", label: "Budget-Analyse" },
-          { href: "/dashboard/budget", icon: "⚙️", label: "Budget anpassen" },
-          { href: "/dashboard/converter", icon: "💱", label: "Währung umrechnen" },
-          { href: "/dashboard/settings", icon: "👤", label: "Profil bearbeiten" },
+          { href: "/dashboard/transactions", icon: Plus, label: "Ausgabe hinzufügen" },
+          { href: "/dashboard/analytics", icon: TrendingUp, label: "Budget-Analyse" },
+          { href: "/dashboard/budget", icon: Settings, label: "Budget anpassen" },
+          { href: "/dashboard/converter", icon: Coins, label: "Währung umrechnen" },
+          { href: "/dashboard/settings", icon: User, label: "Profil bearbeiten" },
         ].map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md hover:-translate-y-0.5 transition-all"
           >
-            <div className="text-2xl mb-2">{link.icon}</div>
+            <link.icon className="w-6 h-6 mx-auto mb-2 text-[#0d1f3c]" />
             <p className="text-xs font-semibold text-[#0d1f3c]">{link.label}</p>
           </Link>
         ))}
