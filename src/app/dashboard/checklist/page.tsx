@@ -1,13 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  ClipboardList, Landmark, GraduationCap, Home, FileText,
+  Lightbulb, PartyPopper, Flame, Check, ChevronUp, ChevronDown, Plus, X,
+  type LucideIcon,
+} from "lucide-react";
 
 type CheckItem = { id: string; label: string; hint?: string; link?: string; custom?: boolean };
-type Section = { title: string; icon: string; color: string; items: CheckItem[] };
+type Section = { title: string; icon: LucideIcon; color: string; items: CheckItem[] };
 
 const CHECKLIST: Section[] = [
   {
-    title: "Vor der Abreise", icon: "📋", color: "#0d1f3c",
+    title: "Vor der Abreise", icon: ClipboardList, color: "#0d1f3c",
     items: [
       { id: "passport", label: "Reisepass / Ausweis gültig (mind. 6 Monate)", hint: "Viele Länder verlangen mind. 6 Monate Restgültigkeit" },
       { id: "visa", label: "Visum beantragt (falls nötig)", link: "https://www.auswaertiges-amt.de", hint: "Auswärtiges Amt: Einreise- und Visabestimmungen nach Zielland" },
@@ -21,7 +26,7 @@ const CHECKLIST: Section[] = [
     ],
   },
   {
-    title: "Banking & Geld", icon: "🏦", color: "#4285F4",
+    title: "Banking & Geld", icon: Landmark, color: "#4285F4",
     items: [
       { id: "bank_foreign", label: "Konto mit kostenloser Auslands-VISA eröffnet", hint: "z. B. DKB oder ING", link: "https://www.test.de" },
       { id: "bank_notify", label: "Bank über Auslandsaufenthalt informiert", hint: "Verhindert Sperrung der Karte" },
@@ -33,7 +38,7 @@ const CHECKLIST: Section[] = [
     ],
   },
   {
-    title: "Studium & Arbeit", icon: "🎓", color: "#34A853",
+    title: "Studium & Arbeit", icon: GraduationCap, color: "#34A853",
     items: [
       { id: "bafög", label: "BAföG-Auslandsantrag gestellt (falls zutreffend)", link: "https://www.bafög.de", hint: "Offizielles BAföG-Portal mit Förderrechner" },
       { id: "stipendium", label: "Stipendien recherchiert (DAAD, Erasmus, etc.)", link: "https://www.daad.de", hint: "DAAD-Stipendiendatenbank" },
@@ -45,7 +50,7 @@ const CHECKLIST: Section[] = [
     ],
   },
   {
-    title: "Wohnen", icon: "🏠", color: "#FF6200",
+    title: "Wohnen", icon: Home, color: "#FF6200",
     items: [
       { id: "housing", label: "Unterkunft für die ersten Wochen gesichert" },
       { id: "deposit", label: "Mietkaution-Regeln im Zielland geprüft", link: "https://www.verbraucherzentrale.de", hint: "Verbraucherzentrale: wie viel Mietkaution zulässig ist" },
@@ -56,7 +61,7 @@ const CHECKLIST: Section[] = [
     ],
   },
   {
-    title: "Dokumente & Digitales", icon: "📄", color: "#9333ea",
+    title: "Dokumente & Digitales", icon: FileText, color: "#9333ea",
     items: [
       { id: "copies", label: "Alle wichtigen Dokumente digital gesichert (Cloud)", hint: "Pass, Versicherungen, Verträge" },
       { id: "embassy", label: "Deutsche Botschaft im Zielland notiert", link: "https://www.auswaertiges-amt.de", hint: "Auswärtiges Amt: Botschaften und Konsulate weltweit" },
@@ -161,8 +166,8 @@ export default function ChecklistPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Auslands-Checkliste</h1>
         <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{doneItems} von {totalItems} erledigt</p>
-        <p className="text-[#0d1f3c]/40 text-xs mt-2 bg-[#0d1f3c]/5 rounded-lg px-3 py-2">
-          💡 Diese Liste ist nur ein Vorschlag und erhebt keinen Anspruch auf Vollständigkeit. Ergänze unten eigene Aufgaben, die für deine Situation wichtig sind.
+        <p className="text-[#0d1f3c]/40 text-xs mt-2 bg-[#0d1f3c]/5 rounded-lg px-3 py-2 flex items-start gap-1.5">
+          <Lightbulb className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" /> Diese Liste ist nur ein Vorschlag und erhebt keinen Anspruch auf Vollständigkeit. Ergänze unten eigene Aufgaben, die für deine Situation wichtig sind.
         </p>
       </div>
 
@@ -173,12 +178,14 @@ export default function ChecklistPage() {
             <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-1">Fortschritt</p>
             <p className="text-3xl font-extrabold">{pct}%</p>
           </div>
-          <p className="text-white/20 text-5xl font-extrabold">{pct >= 100 ? "🎉" : pct >= 50 ? "💪" : "📋"}</p>
+          <div className="text-white/20">
+            {pct >= 100 ? <PartyPopper className="w-10 h-10" /> : pct >= 50 ? <Flame className="w-10 h-10" /> : <ClipboardList className="w-10 h-10" />}
+          </div>
         </div>
         <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
           <div className="h-full bg-white/70 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
         </div>
-        {pct >= 100 && <p className="text-emerald-300 text-sm font-bold mt-3">✓ Alles erledigt — viel Erfolg im Ausland!</p>}
+        {pct >= 100 && <p className="text-emerald-300 text-sm font-bold mt-3 flex items-center gap-1.5"><Check className="w-4 h-4" /> Alles erledigt — viel Erfolg im Ausland!</p>}
       </div>
 
       {/* Sections */}
@@ -192,13 +199,17 @@ export default function ChecklistPage() {
             <div key={section.title} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
               <button onClick={() => toggleSection(section.title)}
                 className="w-full flex items-center gap-3 px-5 py-4 hover:bg-gray-50/60 transition-colors">
-                <span className="text-xl">{section.icon}</span>
+                <section.icon className="w-5 h-5 text-[#0d1f3c]/70 flex-shrink-0" />
                 <div className="flex-1 text-left">
                   <p className="font-extrabold text-[#0d1f3c]">{section.title}</p>
                   <p className="text-xs text-[#0d1f3c]/40">{sectionDone}/{section.items.length} erledigt</p>
                 </div>
-                {allDone && <span className="text-xs bg-emerald-50 text-emerald-600 font-bold px-2.5 py-1 rounded-full border border-emerald-200">✓ Fertig</span>}
-                <span className="text-gray-300 text-lg">{isOpen ? "↑" : "↓"}</span>
+                {allDone && (
+                  <span className="text-xs bg-emerald-50 text-emerald-600 font-bold px-2.5 py-1 rounded-full border border-emerald-200 inline-flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Fertig
+                  </span>
+                )}
+                {isOpen ? <ChevronUp className="w-4 h-4 text-gray-300" /> : <ChevronDown className="w-4 h-4 text-gray-300" />}
               </button>
 
               {isOpen && (
@@ -212,7 +223,7 @@ export default function ChecklistPage() {
                           <div onClick={() => toggle(item.id)}
                             className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${done ? "border-transparent" : "border-gray-200 bg-white"}`}
                             style={done ? { background: section.color } : {}}>
-                            {done && <span className="text-white text-xs font-bold">✓</span>}
+                            {done && <Check className="w-3 h-3 text-white" />}
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -223,10 +234,10 @@ export default function ChecklistPage() {
                         </div>
                         <button
                           onClick={(e) => { e.preventDefault(); removeItem(section.title, item); }}
-                          className="flex-shrink-0 text-[#0d1f3c]/20 hover:text-rose-500 transition-colors text-lg leading-none"
+                          className="flex-shrink-0 text-[#0d1f3c]/20 hover:text-rose-500 transition-colors"
                           title="Löschen"
                         >
-                          ×
+                          <X className="w-4 h-4" />
                         </button>
                       </label>
                     );
@@ -244,9 +255,9 @@ export default function ChecklistPage() {
                     />
                     <button
                       onClick={() => addCustomTask(section.title)}
-                      className="flex-shrink-0 text-sm font-semibold text-white bg-[#0d1f3c] rounded-lg px-3 py-2 hover:bg-[#162d54] transition-colors"
+                      className="flex-shrink-0 inline-flex items-center gap-1 text-sm font-semibold text-white bg-[#0d1f3c] rounded-lg px-3 py-2 hover:bg-[#162d54] transition-colors"
                     >
-                      + Hinzufügen
+                      <Plus className="w-4 h-4" /> Hinzufügen
                     </button>
                   </div>
                 </div>

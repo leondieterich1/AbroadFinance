@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { CURRENCIES } from "@/lib/utils";
+import { Check } from "lucide-react";
 
 type Settings = {
   displayName: string;
@@ -141,9 +142,9 @@ export default function SettingsPage() {
 
         <button
           type="submit"
-          className={`w-full py-4 rounded-xl font-bold text-sm transition-all ${saved ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}
+          className={`w-full py-4 rounded-xl font-bold text-sm transition-all inline-flex items-center justify-center gap-1.5 ${saved ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}
         >
-          {saved ? "✓ Einstellungen gespeichert!" : "Einstellungen speichern"}
+          {saved && <Check className="w-4 h-4" />} {saved ? "Einstellungen gespeichert!" : "Einstellungen speichern"}
         </button>
       </form>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { RefreshCw, AlertTriangle, Newspaper, ArrowRight, Lightbulb, Link2 } from "lucide-react";
 
 type ExchangeRate = { code: string; rate: number; change: number };
 type Article = { title: string; summary: string; link: string; source: { name: string; url: string; hint: string } };
@@ -82,7 +83,7 @@ export default function NewsletterPage() {
         </div>
         <button onClick={() => load(true)} disabled={refreshing || loading}
           className="flex items-center gap-2 border border-gray-200 bg-white text-[#0d1f3c]/60 hover:text-[#0d1f3c] text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors disabled:opacity-40 flex-shrink-0">
-          <span className={refreshing ? "animate-spin inline-block" : ""}>↻</span>
+          <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
           {refreshing ? "Laden…" : "Aktualisieren"}
         </button>
       </div>
@@ -104,7 +105,7 @@ export default function NewsletterPage() {
       {/* Error */}
       {error && !loading && (
         <div className="bg-rose-50 border border-rose-100 rounded-2xl p-8 text-center">
-          <p className="text-3xl mb-3">⚠️</p>
+          <AlertTriangle className="w-8 h-8 mb-3 mx-auto text-rose-400" />
           <p className="font-extrabold text-[#0d1f3c] mb-2">Newsletter konnte nicht geladen werden</p>
           <p className="text-[#0d1f3c]/40 text-sm mb-4">Bitte prüfe deine Internetverbindung.</p>
           <button onClick={() => load(true)} className="bg-[#0d1f3c] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#162d54] transition-colors">
@@ -160,16 +161,16 @@ export default function NewsletterPage() {
                 <p className="text-xs text-[#0d1f3c]/30 mt-0.5">ARD Tagesschau · Öffentlich-rechtlich</p>
               </div>
               <a href="https://www.tagesschau.de/wirtschaft" target="_blank" rel="noopener noreferrer"
-                className="text-xs text-[#0d1f3c]/40 hover:text-[#0d1f3c] transition-colors font-semibold">
-                Alle Nachrichten →
+                className="text-xs text-[#0d1f3c]/40 hover:text-[#0d1f3c] transition-colors font-semibold inline-flex items-center gap-1">
+                Alle Nachrichten <ArrowRight className="w-3 h-3" />
               </a>
             </div>
             <div className="divide-y divide-gray-50">
               {newsletter.articles.map((article, i) => (
                 <a key={i} href={article.link} target="_blank" rel="noopener noreferrer"
                   className="flex items-start gap-4 px-5 py-4 hover:bg-gray-50/60 transition-colors group block">
-                  <div className="w-8 h-8 rounded-xl bg-[#0d1f3c]/5 flex items-center justify-center text-base flex-shrink-0 mt-0.5">
-                    📰
+                  <div className="w-8 h-8 rounded-xl bg-[#0d1f3c]/5 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Newspaper className="w-4 h-4 text-[#0d1f3c]/60" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-[#0d1f3c] leading-snug group-hover:text-[#162d54] transition-colors mb-1">
@@ -182,7 +183,7 @@ export default function NewsletterPage() {
                       {article.source.name} · {article.source.hint}
                     </p>
                   </div>
-                  <span className="text-gray-300 group-hover:text-gray-400 transition-colors text-lg flex-shrink-0">→</span>
+                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-400 transition-colors flex-shrink-0" />
                 </a>
               ))}
             </div>
@@ -190,12 +191,12 @@ export default function NewsletterPage() {
 
           {/* Tip of the day */}
           <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5">
-            <p className="text-emerald-600 text-xs font-bold uppercase tracking-widest mb-2">💡 Tipp des Tages</p>
+            <p className="text-emerald-600 text-xs font-bold uppercase tracking-widest mb-2 inline-flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5" /> Tipp des Tages</p>
             <h3 className="font-extrabold text-[#0d1f3c] mb-2">{newsletter.tip.title}</h3>
             <p className="text-[#0d1f3c]/60 text-sm leading-relaxed mb-3">{newsletter.tip.text}</p>
             <a href={newsletter.tip.source.url} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-700 font-semibold transition-colors">
-              <span>🔗</span>
+              <Link2 className="w-3.5 h-3.5" />
               <span className="underline underline-offset-2">{newsletter.tip.source.name}</span>
             </a>
           </div>

@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  Tv, Music, Laptop2, Dumbbell, Newspaper, Gamepad2, Cloud, Package,
+  Plus, X, ArrowRight, Lightbulb, type LucideIcon,
+} from "lucide-react";
 
 type Cycle = "monthly" | "yearly" | "weekly";
 
@@ -17,9 +21,9 @@ type Subscription = {
 };
 
 const CATEGORIES = ["Streaming", "Musik", "Software", "Fitness", "News", "Gaming", "Cloud", "Sonstiges"];
-const CATEGORY_ICONS: Record<string, string> = {
-  Streaming: "📺", Musik: "🎵", Software: "💻", Fitness: "💪",
-  News: "📰", Gaming: "🎮", Cloud: "☁️", Sonstiges: "📦",
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Streaming: Tv, Musik: Music, Software: Laptop2, Fitness: Dumbbell,
+  News: Newspaper, Gaming: Gamepad2, Cloud: Cloud, Sonstiges: Package,
 };
 const COLORS = ["#0d1f3c", "#E50914", "#1DB954", "#0078d4", "#FF6B35", "#9333ea", "#0891b2", "#f59e0b"];
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF"];
@@ -112,8 +116,8 @@ export default function SubscriptionsPage() {
           <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Abo-Tracker</h1>
           <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{subs.length} Abonnement{subs.length !== 1 ? "s" : ""} · {fmt(monthlyTotal)}/Monat</p>
         </div>
-        <button onClick={() => setModal("create")} className="bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
-          + Abo hinzufügen
+        <button onClick={() => setModal("create")} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
+          <Plus className="w-4 h-4" /> Abo hinzufügen
         </button>
       </div>
 
@@ -136,7 +140,7 @@ export default function SubscriptionsPage() {
       {subs.length === 0 ? (
         <div>
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center mb-6">
-            <p className="text-5xl mb-4">📦</p>
+            <Package className="w-10 h-10 mb-4 mx-auto text-[#0d1f3c]/20" />
             <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Abos</h3>
             <p className="text-[#0d1f3c]/40 text-sm mb-6">Füge deine Abonnements hinzu und sieh wie viel du monatlich ausgibst.</p>
           </div>
@@ -179,7 +183,9 @@ export default function SubscriptionsPage() {
             {byCategory.map(({ cat, subs: catSubs, total }) => (
               <div key={cat} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-3 border-b border-gray-50">
-                  <span className="text-sm font-extrabold text-[#0d1f3c]">{CATEGORY_ICONS[cat]} {cat}</span>
+                  <span className="text-sm font-extrabold text-[#0d1f3c] inline-flex items-center gap-1.5">
+                    {(() => { const Icon = CATEGORY_ICONS[cat]; return <Icon className="w-3.5 h-3.5" />; })()} {cat}
+                  </span>
                   <span className="text-xs font-bold text-[#0d1f3c]/40">{fmt(total)}/Mo</span>
                 </div>
                 <div className="divide-y divide-gray-50">
@@ -204,7 +210,9 @@ export default function SubscriptionsPage() {
                         <p className="text-xs text-[#0d1f3c]/30">{fmt(toMonthly(sub.amount, sub.cycle))}/Mo</p>
                       </div>
                       <button onClick={() => setSubs((p) => p.filter((s) => s.id !== sub.id))}
-                        className="opacity-0 group-hover:opacity-100 text-gray-200 hover:text-rose-400 transition-all text-xl ml-1">×</button>
+                        className="opacity-0 group-hover:opacity-100 text-gray-200 hover:text-rose-400 transition-all ml-1">
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -231,7 +239,7 @@ export default function SubscriptionsPage() {
               </div>
             )}
             <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4">
-              <p className="text-amber-700 text-xs font-bold mb-1">💡 Wusstest du?</p>
+              <p className="text-amber-700 text-xs font-bold mb-1 inline-flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5" /> Wusstest du?</p>
               <p className="text-amber-700 text-sm">Im Durchschnitt vergessen Menschen 2–3 aktive Abos. Das sind bis zu {fmt(monthlyTotal * 0.2)}/Monat die man einsparen könnte.</p>
             </div>
           </div>
@@ -245,7 +253,7 @@ export default function SubscriptionsPage() {
           <div className="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 flex-shrink-0">
               <h2 className="font-extrabold text-[#0d1f3c] text-lg">Abo hinzufügen</h2>
-              <button onClick={() => { setModal("none"); resetForm(); }} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+              <button onClick={() => { setModal("none"); resetForm(); }} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleAdd} className="overflow-y-auto flex-1 p-5 space-y-4">
               <div>
@@ -281,12 +289,15 @@ export default function SubscriptionsPage() {
               <div>
                 <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Kategorie</label>
                 <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map((cat) => (
-                    <button key={cat} type="button" onClick={() => setCategory(cat)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${category === cat ? "bg-[#0d1f3c] text-white" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}>
-                      {CATEGORY_ICONS[cat]} {cat}
-                    </button>
-                  ))}
+                  {CATEGORIES.map((cat) => {
+                    const Icon = CATEGORY_ICONS[cat];
+                    return (
+                      <button key={cat} type="button" onClick={() => setCategory(cat)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${category === cat ? "bg-[#0d1f3c] text-white" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}>
+                        <Icon className="w-3.5 h-3.5" /> {cat}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               <div>
@@ -304,8 +315,8 @@ export default function SubscriptionsPage() {
                   ))}
                 </div>
               </div>
-              <button type="submit" className="w-full bg-[#0d1f3c] text-white rounded-xl py-3.5 font-bold text-sm hover:bg-[#162d54] transition-colors">
-                Abo speichern →
+              <button type="submit" className="w-full inline-flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3.5 font-bold text-sm hover:bg-[#162d54] transition-colors">
+                Abo speichern <ArrowRight className="w-4 h-4" />
               </button>
             </form>
           </div>

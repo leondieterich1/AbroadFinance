@@ -4,13 +4,34 @@ import { useState } from "react";
 import { useSplit } from "@/hooks/useSplit";
 import type { SplitGroup } from "@/types";
 import type { Settlement } from "@/hooks/useSplit";
+import {
+  Plane, Home, PartyPopper, Pizza, GraduationCap, Palmtree, Landmark,
+  Backpack, Globe, Handshake, Beer, Car, QrCode, Check, Copy, Plus, X,
+  ArrowLeft, ArrowRight, NotebookText, type LucideIcon,
+} from "lucide-react";
+
+const GROUP_ICONS: Record<string, LucideIcon> = {
+  plane: Plane, home: Home, party: PartyPopper, pizza: Pizza, grad: GraduationCap,
+  beach: Palmtree, tower: Landmark, backpack: Backpack, globe: Globe,
+  handshake: Handshake, beer: Beer, car: Car,
+};
+const GROUP_ICON_IDS = Object.keys(GROUP_ICONS);
+const GROUP_EMOJI_FOR_SHARE: Record<string, string> = {
+  plane: "✈️", home: "🏠", party: "🎉", pizza: "🍕", grad: "🎓", beach: "🏖️",
+  tower: "🗼", backpack: "🎒", globe: "🌍", handshake: "🤝", beer: "🍻", car: "🚗",
+};
+
+function GroupIcon({ id, className = "w-5 h-5" }: { id: string; className?: string }) {
+  const Icon = GROUP_ICONS[id] ?? Plane;
+  return <Icon className={className} />;
+}
 
 function QRShare({ group, settlements }: { group: SplitGroup; settlements: Settlement[] }) {
   const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
   const lines = settlements.map((s) => `${s.fromName} → ${s.toName}: ${new Intl.NumberFormat("de-DE", { style: "currency", currency: group.currency }).format(s.amount)}`).join("\n");
-  const text = `${group.emoji} ${group.name} – Abrechnung\n\n${lines || "Alle quitt! 🎉"}\n\nErstellt mit FinanceAbroad`;
+  const text = `${GROUP_EMOJI_FOR_SHARE[group.emoji] ?? "✈️"} ${group.name} – Abrechnung\n\n${lines || "Alle quitt! 🎉"}\n\nErstellt mit FinanceAbroad`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(text)}&bgcolor=ffffff&color=0d1f3c&margin=10`;
 
   async function handleCopy() {
@@ -26,11 +47,11 @@ function QRShare({ group, settlements }: { group: SplitGroup; settlements: Settl
       <div className="flex gap-3">
         <button onClick={() => setShowQR((v) => !v)}
           className="flex-1 flex items-center justify-center gap-2 bg-[#0d1f3c] text-white rounded-xl py-3 text-sm font-bold hover:bg-[#162d54] transition-colors">
-          <span>📱</span> {showQR ? "QR ausblenden" : "QR-Code anzeigen"}
+          <QrCode className="w-4 h-4" /> {showQR ? "QR ausblenden" : "QR-Code anzeigen"}
         </button>
         <button onClick={handleCopy}
           className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all border ${copied ? "bg-emerald-50 border-emerald-200 text-emerald-600" : "border-gray-200 text-[#0d1f3c]/60 hover:bg-gray-50"}`}>
-          <span>{copied ? "✓" : "📋"}</span> {copied ? "Kopiert!" : "Text kopieren"}
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? "Kopiert!" : "Text kopieren"}
         </button>
       </div>
       {showQR && (
@@ -44,7 +65,6 @@ function QRShare({ group, settlements }: { group: SplitGroup; settlements: Settl
   );
 }
 
-const EMOJIS = ["✈️", "🏠", "🎉", "🍕", "🎓", "🏖️", "🗼", "🎒", "🌍", "🤝", "🍻", "🚗"];
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "JPY", "AUD", "CAD", "SEK", "NOK", "DKK", "CNY", "SGD"];
 
 function fmt(amount: number, currency: string) {
@@ -68,7 +88,7 @@ export default function SplitPage() {
 
   // Create group form
   const [newName, setNewName] = useState("");
-  const [newEmoji, setNewEmoji] = useState("✈️");
+  const [newEmoji, setNewEmoji] = useState("plane");
   const [newMembers, setNewMembers] = useState(["", ""]);
   const [newCurrency, setNewCurrency] = useState("EUR");
 
@@ -95,7 +115,7 @@ export default function SplitPage() {
     const names = newMembers.filter((n) => n.trim());
     if (!newName.trim() || names.length < 2) return;
     const group = split.createGroup(newName.trim(), newEmoji, names, newCurrency);
-    setNewName(""); setNewEmbers(["", ""]); setNewEmoji("✈️"); setNewCurrency("EUR");
+    setNewName(""); setNewEmbers(["", ""]); setNewEmoji("plane"); setNewCurrency("EUR");
     openGroup(group);
   }
 
@@ -147,13 +167,13 @@ export default function SplitPage() {
             onClick={() => setView("create")}
             className="bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex items-center gap-2"
           >
-            <span className="text-base">+</span> Neue Gruppe
+            <Plus className="w-4 h-4" /> Neue Gruppe
           </button>
         </div>
 
         {split.groups.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
-            <div className="text-5xl mb-4">🤝</div>
+            <Handshake className="w-10 h-10 mb-4 mx-auto text-[#0d1f3c]/20" />
             <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Gruppe</h3>
             <p className="text-[#0d1f3c]/40 text-sm mb-6">Erstelle deine erste Gruppe – für den Urlaub, die WG oder das nächste Event.</p>
             <button
@@ -176,8 +196,8 @@ export default function SplitPage() {
                   className="w-full bg-white rounded-2xl border border-gray-100 p-5 hover:border-[#0d1f3c]/20 hover:shadow-sm transition-all text-left"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-3xl w-12 h-12 flex items-center justify-center bg-gray-50 rounded-xl flex-shrink-0">
-                      {group.emoji}
+                    <span className="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-xl flex-shrink-0 text-[#0d1f3c]">
+                      <GroupIcon id={group.emoji} className="w-6 h-6" />
                     </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -192,8 +212,8 @@ export default function SplitPage() {
                           </span>
                         )}
                         {settlements.length === 0 && total > 0 && (
-                          <span className="text-xs bg-emerald-50 text-emerald-600 font-semibold px-2 py-0.5 rounded-full">
-                            Alle quitt ✓
+                          <span className="text-xs bg-emerald-50 text-emerald-600 font-semibold px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                            Alle quitt <Check className="w-3 h-3" />
                           </span>
                         )}
                       </div>
@@ -228,7 +248,7 @@ export default function SplitPage() {
     return (
       <div className="p-6 md:p-8 max-w-xl mx-auto">
         <button onClick={() => setView("list")} className="text-sm text-[#0d1f3c]/40 hover:text-[#0d1f3c] mb-6 flex items-center gap-1">
-          ← Zurück
+          <ArrowLeft className="w-4 h-4" /> Zurück
         </button>
         <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-1">Neue Gruppe</h1>
         <p className="text-[#0d1f3c]/40 text-sm mb-8">Reise, WG, Event – lege los.</p>
@@ -236,16 +256,16 @@ export default function SplitPage() {
         <form onSubmit={handleCreateGroup} className="space-y-6">
           {/* Emoji */}
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <label className="block text-sm font-bold text-[#0d1f3c] mb-3">Emoji</label>
+            <label className="block text-sm font-bold text-[#0d1f3c] mb-3">Symbol</label>
             <div className="flex flex-wrap gap-2">
-              {EMOJIS.map((em) => (
+              {GROUP_ICON_IDS.map((id) => (
                 <button
-                  key={em}
+                  key={id}
                   type="button"
-                  onClick={() => setNewEmoji(em)}
-                  className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all ${newEmoji === em ? "bg-[#0d1f3c] shadow-md scale-110" : "bg-gray-50 hover:bg-gray-100"}`}
+                  onClick={() => setNewEmoji(id)}
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${newEmoji === id ? "bg-[#0d1f3c] text-white shadow-md scale-110" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}
                 >
-                  {em}
+                  <GroupIcon id={id} className="w-5 h-5" />
                 </button>
               ))}
             </div>
@@ -297,9 +317,9 @@ export default function SplitPage() {
                     <button
                       type="button"
                       onClick={() => setNewMembers(newMembers.filter((_, j) => j !== i))}
-                      className="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-rose-50 hover:text-rose-500 transition-colors text-lg flex items-center justify-center"
+                      className="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-rose-50 hover:text-rose-500 transition-colors flex items-center justify-center"
                     >
-                      ×
+                      <X className="w-4 h-4" />
                     </button>
                   )}
                 </div>
@@ -307,18 +327,18 @@ export default function SplitPage() {
               <button
                 type="button"
                 onClick={() => setNewMembers([...newMembers, ""])}
-                className="w-full border border-dashed border-gray-200 rounded-xl py-2.5 text-sm text-[#0d1f3c]/40 hover:border-[#0d1f3c]/40 hover:text-[#0d1f3c]/60 transition-colors"
+                className="w-full border border-dashed border-gray-200 rounded-xl py-2.5 text-sm text-[#0d1f3c]/40 hover:border-[#0d1f3c]/40 hover:text-[#0d1f3c]/60 transition-colors inline-flex items-center justify-center gap-1.5"
               >
-                + Person hinzufügen
+                <Plus className="w-4 h-4" /> Person hinzufügen
               </button>
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-[#0d1f3c] text-white font-bold py-3.5 rounded-xl hover:bg-[#162d54] transition-colors"
+            className="w-full inline-flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white font-bold py-3.5 rounded-xl hover:bg-[#162d54] transition-colors"
           >
-            Gruppe erstellen →
+            Gruppe erstellen <ArrowRight className="w-4 h-4" />
           </button>
         </form>
       </div>
@@ -337,7 +357,7 @@ export default function SplitPage() {
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => setView("list")} className="text-sm text-[#0d1f3c]/40 hover:text-[#0d1f3c]">← Zurück</button>
+        <button onClick={() => setView("list")} className="text-sm text-[#0d1f3c]/40 hover:text-[#0d1f3c] inline-flex items-center gap-1"><ArrowLeft className="w-4 h-4" /> Zurück</button>
         <div className="flex-1" />
         <button
           onClick={() => { if (confirm("Gruppe wirklich löschen?")) { split.deleteGroup(group.id); setView("list"); } }}
@@ -348,16 +368,16 @@ export default function SplitPage() {
       </div>
 
       <div className="flex items-center gap-4 mb-6">
-        <span className="text-4xl">{group.emoji}</span>
+        <span className="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-xl text-[#0d1f3c]"><GroupIcon id={group.emoji} className="w-6 h-6" /></span>
         <div>
           <h1 className="text-2xl font-extrabold text-[#0d1f3c]">{group.name}</h1>
           <p className="text-[#0d1f3c]/40 text-sm">{group.members.length} Personen · {fmt(total, group.currency)} gesamt</p>
         </div>
         <button
           onClick={() => { setShowExpenseForm(true); setExpenseView("expenses"); }}
-          className="ml-auto bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors"
+          className="ml-auto inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors"
         >
-          + Ausgabe
+          <Plus className="w-4 h-4" /> Ausgabe
         </button>
       </div>
 
@@ -379,7 +399,7 @@ export default function SplitPage() {
         <div className="bg-white rounded-2xl border border-[#0d1f3c]/10 p-5 mb-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-extrabold text-[#0d1f3c]">Neue Ausgabe</h3>
-            <button onClick={() => setShowExpenseForm(false)} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
+            <button onClick={() => setShowExpenseForm(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
           </div>
           <form onSubmit={handleAddExpense} className="space-y-3">
             <input
@@ -480,7 +500,7 @@ export default function SplitPage() {
         <div className="space-y-3">
           {groupExps.length === 0 ? (
             <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
-              <div className="text-4xl mb-3">📝</div>
+              <NotebookText className="w-9 h-9 mb-3 mx-auto text-[#0d1f3c]/20" />
               <p className="text-[#0d1f3c]/40 text-sm">Noch keine Ausgaben. Füge die erste hinzu!</p>
             </div>
           ) : (
@@ -504,9 +524,9 @@ export default function SplitPage() {
                   </div>
                   <button
                     onClick={() => split.deleteExpense(exp.id)}
-                    className="text-gray-300 hover:text-rose-400 transition-colors text-lg ml-1 flex-shrink-0"
+                    className="text-gray-300 hover:text-rose-400 transition-colors ml-1 flex-shrink-0"
                   >
-                    ×
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               );
@@ -542,7 +562,7 @@ export default function SplitPage() {
         <div className="space-y-4">
           {settlements.length === 0 ? (
             <div className="bg-emerald-50 rounded-2xl border border-emerald-100 p-10 text-center">
-              <div className="text-4xl mb-3">🎉</div>
+              <PartyPopper className="w-9 h-9 mb-3 mx-auto text-emerald-400" />
               <h3 className="font-extrabold text-emerald-700 mb-1">Alle quitt!</h3>
               <p className="text-emerald-600/70 text-sm">Keine offenen Schulden in dieser Gruppe.</p>
             </div>
@@ -572,7 +592,7 @@ export default function SplitPage() {
                     </div>
                     <div className="flex items-center gap-2 mt-3">
                       <div className={`h-2 rounded-full flex-1 ${AVATAR_COLORS[fromIdx % AVATAR_COLORS.length]} opacity-30`} />
-                      <span className="text-xs text-[#0d1f3c]/30">→</span>
+                      <ArrowRight className="w-3 h-3 text-[#0d1f3c]/30 flex-shrink-0" />
                       <div className={`h-2 rounded-full flex-1 ${AVATAR_COLORS[toIdx % AVATAR_COLORS.length]} opacity-30`} />
                     </div>
                   </div>
