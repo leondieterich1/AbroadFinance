@@ -11,6 +11,7 @@ import {
 } from "@/lib/utils";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 import type { ExpenseCategory } from "@/types";
+import { Plane, BarChart3, Plus, Settings, Receipt, Check, type LucideIcon } from "lucide-react";
 
 type Tab = "overview" | "budget" | "add";
 
@@ -41,7 +42,7 @@ export default function PlannerPage() {
       {/* Header */}
       <div className="bg-[#0d1f3c] text-white px-5 md:px-6 py-8 md:py-10">
         <div className="max-w-4xl mx-auto">
-          <p className="text-white/50 text-sm font-medium uppercase tracking-widest mb-1">✈️ FinanceAbroad</p>
+          <p className="text-white/50 text-sm font-medium uppercase tracking-widest mb-1 inline-flex items-center gap-1.5"><Plane className="w-3.5 h-3.5" /> FinanceAbroad</p>
           <h1 className="text-2xl md:text-3xl font-extrabold mb-5 md:mb-6">Finanzplaner</h1>
 
           {/* Summary Cards */}
@@ -82,20 +83,20 @@ export default function PlannerPage() {
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto flex">
           {([
-            { id: "overview", label: "📊 Übersicht" },
-            { id: "add", label: "➕ Ausgabe hinzufügen" },
-            { id: "budget", label: "⚙️ Budget einrichten" },
-          ] as { id: Tab; label: string }[]).map((t) => (
+            { id: "overview", label: "Übersicht", icon: BarChart3 },
+            { id: "add", label: "Ausgabe hinzufügen", icon: Plus },
+            { id: "budget", label: "Budget einrichten", icon: Settings },
+          ] as { id: Tab; label: string; icon: LucideIcon }[]).map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
+              className={`px-6 py-4 text-sm font-semibold border-b-2 transition-colors inline-flex items-center gap-1.5 ${
                 tab === t.id
                   ? "border-[#0d1f3c] text-[#0d1f3c]"
                   : "border-transparent text-[#0d1f3c]/40 hover:text-[#0d1f3c]/70"
               }`}
             >
-              {t.label}
+              <t.icon className="w-4 h-4" /> {t.label}
             </button>
           ))}
         </div>
@@ -166,7 +167,7 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
         <h2 className="text-lg font-extrabold text-[#0d1f3c] mb-4">Letzte Ausgaben</h2>
         {planner.expenses.length === 0 ? (
           <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
-            <p className="text-4xl mb-3">💸</p>
+            <Receipt className="w-9 h-9 mb-3 mx-auto text-[#0d1f3c]/20" />
             <p className="text-[#0d1f3c]/50 font-medium">Noch keine Ausgaben eingetragen.</p>
             <p className="text-[#0d1f3c]/30 text-sm mt-1">Klicke auf „Ausgabe hinzufügen" um zu starten.</p>
           </div>
@@ -319,7 +320,7 @@ function AddExpenseTab({
                 : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"
             }`}
           >
-            {success ? "✓ Gespeichert!" : "Ausgabe speichern"}
+            {success ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Gespeichert!</span> : "Ausgabe speichern"}
           </button>
         </form>
       </div>
@@ -400,7 +401,7 @@ function BudgetTab({ planner, currency }: { planner: ReturnType<typeof usePlanne
             saved ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"
           }`}
         >
-          {saved ? "✓ Budget gespeichert!" : "Budget speichern"}
+          {saved ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Budget gespeichert!</span> : "Budget speichern"}
         </button>
       </div>
     </div>

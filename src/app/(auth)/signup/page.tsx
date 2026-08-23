@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { MailCheck, ArrowRight } from "lucide-react";
 
 const MIN_SIGNUP_AGE = 16;
 
@@ -58,7 +59,7 @@ export default function SignupPage() {
   if (sent) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 w-full max-w-md text-center">
-        <div className="text-5xl mb-5">📬</div>
+        <MailCheck className="w-10 h-10 mb-5 mx-auto text-[#0d1f3c]/30" />
         <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">Schau in dein Postfach!</h1>
         <p className="text-[#0d1f3c]/50 text-sm mb-1">
           Wir haben einen Bestätigungslink an
@@ -144,7 +145,7 @@ export default function SignupPage() {
               Wird gesendet…
             </>
           ) : (
-            "Bestätigungsmail senden →"
+            <>Bestätigungsmail senden <ArrowRight className="w-4 h-4" /></>
           )}
         </button>
       </form>

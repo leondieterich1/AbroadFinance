@@ -7,6 +7,7 @@ import { forecastCurrentMonth, forecastByCategory, monthlyTotals, generateInsigh
 import BudgetRing from "@/components/ui/BudgetRing";
 import DonutChart from "@/components/ui/DonutChart";
 import DotPattern from "@/components/ui/DotPattern";
+import { Lightbulb } from "lucide-react";
 
 const STATUS_LABEL: Record<string, string> = {
   ok: "Im Plan",
@@ -94,7 +95,7 @@ export default function AnalyticsPage() {
         <ul className="space-y-3">
           {insights.map((text, i) => (
             <li key={i} className="flex items-start gap-2.5 text-sm text-[#0d1f3c]/70">
-              <span className="text-base leading-none mt-0.5">💡</span>
+              <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0d1f3c]/40" />
               <span>{text}</span>
             </li>
           ))}

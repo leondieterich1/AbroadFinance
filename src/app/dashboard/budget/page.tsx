@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { ExpenseCategory } from "@/types";
 import BudgetWizard from "@/components/budget/BudgetWizard";
 import CategoryIcon from "@/components/ui/CategoryIcon";
+import { Compass, ArrowRight, Check } from "lucide-react";
 
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
 
@@ -46,12 +47,12 @@ export default function BudgetPage() {
         onClick={() => setWizardOpen(true)}
         className="w-full text-left bg-[#0d1f3c] text-white rounded-2xl p-5 mb-6 flex items-center gap-4 hover:bg-[#162d54] transition-colors"
       >
-        <span className="text-3xl">🧭</span>
+        <Compass className="w-7 h-7 flex-shrink-0" />
         <div className="flex-1">
           <p className="font-extrabold">Budget-Kompass</p>
           <p className="text-white/50 text-sm">In 4 kurzen Schritten dein Budget durchdenken statt nur eintippen.</p>
         </div>
-        <span className="text-white/40">→</span>
+        <ArrowRight className="w-4 h-4 text-white/40 flex-shrink-0" />
       </button>
 
       {/* Category bars */}
@@ -128,7 +129,7 @@ export default function BudgetPage() {
           onClick={handleSave}
           className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all ${saved ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}
         >
-          {saved ? "✓ Budget gespeichert!" : "Budget speichern"}
+          {saved ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Budget gespeichert!</span> : "Budget speichern"}
         </button>
       </div>
 

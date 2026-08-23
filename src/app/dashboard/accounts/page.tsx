@@ -7,7 +7,7 @@ import { CATEGORY_LABELS } from "@/lib/utils";
 import { ibanToBlz } from "@/lib/blz-database";
 import type { ExpenseCategory } from "@/types";
 import CategoryIcon from "@/components/ui/CategoryIcon";
-import { Landmark, ArrowRight, Check, X, Upload, Lightbulb, Lock, KeyRound } from "lucide-react";
+import { Landmark, ArrowRight, Check, X, Upload, Lightbulb, Lock, KeyRound, ChevronLeft } from "lucide-react";
 
 const DEMO_TX = [
   { date: "2026-07-04", description: "REWE Sagt. Danke",      amount: -32.40 },
@@ -450,7 +450,7 @@ export default function AccountsPage() {
             {step === "credentials" && discoveredBank && (
               <div className="flex flex-col flex-1 overflow-hidden">
                 <div className="flex items-center justify-between p-5 border-b border-gray-100">
-                  <button onClick={() => setStep("iban")} className="text-gray-400 hover:text-gray-600 text-xl">‹</button>
+                  <button onClick={() => setStep("iban")} className="text-gray-400 hover:text-gray-600"><ChevronLeft className="w-5 h-5" /></button>
                   <div className="flex items-center gap-3 flex-1 mx-3">
                     {discoveredBank.logo && <BankLogo logo={discoveredBank.logo} name={discoveredBank.name} />}
                     <div>
@@ -459,7 +459,7 @@ export default function AccountsPage() {
                     </div>
                   </div>
                   {discoveredBank.found
-                    ? <span className="text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-full font-bold flex-shrink-0">✓ Erkannt</span>
+                    ? <span className="text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-full font-bold flex-shrink-0 inline-flex items-center gap-1"><Check className="w-3 h-3" /> Erkannt</span>
                     : <span className="text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-1 rounded-full font-bold flex-shrink-0">Manuell</span>}
                 </div>
                 <div className="overflow-y-auto flex-1 p-5 space-y-3">

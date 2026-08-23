@@ -7,7 +7,10 @@ import { CATEGORY_LABELS, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
 import { categorize } from "@/lib/categorize";
 import type { ExpenseCategory } from "@/types";
 import CategoryIcon from "@/components/ui/CategoryIcon";
-import { Receipt, ArrowDown, ArrowUp, Check } from "lucide-react";
+import { Receipt, ArrowDown, ArrowUp, Check, Landmark, Wallet, Pencil, type LucideIcon } from "lucide-react";
+
+const SOURCE_ICONS: Record<string, LucideIcon> = { bank: Landmark, wallet: Wallet, manual: Pencil };
+const SOURCE_LABELS: Record<string, string> = { bank: "Bank", wallet: "Wallet", manual: "Manuell" };
 
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
 
@@ -370,11 +373,11 @@ export default function TransactionsPage() {
                   const count = allTx.filter((t) => t.source === src).length;
                   const total = allTx.filter((t) => t.source === src).reduce((s, t) => s + t.amount, 0);
                   if (count === 0) return null;
-                  const label = src === "bank" ? "🏦 Bank" : src === "wallet" ? "💳 Wallet" : "✏️ Manuell";
+                  const SrcIcon = SOURCE_ICONS[src];
                   return (
                     <button key={src} onClick={() => setFilterSource(filterSource === src ? "alle" : src)}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-colors ${filterSource === src ? "bg-[#0d1f3c] text-white" : "bg-gray-50 hover:bg-gray-100 text-[#0d1f3c]"}`}>
-                      <span className="font-semibold">{label}</span>
+                      <span className="font-semibold inline-flex items-center gap-1.5"><SrcIcon className="w-3.5 h-3.5" /> {SOURCE_LABELS[src]}</span>
                       <div className="text-right">
                         <p className="font-bold text-xs">{fmt(total)}</p>
                         <p className={`text-[10px] ${filterSource === src ? "text-white/50" : "text-[#0d1f3c]/30"}`}>{count} Buchungen</p>

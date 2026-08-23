@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { Check, X } from "lucide-react";
 
 function VerifyContent() {
   const params = useSearchParams();
@@ -35,14 +36,14 @@ function VerifyContent() {
       )}
       {status === "success" && (
         <>
-          <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5 text-3xl">✓</div>
+          <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5"><Check className="w-8 h-8 text-emerald-500" /></div>
           <h1 className="text-xl font-extrabold text-[#0d1f3c] mb-2">E-Mail bestätigt!</h1>
           <p className="text-[#0d1f3c]/40 text-sm">Du wirst zum Dashboard weitergeleitet…</p>
         </>
       )}
       {status === "error" && (
         <>
-          <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-5 text-3xl">✕</div>
+          <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-5"><X className="w-8 h-8 text-rose-500" /></div>
           <h1 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Link ungültig</h1>
           <p className="text-[#0d1f3c]/40 text-sm mb-6">
             Der Link ist abgelaufen oder ungültig. Bitte registriere dich erneut.
