@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Home, Users, ShoppingCart, TrainFront, UtensilsCrossed, Coffee, Dumbbell, Wifi, Lightbulb, Check, type LucideIcon } from "lucide-react";
 
 type City = {
   id: string;
@@ -66,9 +67,9 @@ const COST_LABELS: Record<string, string> = {
   utilities: "Nebenkosten",
 };
 
-const COST_ICONS: Record<string, string> = {
-  rent1room: "🏠", rent_shared: "🤝", groceries: "🛒", transport: "🚇",
-  eating_out: "🍽️", coffee: "☕", gym: "💪", internet: "📶", utilities: "💡",
+const COST_ICONS: Record<string, LucideIcon> = {
+  rent1room: Home, rent_shared: Users, groceries: ShoppingCart, transport: TrainFront,
+  eating_out: UtensilsCrossed, coffee: Coffee, gym: Dumbbell, internet: Wifi, utilities: Lightbulb,
 };
 
 function fmt(n: number, cur: string) {
@@ -138,7 +139,7 @@ export default function CostsPage() {
                   isSelected ? "bg-[#0d1f3c] text-white border-[#0d1f3c]" : "bg-gray-50 text-[#0d1f3c]/70 border-gray-100 hover:border-[#0d1f3c]/30"
                 }`}>
                 {city.flag} {city.name}
-                {isSelected && <span className="text-white/50">✓</span>}
+                {isSelected && <Check className="w-4 h-4 text-white/50" />}
               </button>
             );
           })}
@@ -166,7 +167,7 @@ export default function CostsPage() {
           return (
             <div key={key} className={`px-5 py-4 ${i !== 0 ? "border-t border-gray-50" : ""}`}>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-base">{COST_ICONS[key]}</span>
+                {(() => { const Icon = COST_ICONS[key]; return <Icon className="w-4 h-4 text-[#0d1f3c]/60" />; })()}
                 <span className="text-sm font-bold text-[#0d1f3c]">{COST_LABELS[key]}</span>
                 {key === "eating_out" || key === "coffee"
                   ? <span className="text-xs text-[#0d1f3c]/30">(× 20 Tage/Monat)</span>

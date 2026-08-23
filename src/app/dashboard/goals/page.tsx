@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  Plane, Home, GraduationCap, Car, Laptop, Palmtree, Gem, Backpack,
+  Dumbbell, Smartphone, Guitar, Globe, Check, ArrowRight, Target, Plus,
+  type LucideIcon,
+} from "lucide-react";
 
 type Goal = {
   id: string;
@@ -14,8 +19,18 @@ type Goal = {
 };
 
 const COLORS = ["#0d1f3c", "#4285F4", "#E30613", "#34A853", "#FF6200", "#9333ea", "#0891b2", "#f59e0b"];
-const ICONS = ["✈️", "🏠", "🎓", "🚗", "💻", "🏖️", "💍", "🎒", "🏋️", "📱", "🎸", "🌍"];
+const GOAL_ICONS: Record<string, LucideIcon> = {
+  plane: Plane, home: Home, education: GraduationCap, car: Car, laptop: Laptop,
+  vacation: Palmtree, ring: Gem, backpack: Backpack, fitness: Dumbbell,
+  phone: Smartphone, music: Guitar, world: Globe,
+};
+const ICONS = Object.keys(GOAL_ICONS);
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "JPY", "AUD", "CAD"];
+
+function GoalIcon({ id, className = "w-5 h-5", style }: { id: string; className?: string; style?: React.CSSProperties }) {
+  const Icon = GOAL_ICONS[id] ?? Plane;
+  return <Icon className={className} style={style} />;
+}
 
 function fmt(n: number, cur = "EUR") {
   return new Intl.NumberFormat("de-DE", { style: "currency", currency: cur, maximumFractionDigits: cur === "JPY" ? 0 : 2 }).format(n);
@@ -30,7 +45,7 @@ export default function GoalsPage() {
 
   // Form
   const [name, setName] = useState("");
-  const [icon, setIcon] = useState("✈️");
+  const [icon, setIcon] = useState("plane");
   const [target, setTarget] = useState("");
   const [currency, setCurrency] = useState("EUR");
   const [deadline, setDeadline] = useState("");
@@ -55,7 +70,7 @@ export default function GoalsPage() {
       currentAmount: 0, currency, deadline: deadline || undefined,
     };
     setGoals((p) => [...p, goal]);
-    setModal("none"); setName(""); setTarget(""); setDeadline(""); setIcon("✈️"); setColor("#0d1f3c");
+    setModal("none"); setName(""); setTarget(""); setDeadline(""); setIcon("plane"); setColor("#0d1f3c");
   }
 
   function handleDeposit() {
@@ -109,11 +124,11 @@ export default function GoalsPage() {
       {/* Goals grid */}
       {goals.length === 0 ? (
         <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-16 text-center">
-          <p className="text-5xl mb-4">🎯</p>
+          <Target className="w-10 h-10 mb-4 mx-auto text-[#0d1f3c]/20" />
           <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch kein Sparziel</h3>
           <p className="text-[#0d1f3c]/40 text-sm mb-6">Setze dir ein Ziel — Reise, Wohnung, Laptop — und tracke deinen Fortschritt.</p>
-          <button onClick={() => setModal("create")} className="bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">
-            Erstes Ziel erstellen →
+          <button onClick={() => setModal("create")} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">
+            Erstes Ziel erstellen <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       ) : (
@@ -126,11 +141,11 @@ export default function GoalsPage() {
 
             return (
               <div key={goal.id} className="bg-white rounded-2xl border border-gray-100 p-5 relative overflow-hidden">
-                {done && <div className="absolute top-3 right-3 bg-emerald-50 text-emerald-600 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">✓ Erreicht!</div>}
+                {done && <div className="absolute top-3 right-3 bg-emerald-50 text-emerald-600 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1"><Check className="w-3 h-3" /> Erreicht!</div>}
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
                     style={{ background: `${goal.color}15` }}>
-                    {goal.icon}
+                    <GoalIcon id={goal.icon} className="w-6 h-6" style={{ color: goal.color }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-extrabold text-[#0d1f3c] truncate">{goal.name}</p>
@@ -152,9 +167,9 @@ export default function GoalsPage() {
                   <p className="text-sm font-bold" style={{ color: goal.color }}>{Math.round(pct)}%</p>
                   {!done && <p className="text-xs text-[#0d1f3c]/40">Noch {fmt(remaining, goal.currency)}</p>}
                   <button onClick={() => { setActiveGoal(goal); setDepositAmount(""); setModal("deposit"); }}
-                    className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-colors"
                     style={{ background: goal.color }}>
-                    + Einzahlen
+                    <Plus className="w-3 h-3" /> Einzahlen
                   </button>
                 </div>
               </div>
@@ -179,8 +194,8 @@ export default function GoalsPage() {
                 <div className="flex flex-wrap gap-2">
                   {ICONS.map((i) => (
                     <button key={i} type="button" onClick={() => setIcon(i)}
-                      className={`w-10 h-10 rounded-xl text-xl transition-all ${icon === i ? "bg-[#0d1f3c] shadow-md scale-110" : "bg-gray-50 hover:bg-gray-100"}`}>
-                      {i}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${icon === i ? "bg-[#0d1f3c] text-white shadow-md scale-110" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}>
+                      <GoalIcon id={i} className="w-5 h-5" />
                     </button>
                   ))}
                 </div>
@@ -219,8 +234,8 @@ export default function GoalsPage() {
                   ))}
                 </div>
               </div>
-              <button type="submit" className="w-full bg-[#0d1f3c] text-white rounded-xl py-3.5 font-bold text-sm hover:bg-[#162d54] transition-colors">
-                Ziel erstellen →
+              <button type="submit" className="w-full inline-flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3.5 font-bold text-sm hover:bg-[#162d54] transition-colors">
+                Ziel erstellen <ArrowRight className="w-4 h-4" />
               </button>
             </form>
           </div>
@@ -233,8 +248,8 @@ export default function GoalsPage() {
           onClick={(e) => { if (e.target === e.currentTarget) setModal("none"); }}>
           <div className="bg-white w-full md:max-w-sm rounded-t-3xl md:rounded-2xl shadow-2xl p-6">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl" style={{ background: `${activeGoal.color}15` }}>
-                {activeGoal.icon}
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: `${activeGoal.color}15` }}>
+                <GoalIcon id={activeGoal.icon} className="w-6 h-6" style={{ color: activeGoal.color }} />
               </div>
               <div>
                 <h2 className="font-extrabold text-[#0d1f3c]">{activeGoal.name}</h2>
@@ -257,9 +272,9 @@ export default function GoalsPage() {
               ))}
             </div>
             <button onClick={handleDeposit} disabled={!depositAmount}
-              className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-colors disabled:opacity-30"
+              className="w-full inline-flex items-center justify-center gap-1.5 py-3.5 rounded-xl font-bold text-white text-sm transition-colors disabled:opacity-30"
               style={{ background: activeGoal.color }}>
-              Einzahlen →
+              Einzahlen <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

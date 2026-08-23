@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Plane, AlertTriangle, ArrowLeftRight } from "lucide-react";
 
 const CURRENCIES: Record<string, { name: string; symbol: string; flag: string }> = {
   EUR: { name: "Euro", symbol: "€", flag: "🇪🇺" },
@@ -101,7 +102,7 @@ export default function ConverterPage() {
       {/* Header */}
       <div className="bg-[#0d1f3c] text-white px-6 py-12">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">✈️ FinanceAbroad</p>
+          <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5"><Plane className="w-3.5 h-3.5" /> FinanceAbroad</p>
           <h1 className="text-4xl font-extrabold mb-2">Währungsrechner</h1>
           <p className="text-white/50 text-sm">
             Live-Wechselkurse · täglich aktualisiert
@@ -116,7 +117,7 @@ export default function ConverterPage() {
         <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
           {error && (
             <div className="bg-rose-50 text-rose-600 text-sm rounded-xl px-4 py-3 mb-6 flex items-center gap-2">
-              ⚠️ Kurse konnten nicht geladen werden. Bitte Seite neu laden.
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" /> Kurse konnten nicht geladen werden. Bitte Seite neu laden.
             </div>
           )}
 
@@ -151,10 +152,10 @@ export default function ConverterPage() {
 
             <button
               onClick={swap}
-              className="w-11 h-11 rounded-full bg-[#0d1f3c] text-white flex items-center justify-center hover:bg-[#162d54] transition-colors text-lg mb-0.5 flex-shrink-0"
+              className="w-11 h-11 rounded-full bg-[#0d1f3c] text-white flex items-center justify-center hover:bg-[#162d54] transition-colors mb-0.5 flex-shrink-0"
               title="Tauschen"
             >
-              ⇄
+              <ArrowLeftRight className="w-4 h-4" />
             </button>
 
             <div>
