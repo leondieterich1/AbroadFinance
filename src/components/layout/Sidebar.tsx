@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Wallet, TrendingUp, Receipt, Landmark, Handshake, Coins,
-  Target, Package, ListChecks, Globe, Newspaper, Settings, Shield, ExternalLink, LogOut,
+  Target, Package, ListChecks, Settings, Shield, ExternalLink, LogOut,
   PiggyBank,
   type LucideIcon,
 } from "lucide-react";
@@ -23,8 +23,6 @@ const NAV: { href: string; icon: LucideIcon; label: string; color: string; badge
   { href: "/dashboard/goals", icon: Target, label: "Sparziele", color: "#4ade80" },
   { href: "/dashboard/subscriptions", icon: Package, label: "Abos", color: "#c084fc" },
   { href: "/dashboard/checklist", icon: ListChecks, label: "Checkliste", color: "#2dd4bf" },
-  { href: "/dashboard/costs", icon: Globe, label: "Lebenskosten", color: "#22d3ee" },
-  { href: "/dashboard/newsletter", icon: Newspaper, label: "Newsletter", color: "#f87171" },
   { href: "/dashboard/settings", icon: Settings, label: "Einstellungen", color: "#94a3b8" },
 ];
 
