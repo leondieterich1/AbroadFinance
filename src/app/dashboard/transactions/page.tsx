@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useAccounts } from "@/hooks/useAccounts";
 import { usePlanner } from "@/hooks/usePlanner";
-import { CATEGORY_LABELS, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
+import { useCategoryLabels } from "@/hooks/useCategoryLabels";
+import { CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
 import { categorize } from "@/lib/categorize";
 import type { ExpenseCategory } from "@/types";
 import CategoryIcon from "@/components/ui/CategoryIcon";
@@ -11,19 +13,8 @@ import { Receipt, ArrowDown, ArrowUp, Check, Landmark, Wallet, Pencil, type Luci
 
 const SOURCE_ICONS: Record<string, LucideIcon> = { bank: Landmark, wallet: Wallet, manual: Pencil };
 const SOURCE_ICON_COLORS: Record<string, string> = { bank: "#0ea5e9", wallet: "#8b5cf6", manual: "#f97316" };
-const SOURCE_LABELS: Record<string, string> = { bank: "Bank", wallet: "Wallet", manual: "Manuell" };
 
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
-
-function fmt(n: number, cur = "EUR") {
-  return new Intl.NumberFormat("de-DE", { style: "currency", currency: cur, minimumFractionDigits: 2 }).format(n);
-}
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" });
-}
-function fmtShort(d: string) {
-  return new Date(d).toLocaleDateString("de-DE", { day: "2-digit", month: "short" });
-}
 
 type UnifiedTx = {
   id: string;
@@ -39,15 +30,15 @@ type UnifiedTx = {
 };
 
 // Mini bar chart component
-function CategoryBar({ category, amount, total, color }: { category: ExpenseCategory; amount: number; total: number; color: string }) {
+function CategoryBar({ category, label, amount, amountLabel, total, color }: { category: ExpenseCategory; label: string; amount: number; amountLabel: string; total: number; color: string }) {
   const pct = total > 0 ? Math.round((amount / total) * 100) : 0;
   return (
     <div className="flex items-center gap-3">
       <span className="w-6 flex justify-center flex-shrink-0"><CategoryIcon category={category} className="w-4 h-4" style={{ color }} /></span>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-center mb-1">
-          <span className="text-xs font-semibold text-[#0d1f3c]">{CATEGORY_LABELS[category]}</span>
-          <span className="text-xs font-bold text-[#0d1f3c]">{fmt(amount)}</span>
+          <span className="text-xs font-semibold text-[#0d1f3c]">{label}</span>
+          <span className="text-xs font-bold text-[#0d1f3c]">{amountLabel}</span>
         </div>
         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
@@ -59,6 +50,18 @@ function CategoryBar({ category, amount, total, color }: { category: ExpenseCate
 }
 
 export default function TransactionsPage() {
+  const t = useTranslations("Transactions");
+  const locale = useLocale();
+  const CATEGORY_LABELS = useCategoryLabels();
+  const SOURCE_LABELS: Record<string, string> = { bank: t("bank"), wallet: t("wallet"), manual: t("manual") };
+
+  function fmt(n: number, cur = "EUR") {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: cur, minimumFractionDigits: 2 }).format(n);
+  }
+  function fmtDate(d: string) {
+    return new Date(d).toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" });
+  }
+
   const acc = useAccounts();
   const planner = usePlanner();
 
@@ -104,7 +107,7 @@ export default function TransactionsPage() {
       category: e.category,
       date: e.date,
       source: "manual" as const,
-      accountName: "Manuell",
+      accountName: t("manual"),
     }));
 
     return [...bankTxs, ...plannerTxs].sort((a, b) =>
@@ -184,22 +187,22 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Transaktionen</h1>
-          <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{allTx.length} Ausgaben · {acc.accounts.length} Konto{acc.accounts.length !== 1 ? "en" : ""} verknüpft</p>
+          <h1 className="text-2xl font-extrabold text-[#0d1f3c]">{t("title")}</h1>
+          <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{t("subtitleExpenses", { count: allTx.length })} · {t("subtitleAccounts", { count: acc.accounts.length })}</p>
         </div>
         <button onClick={() => setShowForm((v) => !v)}
-          className="bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
-          + Ausgabe
+          className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
+          <span className="text-base leading-none">+</span> {t("addExpense")}
         </button>
       </div>
 
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {[
-          { label: "Dieser Monat", value: fmt(totalThisMonth), sub: `${thisMonth.length} Buchungen` },
-          { label: "Gesamt", value: fmt(totalAll), sub: `${allTx.length} Buchungen` },
-          { label: "Größte Kategorie", value: topCategories[0] ? CATEGORY_LABELS[topCategories[0].category] : "—", sub: topCategories[0] ? fmt(topCategories[0].amount) : "Keine Daten" },
-          { label: "Quellen", value: `${acc.accounts.length + (planner.expenses.length > 0 ? 1 : 0)}`, sub: `${acc.accounts.length > 0 ? "Bank" : ""}${acc.accounts.length > 0 && planner.expenses.length > 0 ? " + " : ""}${planner.expenses.length > 0 ? "Manuell" : ""}` || "Keine" },
+          { label: t("statThisMonth"), value: fmt(totalThisMonth), sub: t("bookings", { count: thisMonth.length }) },
+          { label: t("statTotal"), value: fmt(totalAll), sub: t("bookings", { count: allTx.length }) },
+          { label: t("statTopCategory"), value: topCategories[0] ? CATEGORY_LABELS[topCategories[0].category] : "—", sub: topCategories[0] ? fmt(topCategories[0].amount) : t("noData") },
+          { label: t("statSources"), value: `${acc.accounts.length + (planner.expenses.length > 0 ? 1 : 0)}`, sub: `${acc.accounts.length > 0 ? t("bank") : ""}${acc.accounts.length > 0 && planner.expenses.length > 0 ? " + " : ""}${planner.expenses.length > 0 ? t("manual") : ""}` || t("none") },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-2xl border border-gray-100 p-4">
             <p className="text-[#0d1f3c]/40 text-xs font-semibold mb-1">{s.label}</p>
@@ -216,11 +219,11 @@ export default function TransactionsPage() {
           {/* Add form (collapsible) */}
           {showForm && (
             <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-4">
-              <h2 className="font-extrabold text-[#0d1f3c] mb-4">Ausgabe manuell erfassen</h2>
+              <h2 className="font-extrabold text-[#0d1f3c] mb-4">{t("manualEntryTitle")}</h2>
               <form onSubmit={handleAdd} className="space-y-3">
                 <div className="flex gap-3">
                   <div className="flex-1">
-                    <input type="text" placeholder="Beschreibung (z. B. Rewe, Spotify…)" value={formTitle}
+                    <input type="text" placeholder={t("descPlaceholder")} value={formTitle}
                       onChange={(e) => handleDescChange(e.target.value)} required
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
                   </div>
@@ -240,7 +243,7 @@ export default function TransactionsPage() {
                       <button key={cat} type="button" onClick={() => { setFormCategory(cat); setFormAutocat(false); }}
                         className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${formCategory === cat ? "border-[#0d1f3c] bg-[#0d1f3c] text-white" : "border-gray-200 text-[#0d1f3c]/60 hover:border-[#0d1f3c]/30"}`}>
                         <CategoryIcon category={cat} className="w-3.5 h-3.5" colored={formCategory !== cat} /> {CATEGORY_LABELS[cat].split(" ")[0]}
-                        {formCategory === cat && formAutocat && <span className="text-[9px] bg-white/20 px-1 rounded">AUTO</span>}
+                        {formCategory === cat && formAutocat && <span className="text-[9px] bg-white/20 px-1 rounded">{t("auto")}</span>}
                       </button>
                     ))}
                   </div>
@@ -248,7 +251,7 @@ export default function TransactionsPage() {
                     className="border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-[#0d1f3c] focus:outline-none ml-auto" />
                   <button type="submit"
                     className={`px-5 py-1.5 rounded-xl text-sm font-bold transition-all ${formSuccess ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}>
-                    {formSuccess ? <span className="inline-flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Gespeichert</span> : "Speichern"}
+                    {formSuccess ? <span className="inline-flex items-center gap-1"><Check className="w-3.5 h-3.5" /> {t("saved")}</span> : t("save")}
                   </button>
                 </div>
               </form>
@@ -258,7 +261,7 @@ export default function TransactionsPage() {
           {/* Filters */}
           <div className="flex flex-wrap gap-2 mb-4 items-center">
             <div className="flex-1 min-w-48">
-              <input type="text" placeholder="Suchen…" value={search} onChange={(e) => setSearch(e.target.value)}
+              <input type="text" placeholder={t("search")} value={search} onChange={(e) => setSearch(e.target.value)}
                 className="w-full border border-gray-100 rounded-xl px-4 py-2 text-sm text-[#0d1f3c] bg-white focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/10" />
             </div>
             <div className="flex gap-1.5 flex-wrap">
@@ -269,7 +272,7 @@ export default function TransactionsPage() {
                   <button key={cat} onClick={() => setFilterCategory(cat as typeof filterCategory)}
                     className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${filterCategory === cat ? "bg-[#0d1f3c] text-white" : "bg-white text-[#0d1f3c]/50 hover:text-[#0d1f3c] border border-gray-100"}`}>
                     {cat !== "alle" && <CategoryIcon category={cat} className="w-3.5 h-3.5" colored={filterCategory !== cat} />}
-                    {cat === "alle" ? `Alle (${allTx.length})` : `${CATEGORY_LABELS[cat].split(" ")[0]} (${count})`}
+                    {cat === "alle" ? t("all", { count: allTx.length }) : `${CATEGORY_LABELS[cat].split(" ")[0]} (${count})`}
                   </button>
                 );
               })}
@@ -277,7 +280,7 @@ export default function TransactionsPage() {
             <button onClick={() => setSortDesc((v) => !v)}
               className="flex items-center gap-1 text-xs border border-gray-100 bg-white px-3 py-1.5 rounded-full text-[#0d1f3c]/50 hover:text-[#0d1f3c] transition-colors font-semibold">
               {sortDesc ? <ArrowDown className="w-3.5 h-3.5" /> : <ArrowUp className="w-3.5 h-3.5" />}
-              {sortDesc ? "Neueste" : "Älteste"}
+              {sortDesc ? t("newest") : t("oldest")}
             </button>
           </div>
 
@@ -285,12 +288,12 @@ export default function TransactionsPage() {
           {allTx.length === 0 ? (
             <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-16 text-center">
               <Receipt className="w-9 h-9 mx-auto mb-4 text-orange-300" />
-              <p className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Ausgaben</p>
-              <p className="text-[#0d1f3c]/40 text-sm">Verbinde dein Bankkonto oder erfasse Ausgaben manuell.</p>
+              <p className="font-extrabold text-[#0d1f3c] text-lg mb-2">{t("emptyTitle")}</p>
+              <p className="text-[#0d1f3c]/40 text-sm">{t("emptyDesc")}</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center">
-              <p className="text-[#0d1f3c]/30 text-sm">Keine Treffer für die aktuelle Filterung.</p>
+              <p className="text-[#0d1f3c]/30 text-sm">{t("noResults")}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -318,8 +321,8 @@ export default function TransactionsPage() {
                               </span>
                             )}
                             <span className="text-xs text-[#0d1f3c]/30">{CATEGORY_LABELS[tx.category]}</span>
-                            {tx.autoCategorized && <span className="text-[9px] bg-blue-50 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">AUTO</span>}
-                            {tx.source === "manual" && <span className="text-[9px] bg-gray-50 text-gray-400 px-1.5 py-0.5 rounded-full font-bold border border-gray-100">MANUELL</span>}
+                            {tx.autoCategorized && <span className="text-[9px] bg-blue-50 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">{t("auto")}</span>}
+                            {tx.source === "manual" && <span className="text-[9px] bg-gray-50 text-gray-400 px-1.5 py-0.5 rounded-full font-bold border border-gray-100">{t("manualBadge")}</span>}
                           </div>
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0">
@@ -332,7 +335,7 @@ export default function TransactionsPage() {
                   </div>
                 </div>
               ))}
-              <p className="text-center text-xs text-[#0d1f3c]/20 py-2">{filtered.length} Ausgaben · Gesamt {fmt(filtered.reduce((s, t) => s + t.amount, 0))}</p>
+              <p className="text-center text-xs text-[#0d1f3c]/20 py-2">{t("totalExpenses", { count: filtered.length, total: fmt(filtered.reduce((s, tx) => s + tx.amount, 0)) })}</p>
             </div>
           )}
         </div>
@@ -342,9 +345,9 @@ export default function TransactionsPage() {
 
           {/* This month summary */}
           <div className="bg-[#0d1f3c] text-white rounded-2xl p-5">
-            <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">Dieser Monat</p>
+            <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">{t("statThisMonth")}</p>
             <p className="text-3xl font-extrabold mb-0.5">{fmt(totalThisMonth)}</p>
-            <p className="text-white/40 text-xs">{thisMonth.length} Buchungen</p>
+            <p className="text-white/40 text-xs">{t("bookings", { count: thisMonth.length })}</p>
             {totalAll > 0 && (
               <div className="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
                 <div className="h-full bg-white/60 rounded-full" style={{ width: `${Math.min(100, (totalThisMonth / totalAll) * 100)}%` }} />
@@ -355,10 +358,10 @@ export default function TransactionsPage() {
           {/* Category breakdown */}
           {topCategories.length > 0 && (
             <div className="bg-white rounded-2xl border border-gray-100 p-5">
-              <h3 className="font-extrabold text-[#0d1f3c] mb-4">Nach Kategorie</h3>
+              <h3 className="font-extrabold text-[#0d1f3c] mb-4">{t("byCategory")}</h3>
               <div className="space-y-3">
                 {topCategories.map(({ category, amount }) => (
-                  <CategoryBar key={category} category={category} amount={amount} total={totalAll}
+                  <CategoryBar key={category} category={category} label={CATEGORY_LABELS[category]} amount={amount} amountLabel={fmt(amount)} total={totalAll}
                     color={CATEGORY_COLORS[category]} />
                 ))}
               </div>
@@ -368,7 +371,7 @@ export default function TransactionsPage() {
           {/* Source breakdown */}
           {allTx.length > 0 && (
             <div className="bg-white rounded-2xl border border-gray-100 p-5">
-              <h3 className="font-extrabold text-[#0d1f3c] mb-4">Nach Quelle</h3>
+              <h3 className="font-extrabold text-[#0d1f3c] mb-4">{t("bySource")}</h3>
               <div className="space-y-2">
                 {(["bank", "wallet", "manual"] as const).map((src) => {
                   const count = allTx.filter((t) => t.source === src).length;
@@ -381,7 +384,7 @@ export default function TransactionsPage() {
                       <span className="font-semibold inline-flex items-center gap-1.5"><SrcIcon className="w-3.5 h-3.5" style={{ color: filterSource === src ? undefined : SOURCE_ICON_COLORS[src] }} /> {SOURCE_LABELS[src]}</span>
                       <div className="text-right">
                         <p className="font-bold text-xs">{fmt(total)}</p>
-                        <p className={`text-[10px] ${filterSource === src ? "text-white/50" : "text-[#0d1f3c]/30"}`}>{count} Buchungen</p>
+                        <p className={`text-[10px] ${filterSource === src ? "text-white/50" : "text-[#0d1f3c]/30"}`}>{t("bookings", { count })}</p>
                       </div>
                     </button>
                   );
@@ -392,11 +395,11 @@ export default function TransactionsPage() {
 
           {/* Quick shortcuts */}
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <h3 className="font-extrabold text-[#0d1f3c] mb-3">Schnellfilter</h3>
+            <h3 className="font-extrabold text-[#0d1f3c] mb-3">{t("quickFilters")}</h3>
             <div className="space-y-1">
               {[
-                { label: "Heute", filter: () => { const d = new Date().toISOString().slice(0,10); return allTx.filter(t => t.date === d); } },
-                { label: "Diese Woche", filter: () => { const now = new Date(); const mon = new Date(now); mon.setDate(now.getDate() - now.getDay() + 1); return allTx.filter(t => new Date(t.date) >= mon); } },
+                { label: t("today"), filter: () => { const d = new Date().toISOString().slice(0,10); return allTx.filter(tx => tx.date === d); } },
+                { label: t("thisWeek"), filter: () => { const now = new Date(); const mon = new Date(now); mon.setDate(now.getDate() - now.getDay() + 1); return allTx.filter(tx => new Date(tx.date) >= mon); } },
               ].map(({ label, filter }) => {
                 const count = filter().length;
                 return (
@@ -407,11 +410,11 @@ export default function TransactionsPage() {
                 );
               })}
               <div className="flex items-center justify-between px-3 py-2 rounded-xl text-sm text-[#0d1f3c]/60 bg-gray-50">
-                <span>Letzter Monat</span>
+                <span>{t("lastMonth")}</span>
                 <span className="font-bold text-[#0d1f3c]">{(() => {
                   const now = new Date();
                   const prefix = `${now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear()}-${String(now.getMonth() === 0 ? 12 : now.getMonth()).padStart(2, "0")}`;
-                  return fmt(allTx.filter(t => t.date.startsWith(prefix)).reduce((s, t) => s + t.amount, 0));
+                  return fmt(allTx.filter(tx => tx.date.startsWith(prefix)).reduce((s, tx) => s + tx.amount, 0));
                 })()}</span>
               </div>
             </div>

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useAccounts } from "@/hooks/useAccounts";
 import { parseCSV, categorize } from "@/lib/categorize";
-import { CATEGORY_LABELS } from "@/lib/utils";
+import { useCategoryLabels } from "@/hooks/useCategoryLabels";
 import { ibanToBlz } from "@/lib/blz-database";
 import type { ExpenseCategory } from "@/types";
 import CategoryIcon from "@/components/ui/CategoryIcon";
@@ -21,9 +22,6 @@ const DEMO_TX = [
 
 const CATEGORY_OPTIONS: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
 
-function fmt(n: number, cur = "EUR") {
-  return new Intl.NumberFormat("de-DE", { style: "currency", currency: cur, minimumFractionDigits: 2 }).format(n);
-}
 function maskIban(iban: string) {
   if (!iban || iban.length < 8) return iban || "—";
   return iban.slice(0, 4) + " **** **** **** " + iban.slice(-4);
@@ -48,6 +46,14 @@ function BankLogo({ logo, name, size = "sm" }: { logo?: string; name: string; si
 type DiscoveredBank = { name: string; url: string; logo: string; color: string; blz: string; found: boolean };
 
 export default function AccountsPage() {
+  const t = useTranslations("Accounts");
+  const locale = useLocale();
+  const CATEGORY_LABELS = useCategoryLabels();
+
+  function fmt(n: number, cur = "EUR") {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: cur, minimumFractionDigits: 2 }).format(n);
+  }
+
   const acc = useAccounts();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -98,8 +104,8 @@ export default function AccountsPage() {
     try {
       const res = await fetch("/api/banks/fetch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ requisitionId }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Import fehlgeschlagen");
-      const instName = localStorage.getItem("gc_inst_name") ?? "Meine Bank";
+      if (!res.ok) throw new Error(data.error ?? t("connectionFailed"));
+      const instName = localStorage.getItem("gc_inst_name") ?? t("myBank");
       const instLogo = localStorage.getItem("gc_inst_logo") ?? undefined;
       for (const a of data.accounts) {
         const account = acc.addAccount({ bankName: instName, bankColor: "#0d1f3c", bankInitials: instName.slice(0, 2).toUpperCase(), bankLogo: instLogo, accountType: "girokonto", holderName: a.holderName, iban: a.iban, balance: a.balance, currency: a.currency, isDemo: false, externalId: a.externalId });
@@ -120,7 +126,7 @@ export default function AccountsPage() {
   async function handleIbanSubmit() {
     const clean = ibanInput.replace(/\s/g, "").toUpperCase();
     const blz = ibanToBlz(clean);
-    if (!blz) { setConnectError("Ungültige IBAN — bitte prüfen."); return; }
+    if (!blz) { setConnectError(t("invalidIban")); return; }
 
     setStep("discovering");
     setConnectError("");
@@ -133,11 +139,11 @@ export default function AccountsPage() {
         setStep("credentials");
       } else {
         setNotFound(true);
-        setDiscoveredBank({ name: "Deine Bank", url: "", logo: "", color: "#0d1f3c", blz, found: false });
+        setDiscoveredBank({ name: t("yourBank"), url: "", logo: "", color: "#0d1f3c", blz, found: false });
         setStep("credentials");
       }
     } catch {
-      setConnectError("Verbindung fehlgeschlagen. Bitte erneut versuchen.");
+      setConnectError(t("connectionFailed"));
       setStep("iban");
     }
   }
@@ -151,8 +157,8 @@ export default function AccountsPage() {
     try {
       const res = await fetch("/api/fints/connect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ bankUrl, blz: discoveredBank.blz, username: username.trim(), pin: pin.trim() }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Verbindung fehlgeschlagen");
-      if (data.requiresTan) { setSessionId(data.sessionId); setTanChallenge(data.tanChallenge ?? "TAN eingeben"); setTan(""); setStep("tan"); return; }
+      if (!res.ok) throw new Error(data.error ?? t("connectionFailedTitle"));
+      if (data.requiresTan) { setSessionId(data.sessionId); setTanChallenge(data.tanChallenge ?? t("tanEnterPlaceholder")); setTan(""); setStep("tan"); return; }
       finishImport(data.accounts);
     } catch (err) { setConnectError(err instanceof Error ? err.message : String(err)); setStep("error"); }
   }
@@ -163,8 +169,8 @@ export default function AccountsPage() {
     try {
       const res = await fetch("/api/fints/tan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId, tan: tan.trim() }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "TAN fehlgeschlagen");
-      if (data.requiresTan) { setTanChallenge(data.tanChallenge ?? "TAN eingeben"); setTan(""); setStep("tan"); return; }
+      if (!res.ok) throw new Error(data.error ?? t("tanFailed"));
+      if (data.requiresTan) { setTanChallenge(data.tanChallenge ?? t("tanEnterPlaceholder")); setTan(""); setStep("tan"); return; }
       finishImport(data.accounts);
     } catch (err) { setConnectError(err instanceof Error ? err.message : String(err)); setStep("error"); }
   }
@@ -178,8 +184,8 @@ export default function AccountsPage() {
   }
 
   function handleDemoImport() {
-    const bank = discoveredBank ?? { name: "Demo Bank", logo: "", color: "#0d1f3c", blz: "00000000" };
-    const account = acc.addAccount({ bankName: bank.name, bankColor: bank.color, bankInitials: bank.name.slice(0, 2).toUpperCase(), bankLogo: bank.logo, accountType: "girokonto", holderName: "Mein Konto", iban: ibanInput.replace(/\s/g, "") || "DE89370400440532013000", balance: 2347.85, currency: "EUR", isDemo: true });
+    const bank = discoveredBank ?? { name: t("demoBankName"), logo: "", color: "#0d1f3c", blz: "00000000" };
+    const account = acc.addAccount({ bankName: bank.name, bankColor: bank.color, bankInitials: bank.name.slice(0, 2).toUpperCase(), bankLogo: bank.logo, accountType: "girokonto", holderName: t("myAccount"), iban: ibanInput.replace(/\s/g, "") || "DE89370400440532013000", balance: 2347.85, currency: "EUR", isDemo: true });
     acc.addTransactions(account.id, DEMO_TX, "EUR");
     setStep("done"); setTimeout(() => setModal("none"), 1500);
   }
@@ -244,11 +250,11 @@ export default function AccountsPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Meine Konten</h1>
-          <p className="text-[#0d1f3c]/40 text-sm mt-0.5">Direkte Bankverbindung · Kein Drittanbieter nötig</p>
+          <h1 className="text-2xl font-extrabold text-[#0d1f3c]">{t("title")}</h1>
+          <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{t("subtitle")}</p>
         </div>
-        <button onClick={openConnect} className="bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
-          + Konto hinzufügen
+        <button onClick={openConnect} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
+          <span className="text-base leading-none">+</span> {t("addAccount")}
         </button>
       </div>
 
@@ -256,9 +262,9 @@ export default function AccountsPage() {
       {acc.accounts.length > 0 && (
         <div className="bg-[#0d1f3c] text-white rounded-2xl p-5 mb-6 flex items-center justify-between">
           <div>
-            <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">Gesamtsaldo</p>
+            <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">{t("totalBalance")}</p>
             <p className="text-3xl font-extrabold">{fmt(totalBalance)}</p>
-            <p className="text-white/40 text-xs mt-1">{acc.accounts.length} Konto{acc.accounts.length !== 1 ? "en" : ""} verknüpft</p>
+            <p className="text-white/40 text-xs mt-1">{t("accountsLinked", { count: acc.accounts.length })}</p>
           </div>
           <Landmark className="w-12 h-12 opacity-20" />
         </div>
@@ -268,9 +274,9 @@ export default function AccountsPage() {
       {acc.accounts.length === 0 ? (
         <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center mb-6">
           <Landmark className="w-12 h-12 mb-4 mx-auto text-sky-400" />
-          <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch kein Konto verknüpft</h3>
-          <p className="text-[#0d1f3c]/40 text-sm mb-6 max-w-sm mx-auto">Gib einfach deine IBAN ein — wir erkennen deine Bank automatisch und stellen die Verbindung her.</p>
-          <button onClick={openConnect} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">Bank verbinden <ArrowRight className="w-4 h-4" /></button>
+          <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">{t("noAccountTitle")}</h3>
+          <p className="text-[#0d1f3c]/40 text-sm mb-6 max-w-sm mx-auto">{t("noAccountDesc")}</p>
+          <button onClick={openConnect} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">{t("connectBank")} <ArrowRight className="w-4 h-4" /></button>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4 mb-6">
@@ -292,8 +298,8 @@ export default function AccountsPage() {
                   <BankLogo logo={account.bankLogo} name={account.bankName} />
                 )}
                 <div className="flex items-center gap-2">
-                  {!account.isDemo && account.externalId && <span className="text-[9px] bg-white/20 border border-white/30 px-2 py-0.5 rounded-full font-bold">LIVE</span>}
-                  {account.isDemo && <span className="text-[9px] bg-white/20 border border-white/30 px-2 py-0.5 rounded-full font-bold">DEMO</span>}
+                  {!account.isDemo && account.externalId && <span className="text-[9px] bg-white/20 border border-white/30 px-2 py-0.5 rounded-full font-bold">{t("live")}</span>}
+                  {account.isDemo && <span className="text-[9px] bg-white/20 border border-white/30 px-2 py-0.5 rounded-full font-bold">{t("demo")}</span>}
                   <button onClick={() => acc.removeAccount(account.id)} className="text-white/40 hover:text-white text-xl transition-colors">×</button>
                 </div>
               </div>
@@ -304,16 +310,16 @@ export default function AccountsPage() {
                     <p className="text-white/60 text-xs uppercase tracking-wider mb-0.5">{account.bankName}</p>
                     {account.accountType !== "wallet"
                       ? <p className="text-2xl font-extrabold">{fmt(account.balance, account.currency)}</p>
-                      : <p className="text-sm font-semibold text-white/70">{acc.accountTransactions(account.id).length} Ausgabe{acc.accountTransactions(account.id).length !== 1 ? "n" : ""} erfasst</p>}
+                      : <p className="text-sm font-semibold text-white/70">{t("expensesLogged", { count: acc.accountTransactions(account.id).length })}</p>}
                   </div>
                   <div className="flex gap-2">
                     {account.accountType === "wallet" && (
-                      <button onClick={() => openQuickLog(account.id)} className="text-xs bg-white text-[#0d1f3c] hover:bg-white/90 transition-colors px-3 py-1.5 rounded-lg font-bold shadow-sm">
-                        + Ausgabe
+                      <button onClick={() => openQuickLog(account.id)} className="inline-flex items-center gap-1 text-xs bg-white text-[#0d1f3c] hover:bg-white/90 transition-colors px-3 py-1.5 rounded-lg font-bold shadow-sm">
+                        <span className="leading-none">+</span> {t("addExpense")}
                       </button>
                     )}
                     <button onClick={() => { setActiveAccountId(account.id); setModal("transactions"); }} className="flex items-center gap-1 text-xs bg-white/20 hover:bg-white/30 transition-colors px-3 py-1.5 rounded-lg font-semibold">
-                      Verlauf <ArrowRight className="w-3.5 h-3.5" />
+                      {t("history")} <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -325,8 +331,8 @@ export default function AccountsPage() {
 
       {/* Wallet tiles */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6">
-        <h2 className="font-extrabold text-[#0d1f3c] mb-1">Bezahldienste</h2>
-        <p className="text-[#0d1f3c]/40 text-xs mb-4">Apple Pay & Google Pay verknüpfen</p>
+        <h2 className="font-extrabold text-[#0d1f3c] mb-1">{t("paymentServices")}</h2>
+        <p className="text-[#0d1f3c]/40 text-xs mb-4">{t("paymentServicesDesc")}</p>
         <div className="grid grid-cols-2 gap-3">
           {(["apple", "google"] as const).map((type) => {
             const connected = acc.accounts.some((a) => a.walletType === type);
@@ -340,13 +346,13 @@ export default function AccountsPage() {
                   {icon}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-[#0d1f3c]">{isApple ? "Apple Pay" : "Google Pay"}</p>
-                    <p className="text-xs text-emerald-500 font-semibold flex items-center gap-1"><Check className="w-3 h-3" /> Verbunden</p>
+                    <p className="text-xs text-emerald-500 font-semibold flex items-center gap-1"><Check className="w-3 h-3" /> {t("connected")}</p>
                   </div>
-                  <button onClick={() => openQuickLog(walletAccount.id)} className="text-xs bg-[#0d1f3c] text-white px-3 py-1.5 rounded-lg font-bold hover:bg-[#162d54] transition-colors flex-shrink-0">
-                    + Ausgabe
+                  <button onClick={() => openQuickLog(walletAccount.id)} className="inline-flex items-center gap-1 text-xs bg-[#0d1f3c] text-white px-3 py-1.5 rounded-lg font-bold hover:bg-[#162d54] transition-colors flex-shrink-0">
+                    <span className="leading-none">+</span> {t("addExpense")}
                   </button>
                 </div>
-              : <button key={type} onClick={() => connectWallet(type)} className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl text-left transition-colors border border-dashed border-gray-200">{icon}<div><p className="text-sm font-bold text-[#0d1f3c]">{isApple ? "Apple Pay" : "Google Pay"}</p><p className="text-xs text-[#0d1f3c]/40">Verbinden &amp; Ausgaben erfassen</p></div></button>;
+              : <button key={type} onClick={() => connectWallet(type)} className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl text-left transition-colors border border-dashed border-gray-200">{icon}<div><p className="text-sm font-bold text-[#0d1f3c]">{isApple ? "Apple Pay" : "Google Pay"}</p><p className="text-xs text-[#0d1f3c]/40">{t("connectAction")}</p></div></button>;
           })}
         </div>
       </div>
@@ -355,8 +361,8 @@ export default function AccountsPage() {
       {acc.transactions.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
-            <h2 className="font-extrabold text-[#0d1f3c]">Letzte Transaktionen</h2>
-            <span className="text-xs text-[#0d1f3c]/30">{acc.transactions.length} importiert</span>
+            <h2 className="font-extrabold text-[#0d1f3c]">{t("recentTransactions")}</h2>
+            <span className="text-xs text-[#0d1f3c]/30">{t("imported", { count: acc.transactions.length })}</span>
           </div>
           <div className="divide-y divide-gray-50">
             {acc.transactions.slice(0, 8).map((txn) => (
@@ -365,10 +371,10 @@ export default function AccountsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-[#0d1f3c] truncate">{txn.description}</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-xs text-[#0d1f3c]/30">{new Date(txn.date).toLocaleDateString("de-DE", { day: "2-digit", month: "short" })}</span>
+                    <span className="text-xs text-[#0d1f3c]/30">{new Date(txn.date).toLocaleDateString(locale, { day: "2-digit", month: "short" })}</span>
                     <span className="text-[#0d1f3c]/20">·</span>
                     <span className="text-xs text-[#0d1f3c]/40">{CATEGORY_LABELS[txn.category]}</span>
-                    {txn.autoCategorized && <span className="text-[9px] bg-blue-50 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">AUTO</span>}
+                    {txn.autoCategorized && <span className="text-[9px] bg-blue-50 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">{t("auto")}</span>}
                   </div>
                 </div>
                 <span className="text-sm font-bold text-[#0d1f3c] flex-shrink-0">-{fmt(txn.amount, txn.currency)}</span>
@@ -383,7 +389,7 @@ export default function AccountsPage() {
         <div className="mt-4">
           <button onClick={() => { setModal("csv"); setCsvPreview([]); setCsvDone(false); setActiveAccountId(acc.accounts[0]?.id ?? null); }}
             className="w-full border border-dashed border-gray-200 rounded-2xl py-4 text-sm font-semibold text-[#0d1f3c]/40 hover:border-[#0d1f3c]/30 hover:text-[#0d1f3c]/60 transition-colors flex items-center justify-center gap-2">
-            <Upload className="w-4 h-4" /> Kontoauszug als CSV importieren
+            <Upload className="w-4 h-4" /> {t("importCsv")}
           </button>
         </div>
       )}
@@ -399,14 +405,14 @@ export default function AccountsPage() {
               <div className="flex flex-col">
                 <div className="flex items-center justify-between p-5 border-b border-gray-100">
                   <div>
-                    <h2 className="font-extrabold text-[#0d1f3c] text-lg">Bank verbinden</h2>
-                    <p className="text-xs text-[#0d1f3c]/40 mt-0.5">Gib einfach deine IBAN ein</p>
+                    <h2 className="font-extrabold text-[#0d1f3c] text-lg">{t("connectModalTitle")}</h2>
+                    <p className="text-xs text-[#0d1f3c]/40 mt-0.5">{t("connectModalSubtitle")}</p>
                   </div>
                   <button onClick={() => setModal("none")} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
                 </div>
                 <div className="p-6 space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-[#0d1f3c] mb-2">IBAN</label>
+                    <label className="block text-sm font-bold text-[#0d1f3c] mb-2">{t("ibanLabel")}</label>
                     <input
                       autoFocus
                       type="text"
@@ -417,19 +423,19 @@ export default function AccountsPage() {
                       onKeyDown={(e) => { if (e.key === "Enter" && ibanValid) handleIbanSubmit(); }}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-lg font-mono tracking-wide text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
                     />
-                    {ibanValid && <p className="text-xs text-emerald-500 font-semibold mt-1.5 flex items-center gap-1"><Check className="w-3 h-3" /> Gültige IBAN</p>}
+                    {ibanValid && <p className="text-xs text-emerald-500 font-semibold mt-1.5 flex items-center gap-1"><Check className="w-3 h-3" /> {t("ibanValid")}</p>}
                     {connectError && <p className="text-xs text-rose-500 mt-1.5">{connectError}</p>}
                   </div>
                   <div className="bg-gray-50 rounded-xl p-3 flex items-start gap-2">
                     <Lightbulb className="w-4 h-4 flex-shrink-0 text-amber-500 mt-px" />
-                    <p className="text-xs text-[#0d1f3c]/50">Deine IBAN findest du auf deiner Bankkarte oder im Online-Banking unter Kontodetails.</p>
+                    <p className="text-xs text-[#0d1f3c]/50">{t("ibanHint")}</p>
                   </div>
                   <button onClick={handleIbanSubmit} disabled={!ibanValid}
                     className="w-full flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                    Bank automatisch erkennen <ArrowRight className="w-4 h-4" />
+                    {t("detectBank")} <ArrowRight className="w-4 h-4" />
                   </button>
                   <button onClick={handleDemoImport} className="w-full text-xs text-[#0d1f3c]/30 hover:text-[#0d1f3c]/50 transition-colors py-1">
-                    Demo-Daten laden
+                    {t("loadDemoData")}
                   </button>
                 </div>
               </div>
@@ -440,8 +446,8 @@ export default function AccountsPage() {
               <div className="p-12 flex flex-col items-center gap-5">
                 <div className="w-14 h-14 border-4 border-[#0d1f3c]/10 border-t-[#0d1f3c] rounded-full animate-spin" />
                 <div className="text-center">
-                  <p className="font-extrabold text-[#0d1f3c] text-lg mb-1">Bank wird erkannt…</p>
-                  <p className="text-[#0d1f3c]/40 text-sm">Wir suchen automatisch nach deiner Bank</p>
+                  <p className="font-extrabold text-[#0d1f3c] text-lg mb-1">{t("discoveringTitle")}</p>
+                  <p className="text-[#0d1f3c]/40 text-sm">{t("discoveringDesc")}</p>
                 </div>
               </div>
             )}
@@ -459,38 +465,38 @@ export default function AccountsPage() {
                     </div>
                   </div>
                   {discoveredBank.found
-                    ? <span className="text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-full font-bold flex-shrink-0 inline-flex items-center gap-1"><Check className="w-3 h-3" /> Erkannt</span>
-                    : <span className="text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-1 rounded-full font-bold flex-shrink-0">Manuell</span>}
+                    ? <span className="text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-full font-bold flex-shrink-0 inline-flex items-center gap-1"><Check className="w-3 h-3" /> {t("recognized")}</span>
+                    : <span className="text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-1 rounded-full font-bold flex-shrink-0">{t("manual")}</span>}
                 </div>
                 <div className="overflow-y-auto flex-1 p-5 space-y-3">
                   {notFound && (
                     <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 space-y-2">
-                      <p className="text-xs font-bold text-amber-700">Bank nicht automatisch gefunden</p>
-                      <p className="text-xs text-amber-600">Bitte gib die FinTS-URL deiner Bank ein. Diese findest du auf der Website deiner Bank oder unter fints.de.</p>
+                      <p className="text-xs font-bold text-amber-700">{t("bankNotFoundTitle")}</p>
+                      <p className="text-xs text-amber-600">{t("bankNotFoundDesc")}</p>
                       <input type="url" placeholder="https://banking.meine-bank.de/fints" value={manualUrl} onChange={(e) => setManualUrl(e.target.value)}
                         className="w-full border border-amber-200 rounded-xl px-3 py-2.5 text-xs text-[#0d1f3c] bg-white focus:outline-none focus:ring-1 focus:ring-amber-300" />
                     </div>
                   )}
                   <div>
-                    <label className="block text-xs font-bold text-[#0d1f3c] mb-1.5">Online-Banking Benutzername</label>
-                    <input autoFocus type="text" autoComplete="username" placeholder="Benutzername / Kontonummer" value={username} onChange={(e) => setUsername(e.target.value)}
+                    <label className="block text-xs font-bold text-[#0d1f3c] mb-1.5">{t("onlineBankingUsername")}</label>
+                    <input autoFocus type="text" autoComplete="username" placeholder={t("usernamePlaceholder")} value={username} onChange={(e) => setUsername(e.target.value)}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#0d1f3c] mb-1.5">PIN / Passwort</label>
+                    <label className="block text-xs font-bold text-[#0d1f3c] mb-1.5">{t("pinLabel")}</label>
                     <input type="password" autoComplete="current-password" placeholder="••••••" value={pin} onChange={(e) => setPin(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter") handleConnect(); }}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
                   </div>
                   <p className="text-[10px] text-[#0d1f3c]/30 text-center flex items-center justify-center gap-1">
-                    <Lock className="w-3 h-3 flex-shrink-0" /> Zugangsdaten werden nur für diese Verbindung verwendet und niemals gespeichert.
+                    <Lock className="w-3 h-3 flex-shrink-0" /> {t("credentialsHint")}
                   </p>
                 </div>
                 <div className="p-5 border-t border-gray-100 flex gap-3">
-                  <button onClick={handleDemoImport} className="text-xs border border-gray-200 px-4 py-3 rounded-xl font-semibold text-[#0d1f3c]/40 hover:bg-gray-50 transition-colors">Demo</button>
+                  <button onClick={handleDemoImport} className="text-xs border border-gray-200 px-4 py-3 rounded-xl font-semibold text-[#0d1f3c]/40 hover:bg-gray-50 transition-colors">{t("demo_short")}</button>
                   <button onClick={handleConnect} disabled={!username.trim() || !pin.trim() || (notFound && !manualUrl.trim())}
                     className="flex-1 flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                    Verbinden <ArrowRight className="w-4 h-4" />
+                    {t("connect")} <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -501,8 +507,8 @@ export default function AccountsPage() {
               <div className="p-12 flex flex-col items-center gap-5">
                 <div className="w-14 h-14 border-4 border-[#0d1f3c]/10 border-t-[#0d1f3c] rounded-full animate-spin" />
                 <div className="text-center">
-                  <p className="font-extrabold text-[#0d1f3c] text-lg mb-1">Verbindung wird hergestellt…</p>
-                  <p className="text-[#0d1f3c]/40 text-sm">Transaktionen werden abgerufen</p>
+                  <p className="font-extrabold text-[#0d1f3c] text-lg mb-1">{t("connectingTitle")}</p>
+                  <p className="text-[#0d1f3c]/40 text-sm">{t("connectingDesc")}</p>
                 </div>
               </div>
             )}
@@ -512,7 +518,7 @@ export default function AccountsPage() {
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center"><KeyRound className="w-5 h-5 text-amber-600" /></div>
-                  <div><h2 className="font-extrabold text-[#0d1f3c]">TAN erforderlich</h2><p className="text-xs text-[#0d1f3c]/40">{discoveredBank?.name}</p></div>
+                  <div><h2 className="font-extrabold text-[#0d1f3c]">{t("tanRequired")}</h2><p className="text-xs text-[#0d1f3c]/40">{discoveredBank?.name}</p></div>
                 </div>
                 <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
                   <p className="text-sm font-semibold text-amber-800">{tanChallenge}</p>
@@ -522,7 +528,7 @@ export default function AccountsPage() {
                   onKeyDown={(e) => { if (e.key === "Enter") handleTan(); }}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-xl text-center tracking-widest font-mono text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
                 <button onClick={handleTan} disabled={!tan.trim()} className="w-full flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3 text-sm font-bold hover:bg-[#162d54] transition-colors disabled:opacity-30">
-                  Bestätigen <ArrowRight className="w-4 h-4" />
+                  {t("confirm")} <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             )}
@@ -531,8 +537,8 @@ export default function AccountsPage() {
             {step === "done" && (
               <div className="p-12 flex flex-col items-center gap-4">
                 <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center"><Check className="w-8 h-8 text-emerald-600" /></div>
-                <p className="font-extrabold text-[#0d1f3c] text-xl">Verbunden!</p>
-                <p className="text-[#0d1f3c]/40 text-sm text-center">Transaktionen importiert und automatisch kategorisiert.</p>
+                <p className="font-extrabold text-[#0d1f3c] text-xl">{t("connectedTitle")}</p>
+                <p className="text-[#0d1f3c]/40 text-sm text-center">{t("connectedDesc")}</p>
               </div>
             )}
 
@@ -540,13 +546,13 @@ export default function AccountsPage() {
             {step === "error" && (
               <div className="p-8 flex flex-col items-center gap-4">
                 <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center"><X className="w-8 h-8 text-rose-600" /></div>
-                <p className="font-extrabold text-[#0d1f3c] text-lg">Verbindung fehlgeschlagen</p>
+                <p className="font-extrabold text-[#0d1f3c] text-lg">{t("connectionFailedTitle")}</p>
                 <div className="w-full bg-rose-50 border border-rose-100 rounded-xl p-3">
                   <p className="text-rose-600 text-sm">{connectError}</p>
                 </div>
                 <div className="flex gap-3 w-full">
-                  <button onClick={() => setStep("credentials")} className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-[#0d1f3c]/60 hover:bg-gray-50 transition-colors">Zurück</button>
-                  <button onClick={handleDemoImport} className="flex-1 bg-gray-100 text-[#0d1f3c] rounded-xl py-3 text-sm font-semibold hover:bg-gray-200 transition-colors">Demo laden</button>
+                  <button onClick={() => setStep("credentials")} className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-[#0d1f3c]/60 hover:bg-gray-50 transition-colors">{t("back")}</button>
+                  <button onClick={handleDemoImport} className="flex-1 bg-gray-100 text-[#0d1f3c] rounded-xl py-3 text-sm font-semibold hover:bg-gray-200 transition-colors">{t("loadDemo")}</button>
                 </div>
               </div>
             )}
@@ -560,28 +566,28 @@ export default function AccountsPage() {
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/40 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) setModal("none"); }}>
           <div className="bg-white w-full md:max-w-2xl rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 flex-shrink-0">
-              <h2 className="font-extrabold text-[#0d1f3c] text-lg">Kontoauszug importieren</h2>
+              <h2 className="font-extrabold text-[#0d1f3c] text-lg">{t("importCsvModalTitle")}</h2>
               <button onClick={() => setModal("none")} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
             </div>
             <div className="overflow-y-auto flex-1 p-5">
               <div className="mb-4">
-                <label className="block text-sm font-bold text-[#0d1f3c] mb-1.5">Zu welchem Konto?</label>
+                <label className="block text-sm font-bold text-[#0d1f3c] mb-1.5">{t("whichAccount")}</label>
                 <select value={activeAccountId ?? ""} onChange={(e) => setActiveAccountId(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] bg-white focus:outline-none">
                   {acc.accounts.filter((a) => a.accountType !== "wallet").map((a) => <option key={a.id} value={a.id}>{a.bankName} – {maskIban(a.iban)}</option>)}
                 </select>
               </div>
               <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-[#0d1f3c]/30 transition-colors mb-4">
                 <Upload className="w-8 h-8 mb-3 mx-auto text-violet-400" />
-                <p className="font-bold text-[#0d1f3c] mb-1">CSV-Datei hier ablegen</p>
-                <p className="text-xs text-[#0d1f3c]/40">Sparkasse · DKB · ING · Commerzbank · Deutsche Bank</p>
+                <p className="font-bold text-[#0d1f3c] mb-1">{t("dropCsvTitle")}</p>
+                <p className="text-xs text-[#0d1f3c]/40">{t("dropCsvDesc")}</p>
                 <input ref={fileRef} type="file" accept=".csv,.txt" onChange={handleFileChange} className="hidden" />
               </div>
-              {csvLoading && <div className="flex items-center justify-center gap-3 py-6"><div className="w-5 h-5 border-2 border-[#0d1f3c]/20 border-t-[#0d1f3c] rounded-full animate-spin" /><span className="text-sm text-[#0d1f3c]/50">Wird analysiert…</span></div>}
+              {csvLoading && <div className="flex items-center justify-center gap-3 py-6"><div className="w-5 h-5 border-2 border-[#0d1f3c]/20 border-t-[#0d1f3c] rounded-full animate-spin" /><span className="text-sm text-[#0d1f3c]/50">{t("analyzing")}</span></div>}
               {csvPreview.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm font-bold text-[#0d1f3c]">{csvPreview.length} Ausgaben erkannt</p>
-                    <p className="text-xs text-[#0d1f3c]/40">{csvPreview.filter((r) => r.auto).length} auto-kategorisiert</p>
+                    <p className="text-sm font-bold text-[#0d1f3c]">{t("expensesDetected", { count: csvPreview.length })}</p>
+                    <p className="text-xs text-[#0d1f3c]/40">{t("autoCategorized", { count: csvPreview.filter((r) => r.auto).length })}</p>
                   </div>
                   <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
                     {csvPreview.map((row, i) => (
@@ -603,7 +609,7 @@ export default function AccountsPage() {
             {csvPreview.length > 0 && (
               <div className="p-5 border-t border-gray-100 flex-shrink-0">
                 <button onClick={handleCsvImport} className={`w-full flex items-center justify-center gap-1.5 py-3.5 rounded-xl font-bold text-sm transition-all ${csvDone ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}>
-                  {csvDone ? <><Check className="w-4 h-4" /> Importiert!</> : `${csvPreview.length} Transaktionen importieren`}
+                  {csvDone ? <><Check className="w-4 h-4" /> {t("imported2")}</> : t("importTransactions", { count: csvPreview.length })}
                 </button>
               </div>
             )}
@@ -619,26 +625,26 @@ export default function AccountsPage() {
           <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/40 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) setModal("none"); }}>
             <div className="bg-white w-full md:max-w-xl rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
               <div className="flex items-center justify-between p-5 border-b border-gray-100 flex-shrink-0">
-                <div><h2 className="font-extrabold text-[#0d1f3c]">{account?.bankName}</h2><p className="text-xs text-[#0d1f3c]/40">{txns.length} Transaktionen</p></div>
+                <div><h2 className="font-extrabold text-[#0d1f3c]">{account?.bankName}</h2><p className="text-xs text-[#0d1f3c]/40">{t("transactionsCount", { count: txns.length })}</p></div>
                 <div className="flex items-center gap-3">
-                  <button onClick={() => { setModal("csv"); setCsvPreview([]); setCsvDone(false); }} className="text-xs border border-gray-200 px-3 py-1.5 rounded-lg font-semibold text-[#0d1f3c]/60 hover:bg-gray-50 transition-colors">CSV importieren</button>
+                  <button onClick={() => { setModal("csv"); setCsvPreview([]); setCsvDone(false); }} className="text-xs border border-gray-200 px-3 py-1.5 rounded-lg font-semibold text-[#0d1f3c]/60 hover:bg-gray-50 transition-colors">{t("importCsvShort")}</button>
                   <button onClick={() => setModal("none")} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
                 </div>
               </div>
               <div className="overflow-y-auto flex-1 divide-y divide-gray-50">
                 {txns.length === 0
-                  ? <div className="p-10 text-center text-[#0d1f3c]/30 text-sm">Keine Transaktionen</div>
+                  ? <div className="p-10 text-center text-[#0d1f3c]/30 text-sm">{t("noTransactions")}</div>
                   : txns.map((txn) => (
                     <div key={txn.id} className="flex items-center gap-3 px-5 py-3.5 group">
                       <span className="flex-shrink-0"><CategoryIcon category={txn.category} className="w-5 h-5" /></span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-[#0d1f3c] truncate">{txn.description}</p>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-[#0d1f3c]/30">{new Date(txn.date).toLocaleDateString("de-DE", { day: "2-digit", month: "short" })}</span>
+                          <span className="text-xs text-[#0d1f3c]/30">{new Date(txn.date).toLocaleDateString(locale, { day: "2-digit", month: "short" })}</span>
                           <select value={txn.category} onChange={(e) => acc.updateCategory(txn.id, e.target.value as ExpenseCategory)} className="text-xs text-[#0d1f3c]/50 bg-transparent border-none outline-none cursor-pointer">
                             {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
                           </select>
-                          {txn.autoCategorized && <span className="text-[9px] bg-blue-50 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">AUTO</span>}
+                          {txn.autoCategorized && <span className="text-[9px] bg-blue-50 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">{t("auto")}</span>}
                         </div>
                       </div>
                       <span className="text-sm font-bold text-[#0d1f3c]">-{fmt(txn.amount, txn.currency)}</span>
@@ -667,7 +673,7 @@ export default function AccountsPage() {
                   {isApple ? "AP" : "GP"}
                 </div>
                 <div className="flex-1">
-                  <h2 className="font-extrabold text-[#0d1f3c]">Ausgabe erfassen</h2>
+                  <h2 className="font-extrabold text-[#0d1f3c]">{t("logExpense")}</h2>
                   <p className="text-xs text-[#0d1f3c]/40">{walletAccount?.bankName}</p>
                 </div>
                 <button onClick={() => setModal("none")} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
@@ -676,13 +682,13 @@ export default function AccountsPage() {
               {quickDone ? (
                 <div className="p-12 flex flex-col items-center gap-3">
                   <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center"><Check className="w-7 h-7 text-emerald-600" /></div>
-                  <p className="font-extrabold text-[#0d1f3c]">Ausgabe gespeichert!</p>
+                  <p className="font-extrabold text-[#0d1f3c]">{t("expenseSaved")}</p>
                 </div>
               ) : (
                 <div className="p-5 space-y-4">
                   {/* Amount — big and prominent */}
                   <div>
-                    <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Betrag</label>
+                    <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("amount")}</label>
                     <div className="flex items-center gap-2 border-2 border-gray-100 rounded-2xl px-4 py-3 focus-within:border-[#0d1f3c]/20">
                       <span className="text-2xl font-extrabold text-[#0d1f3c]/30">€</span>
                       <input
@@ -700,10 +706,10 @@ export default function AccountsPage() {
 
                   {/* Description */}
                   <div>
-                    <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Beschreibung</label>
+                    <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("description")}</label>
                     <input
                       type="text"
-                      placeholder="z. B. Starbucks, Uber, Rewe …"
+                      placeholder={t("descPlaceholder")}
                       value={quickDesc}
                       onChange={(e) => handleQuickDescChange(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter") handleQuickSubmit(); }}
@@ -714,18 +720,18 @@ export default function AccountsPage() {
                   {/* Category + Date row */}
                   <div className="flex gap-3">
                     <div className="flex-1">
-                      <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Kategorie</label>
+                      <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("category")}</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2"><CategoryIcon category={quickCategory} className="w-4 h-4" /></span>
                         <select value={quickCategory} onChange={(e) => { setQuickCategory(e.target.value as ExpenseCategory); setQuickAutocat(false); }}
                           className="w-full border border-gray-100 rounded-xl pl-9 pr-3 py-3 text-sm text-[#0d1f3c] bg-gray-50 focus:outline-none appearance-none cursor-pointer">
                           {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
                         </select>
-                        {quickAutocat && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] bg-blue-50 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">AUTO</span>}
+                        {quickAutocat && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] bg-blue-50 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">{t("auto")}</span>}
                       </div>
                     </div>
                     <div className="flex-1">
-                      <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Datum</label>
+                      <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("date")}</label>
                       <input type="date" value={quickDate} onChange={(e) => setQuickDate(e.target.value)}
                         className="w-full border border-gray-100 rounded-xl px-3 py-3 text-sm text-[#0d1f3c] bg-gray-50 focus:outline-none" />
                     </div>
@@ -745,7 +751,7 @@ export default function AccountsPage() {
                     disabled={!quickAmount || !quickDesc.trim()}
                     className="w-full py-4 rounded-2xl text-white font-extrabold text-base transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     style={{ background: accentColor }}>
-                    Ausgabe speichern
+                    {t("saveExpense")}
                   </button>
                 </div>
               )}
