@@ -167,7 +167,7 @@ export default function ChecklistPage() {
         <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Auslands-Checkliste</h1>
         <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{doneItems} von {totalItems} erledigt</p>
         <p className="text-[#0d1f3c]/40 text-xs mt-2 bg-[#0d1f3c]/5 rounded-lg px-3 py-2 flex items-start gap-1.5">
-          <Lightbulb className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" /> Diese Liste ist nur ein Vorschlag und erhebt keinen Anspruch auf Vollständigkeit. Ergänze unten eigene Aufgaben, die für deine Situation wichtig sind.
+          <Lightbulb className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#d97706" }} /> Diese Liste ist nur ein Vorschlag und erhebt keinen Anspruch auf Vollständigkeit. Ergänze unten eigene Aufgaben, die für deine Situation wichtig sind.
         </p>
       </div>
 
@@ -178,8 +178,8 @@ export default function ChecklistPage() {
             <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-1">Fortschritt</p>
             <p className="text-3xl font-extrabold">{pct}%</p>
           </div>
-          <div className="text-white/20">
-            {pct >= 100 ? <PartyPopper className="w-10 h-10" /> : pct >= 50 ? <Flame className="w-10 h-10" /> : <ClipboardList className="w-10 h-10" />}
+          <div className="opacity-40">
+            {pct >= 100 ? <PartyPopper className="w-10 h-10 text-amber-300" /> : pct >= 50 ? <Flame className="w-10 h-10 text-orange-300" /> : <ClipboardList className="w-10 h-10 text-white" />}
           </div>
         </div>
         <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
@@ -199,7 +199,7 @@ export default function ChecklistPage() {
             <div key={section.title} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
               <button onClick={() => toggleSection(section.title)}
                 className="w-full flex items-center gap-3 px-5 py-4 hover:bg-gray-50/60 transition-colors">
-                <section.icon className="w-5 h-5 text-[#0d1f3c]/70 flex-shrink-0" />
+                <section.icon className="w-5 h-5 flex-shrink-0" style={{ color: section.color }} />
                 <div className="flex-1 text-left">
                   <p className="font-extrabold text-[#0d1f3c]">{section.title}</p>
                   <p className="text-xs text-[#0d1f3c]/40">{sectionDone}/{section.items.length} erledigt</p>

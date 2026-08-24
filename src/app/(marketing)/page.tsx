@@ -13,7 +13,7 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-16 md:pt-24 pb-16 md:pb-20 grid lg:grid-cols-[1.2fr_1fr] gap-12 items-center">
           <div className="text-center lg:text-left">
             <div className="inline-flex items-center gap-2 bg-[#0d1f3c]/5 text-[#0d1f3c] text-xs font-semibold px-4 py-2 rounded-full mb-6 md:mb-8 tracking-widest uppercase">
-              <Plane className="w-3.5 h-3.5" /> Plan. Budget. Explore.
+              <Plane className="w-3.5 h-3.5 text-sky-500" /> Plan. Budget. Explore.
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[#0d1f3c] leading-tight tracking-tight mb-5 md:mb-6">
               Dein Plan für dein<br />Auslandsabenteuer.
@@ -88,27 +88,31 @@ export default function Home() {
           {[
             {
               icon: GraduationCap,
+              color: "#8b5cf6",
               title: "Für Studierende",
               desc: "Speziell auf Auslandssemester und Stipendien ausgerichtet. Budgets nach BAföG oder Stipendiumsbeträgen.",
             },
             {
               icon: Globe,
+              color: "#10b981",
               title: "International",
               desc: "Verwalte Konten in mehreren Ländern und Währungen gleichzeitig – immer aktuell.",
             },
             {
               icon: BarChart3,
+              color: "#3b82f6",
               title: "Finanzplanung",
               desc: "Erstelle Budgets für Miete, Essen und Freizeit. Behalte deine Ausgaben mit klaren Charts im Blick.",
             },
             {
               icon: Lock,
+              color: "#f43f5e",
               title: "Sicherheit",
               desc: "Deine Daten sind Ende-zu-Ende verschlüsselt. Keine Werbung, keine Datenweitergabe.",
             },
           ].map((f) => (
             <div key={f.title} className="bg-gray-50 rounded-2xl p-6 hover:bg-[#0d1f3c]/5 transition-colors">
-              <div className="w-12 h-12 rounded-full bg-[#0d1f3c] flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: f.color }}>
                 <f.icon className="w-5 h-5 text-white" />
               </div>
               <h3 className="font-bold text-[#0d1f3c] text-lg mb-2">{f.title}</h3>

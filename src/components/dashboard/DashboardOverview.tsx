@@ -130,7 +130,7 @@ export default function DashboardOverview({ userName }: { userName: string }) {
           </div>
           {recentExpenses.length === 0 ? (
             <div className="text-center py-6">
-              <Receipt className="w-6 h-6 mx-auto mb-2 text-[#0d1f3c]/20" />
+              <Receipt className="w-6 h-6 mx-auto mb-2 text-orange-300" />
               <p className="text-[#0d1f3c]/30 text-sm">Noch keine Ausgaben.</p>
               <Link
                 href="/dashboard/transactions"
@@ -166,18 +166,18 @@ export default function DashboardOverview({ userName }: { userName: string }) {
       {/* Quick Links */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-6">
         {[
-          { href: "/dashboard/transactions", icon: Plus, label: "Ausgabe hinzufügen" },
-          { href: "/dashboard/analytics", icon: TrendingUp, label: "Budget-Analyse" },
-          { href: "/dashboard/budget", icon: Settings, label: "Budget anpassen" },
-          { href: "/dashboard/converter", icon: Coins, label: "Währung umrechnen" },
-          { href: "/dashboard/settings", icon: User, label: "Profil bearbeiten" },
+          { href: "/dashboard/transactions", icon: Plus, label: "Ausgabe hinzufügen", color: "#f97316" },
+          { href: "/dashboard/analytics", icon: TrendingUp, label: "Budget-Analyse", color: "#8b5cf6" },
+          { href: "/dashboard/budget", icon: Settings, label: "Budget anpassen", color: "#10b981" },
+          { href: "/dashboard/converter", icon: Coins, label: "Währung umrechnen", color: "#f59e0b" },
+          { href: "/dashboard/settings", icon: User, label: "Profil bearbeiten", color: "#64748b" },
         ].map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className="bg-white rounded-2xl p-4 shadow-sm text-center hover:shadow-md hover:-translate-y-0.5 transition-all"
           >
-            <link.icon className="w-6 h-6 mx-auto mb-2 text-[#0d1f3c]" />
+            <link.icon className="w-6 h-6 mx-auto mb-2" style={{ color: link.color }} />
             <p className="text-xs font-semibold text-[#0d1f3c]">{link.label}</p>
           </Link>
         ))}

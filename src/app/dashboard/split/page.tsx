@@ -15,15 +15,20 @@ const GROUP_ICONS: Record<string, LucideIcon> = {
   beach: Palmtree, tower: Landmark, backpack: Backpack, globe: Globe,
   handshake: Handshake, beer: Beer, car: Car,
 };
+const GROUP_ICON_COLORS: Record<string, string> = {
+  plane: "#0ea5e9", home: "#f97316", party: "#ec4899", pizza: "#ef4444", grad: "#8b5cf6",
+  beach: "#22c55e", tower: "#64748b", backpack: "#d97706", globe: "#10b981",
+  handshake: "#f59e0b", beer: "#a16207", car: "#06b6d4",
+};
 const GROUP_ICON_IDS = Object.keys(GROUP_ICONS);
 const GROUP_EMOJI_FOR_SHARE: Record<string, string> = {
   plane: "✈️", home: "🏠", party: "🎉", pizza: "🍕", grad: "🎓", beach: "🏖️",
   tower: "🗼", backpack: "🎒", globe: "🌍", handshake: "🤝", beer: "🍻", car: "🚗",
 };
 
-function GroupIcon({ id, className = "w-5 h-5" }: { id: string; className?: string }) {
+function GroupIcon({ id, className = "w-5 h-5", colored = true }: { id: string; className?: string; colored?: boolean }) {
   const Icon = GROUP_ICONS[id] ?? Plane;
-  return <Icon className={className} />;
+  return <Icon className={className} style={colored ? { color: GROUP_ICON_COLORS[id] ?? GROUP_ICON_COLORS.plane } : undefined} />;
 }
 
 function QRShare({ group, settlements }: { group: SplitGroup; settlements: Settlement[] }) {
@@ -173,7 +178,7 @@ export default function SplitPage() {
 
         {split.groups.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
-            <Handshake className="w-10 h-10 mb-4 mx-auto text-[#0d1f3c]/20" />
+            <Handshake className="w-10 h-10 mb-4 mx-auto text-pink-400" />
             <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Gruppe</h3>
             <p className="text-[#0d1f3c]/40 text-sm mb-6">Erstelle deine erste Gruppe – für den Urlaub, die WG oder das nächste Event.</p>
             <button
@@ -265,7 +270,7 @@ export default function SplitPage() {
                   onClick={() => setNewEmoji(id)}
                   className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${newEmoji === id ? "bg-[#0d1f3c] text-white shadow-md scale-110" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}
                 >
-                  <GroupIcon id={id} className="w-5 h-5" />
+                  <GroupIcon id={id} className="w-5 h-5" colored={newEmoji !== id} />
                 </button>
               ))}
             </div>
@@ -500,7 +505,7 @@ export default function SplitPage() {
         <div className="space-y-3">
           {groupExps.length === 0 ? (
             <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
-              <NotebookText className="w-9 h-9 mb-3 mx-auto text-[#0d1f3c]/20" />
+              <NotebookText className="w-9 h-9 mb-3 mx-auto text-sky-400" />
               <p className="text-[#0d1f3c]/40 text-sm">Noch keine Ausgaben. Füge die erste hinzu!</p>
             </div>
           ) : (

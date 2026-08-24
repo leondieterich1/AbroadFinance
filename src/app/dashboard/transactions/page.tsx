@@ -10,6 +10,7 @@ import CategoryIcon from "@/components/ui/CategoryIcon";
 import { Receipt, ArrowDown, ArrowUp, Check, Landmark, Wallet, Pencil, type LucideIcon } from "lucide-react";
 
 const SOURCE_ICONS: Record<string, LucideIcon> = { bank: Landmark, wallet: Wallet, manual: Pencil };
+const SOURCE_ICON_COLORS: Record<string, string> = { bank: "#0ea5e9", wallet: "#8b5cf6", manual: "#f97316" };
 const SOURCE_LABELS: Record<string, string> = { bank: "Bank", wallet: "Wallet", manual: "Manuell" };
 
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
@@ -238,7 +239,7 @@ export default function TransactionsPage() {
                     {CATEGORIES.map((cat) => (
                       <button key={cat} type="button" onClick={() => { setFormCategory(cat); setFormAutocat(false); }}
                         className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${formCategory === cat ? "border-[#0d1f3c] bg-[#0d1f3c] text-white" : "border-gray-200 text-[#0d1f3c]/60 hover:border-[#0d1f3c]/30"}`}>
-                        <CategoryIcon category={cat} className="w-3.5 h-3.5" /> {CATEGORY_LABELS[cat].split(" ")[0]}
+                        <CategoryIcon category={cat} className="w-3.5 h-3.5" colored={formCategory !== cat} /> {CATEGORY_LABELS[cat].split(" ")[0]}
                         {formCategory === cat && formAutocat && <span className="text-[9px] bg-white/20 px-1 rounded">AUTO</span>}
                       </button>
                     ))}
@@ -267,7 +268,7 @@ export default function TransactionsPage() {
                 return (
                   <button key={cat} onClick={() => setFilterCategory(cat as typeof filterCategory)}
                     className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${filterCategory === cat ? "bg-[#0d1f3c] text-white" : "bg-white text-[#0d1f3c]/50 hover:text-[#0d1f3c] border border-gray-100"}`}>
-                    {cat !== "alle" && <CategoryIcon category={cat} className="w-3.5 h-3.5" />}
+                    {cat !== "alle" && <CategoryIcon category={cat} className="w-3.5 h-3.5" colored={filterCategory !== cat} />}
                     {cat === "alle" ? `Alle (${allTx.length})` : `${CATEGORY_LABELS[cat].split(" ")[0]} (${count})`}
                   </button>
                 );
@@ -283,7 +284,7 @@ export default function TransactionsPage() {
           {/* Transaction list */}
           {allTx.length === 0 ? (
             <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-16 text-center">
-              <Receipt className="w-9 h-9 mx-auto mb-4 text-[#0d1f3c]/20" />
+              <Receipt className="w-9 h-9 mx-auto mb-4 text-orange-300" />
               <p className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Ausgaben</p>
               <p className="text-[#0d1f3c]/40 text-sm">Verbinde dein Bankkonto oder erfasse Ausgaben manuell.</p>
             </div>
@@ -377,7 +378,7 @@ export default function TransactionsPage() {
                   return (
                     <button key={src} onClick={() => setFilterSource(filterSource === src ? "alle" : src)}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-colors ${filterSource === src ? "bg-[#0d1f3c] text-white" : "bg-gray-50 hover:bg-gray-100 text-[#0d1f3c]"}`}>
-                      <span className="font-semibold inline-flex items-center gap-1.5"><SrcIcon className="w-3.5 h-3.5" /> {SOURCE_LABELS[src]}</span>
+                      <span className="font-semibold inline-flex items-center gap-1.5"><SrcIcon className="w-3.5 h-3.5" style={{ color: filterSource === src ? undefined : SOURCE_ICON_COLORS[src] }} /> {SOURCE_LABELS[src]}</span>
                       <div className="text-right">
                         <p className="font-bold text-xs">{fmt(total)}</p>
                         <p className={`text-[10px] ${filterSource === src ? "text-white/50" : "text-[#0d1f3c]/30"}`}>{count} Buchungen</p>

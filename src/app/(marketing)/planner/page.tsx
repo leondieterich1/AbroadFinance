@@ -167,7 +167,7 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
         <h2 className="text-lg font-extrabold text-[#0d1f3c] mb-4">Letzte Ausgaben</h2>
         {planner.expenses.length === 0 ? (
           <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
-            <Receipt className="w-9 h-9 mb-3 mx-auto text-[#0d1f3c]/20" />
+            <Receipt className="w-9 h-9 mb-3 mx-auto text-orange-300" />
             <p className="text-[#0d1f3c]/50 font-medium">Noch keine Ausgaben eingetragen.</p>
             <p className="text-[#0d1f3c]/30 text-sm mt-1">Klicke auf „Ausgabe hinzufügen" um zu starten.</p>
           </div>
@@ -294,7 +294,7 @@ function AddExpenseTab({
                       : "border-gray-200 text-[#0d1f3c]/60 hover:border-[#0d1f3c]/30"
                   }`}
                 >
-                  <CategoryIcon category={cat} className="w-4 h-4" />
+                  <CategoryIcon category={cat} className="w-4 h-4" colored={category !== cat} />
                   <span className="truncate text-xs">{CATEGORY_LABELS[cat].split(" ")[0]}</span>
                 </button>
               ))}

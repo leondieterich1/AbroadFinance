@@ -24,6 +24,11 @@ const GOAL_ICONS: Record<string, LucideIcon> = {
   vacation: Palmtree, ring: Gem, backpack: Backpack, fitness: Dumbbell,
   phone: Smartphone, music: Guitar, world: Globe,
 };
+const GOAL_ICON_COLORS: Record<string, string> = {
+  plane: "#0ea5e9", home: "#f97316", education: "#8b5cf6", car: "#ef4444", laptop: "#64748b",
+  vacation: "#22c55e", ring: "#ec4899", backpack: "#d97706", fitness: "#dc2626",
+  phone: "#06b6d4", music: "#a855f7", world: "#10b981",
+};
 const ICONS = Object.keys(GOAL_ICONS);
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "JPY", "AUD", "CAD"];
 
@@ -124,7 +129,7 @@ export default function GoalsPage() {
       {/* Goals grid */}
       {goals.length === 0 ? (
         <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-16 text-center">
-          <Target className="w-10 h-10 mb-4 mx-auto text-[#0d1f3c]/20" />
+          <Target className="w-10 h-10 mb-4 mx-auto text-emerald-400" />
           <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch kein Sparziel</h3>
           <p className="text-[#0d1f3c]/40 text-sm mb-6">Setze dir ein Ziel — Reise, Wohnung, Laptop — und tracke deinen Fortschritt.</p>
           <button onClick={() => setModal("create")} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">
@@ -195,7 +200,7 @@ export default function GoalsPage() {
                   {ICONS.map((i) => (
                     <button key={i} type="button" onClick={() => setIcon(i)}
                       className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${icon === i ? "bg-[#0d1f3c] text-white shadow-md scale-110" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}>
-                      <GoalIcon id={i} className="w-5 h-5" />
+                      <GoalIcon id={i} className="w-5 h-5" style={{ color: icon === i ? undefined : GOAL_ICON_COLORS[i] }} />
                     </button>
                   ))}
                 </div>

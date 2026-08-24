@@ -170,7 +170,7 @@ export default function NewsletterPage() {
                 <a key={i} href={article.link} target="_blank" rel="noopener noreferrer"
                   className="flex items-start gap-4 px-5 py-4 hover:bg-gray-50/60 transition-colors group block">
                   <div className="w-8 h-8 rounded-xl bg-[#0d1f3c]/5 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Newspaper className="w-4 h-4 text-[#0d1f3c]/60" />
+                    <Newspaper className="w-4 h-4 text-blue-500" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-[#0d1f3c] leading-snug group-hover:text-[#162d54] transition-colors mb-1">

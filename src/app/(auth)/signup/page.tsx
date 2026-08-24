@@ -59,7 +59,7 @@ export default function SignupPage() {
   if (sent) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 w-full max-w-md text-center">
-        <MailCheck className="w-10 h-10 mb-5 mx-auto text-[#0d1f3c]/30" />
+        <MailCheck className="w-10 h-10 mb-5 mx-auto text-emerald-400" />
         <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">Schau in dein Postfach!</h1>
         <p className="text-[#0d1f3c]/50 text-sm mb-1">
           Wir haben einen Bestätigungslink an

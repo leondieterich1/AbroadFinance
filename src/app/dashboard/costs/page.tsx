@@ -71,6 +71,10 @@ const COST_ICONS: Record<string, LucideIcon> = {
   rent1room: Home, rent_shared: Users, groceries: ShoppingCart, transport: TrainFront,
   eating_out: UtensilsCrossed, coffee: Coffee, gym: Dumbbell, internet: Wifi, utilities: Lightbulb,
 };
+const COST_ICON_COLORS: Record<string, string> = {
+  rent1room: "#0ea5e9", rent_shared: "#8b5cf6", groceries: "#22c55e", transport: "#f97316",
+  eating_out: "#ec4899", coffee: "#92400e", gym: "#ef4444", internet: "#06b6d4", utilities: "#d97706",
+};
 
 function fmt(n: number, cur: string) {
   return new Intl.NumberFormat("de-DE", { style: "currency", currency: cur, maximumFractionDigits: 2 }).format(n);
@@ -167,7 +171,7 @@ export default function CostsPage() {
           return (
             <div key={key} className={`px-5 py-4 ${i !== 0 ? "border-t border-gray-50" : ""}`}>
               <div className="flex items-center gap-2 mb-3">
-                {(() => { const Icon = COST_ICONS[key]; return <Icon className="w-4 h-4 text-[#0d1f3c]/60" />; })()}
+                {(() => { const Icon = COST_ICONS[key]; return <Icon className="w-4 h-4" style={{ color: COST_ICON_COLORS[key] }} />; })()}
                 <span className="text-sm font-bold text-[#0d1f3c]">{COST_LABELS[key]}</span>
                 {key === "eating_out" || key === "coffee"
                   ? <span className="text-xs text-[#0d1f3c]/30">(× 20 Tage/Monat)</span>

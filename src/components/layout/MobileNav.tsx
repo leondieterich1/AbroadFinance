@@ -6,12 +6,12 @@ import { signOut } from "next-auth/react";
 import { LayoutDashboard, Wallet, Receipt, Landmark, Target, ListChecks, LogOut } from "lucide-react";
 
 const TABS = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-  { href: "/dashboard/budget", icon: Wallet, label: "Budget" },
-  { href: "/dashboard/transactions", icon: Receipt, label: "Ausgaben" },
-  { href: "/dashboard/accounts", icon: Landmark, label: "Konten" },
-  { href: "/dashboard/goals", icon: Target, label: "Ziele" },
-  { href: "/dashboard/checklist", icon: ListChecks, label: "Check" },
+  { href: "/dashboard", icon: LayoutDashboard, label: "Home", color: "#3b82f6" },
+  { href: "/dashboard/budget", icon: Wallet, label: "Budget", color: "#10b981" },
+  { href: "/dashboard/transactions", icon: Receipt, label: "Ausgaben", color: "#f97316" },
+  { href: "/dashboard/accounts", icon: Landmark, label: "Konten", color: "#0ea5e9" },
+  { href: "/dashboard/goals", icon: Target, label: "Ziele", color: "#22c55e" },
+  { href: "/dashboard/checklist", icon: ListChecks, label: "Check", color: "#14b8a6" },
 ];
 
 export default function MobileNav() {
@@ -30,7 +30,10 @@ export default function MobileNav() {
                 active ? "text-[#0d1f3c]" : "text-gray-400"
               }`}
             >
-              <tab.icon className={`w-5 h-5 transition-transform ${active ? "scale-110" : ""}`} />
+              <tab.icon
+                className={`w-5 h-5 transition-transform ${active ? "scale-110" : ""}`}
+                style={{ color: active ? tab.color : undefined }}
+              />
               <span className={`text-[10px] font-semibold truncate ${active ? "text-[#0d1f3c]" : "text-gray-400"}`}>
                 {tab.label}
               </span>

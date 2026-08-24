@@ -95,7 +95,7 @@ export default function AnalyticsPage() {
         <ul className="space-y-3">
           {insights.map((text, i) => (
             <li key={i} className="flex items-start gap-2.5 text-sm text-[#0d1f3c]/70">
-              <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0d1f3c]/40" />
+              <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-500" />
               <span>{text}</span>
             </li>
           ))}

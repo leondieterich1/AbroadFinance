@@ -10,20 +10,20 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const NAV: { href: string; icon: LucideIcon; label: string; badge?: string; external?: boolean }[] = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Übersicht" },
-  { href: "/dashboard/budget", icon: Wallet, label: "Budget" },
-  { href: "/dashboard/analytics", icon: TrendingUp, label: "Analyse", badge: "NEU" },
-  { href: "/dashboard/transactions", icon: Receipt, label: "Ausgaben" },
-  { href: "/dashboard/accounts", icon: Landmark, label: "Konten" },
-  { href: "/dashboard/split", icon: Handshake, label: "Splittr" },
-  { href: "/dashboard/converter", icon: Coins, label: "Währungen" },
-  { href: "/dashboard/goals", icon: Target, label: "Sparziele" },
-  { href: "/dashboard/subscriptions", icon: Package, label: "Abos" },
-  { href: "/dashboard/checklist", icon: ListChecks, label: "Checkliste" },
-  { href: "/dashboard/costs", icon: Globe, label: "Lebenskosten" },
-  { href: "/dashboard/newsletter", icon: Newspaper, label: "Newsletter" },
-  { href: "/dashboard/settings", icon: Settings, label: "Einstellungen" },
+const NAV: { href: string; icon: LucideIcon; label: string; color: string; badge?: string; external?: boolean }[] = [
+  { href: "/dashboard", icon: LayoutDashboard, label: "Übersicht", color: "#60a5fa" },
+  { href: "/dashboard/budget", icon: Wallet, label: "Budget", color: "#34d399" },
+  { href: "/dashboard/analytics", icon: TrendingUp, label: "Analyse", color: "#a78bfa", badge: "NEU" },
+  { href: "/dashboard/transactions", icon: Receipt, label: "Ausgaben", color: "#fb923c" },
+  { href: "/dashboard/accounts", icon: Landmark, label: "Konten", color: "#38bdf8" },
+  { href: "/dashboard/split", icon: Handshake, label: "Splittr", color: "#f472b6" },
+  { href: "/dashboard/converter", icon: Coins, label: "Währungen", color: "#fbbf24" },
+  { href: "/dashboard/goals", icon: Target, label: "Sparziele", color: "#4ade80" },
+  { href: "/dashboard/subscriptions", icon: Package, label: "Abos", color: "#c084fc" },
+  { href: "/dashboard/checklist", icon: ListChecks, label: "Checkliste", color: "#2dd4bf" },
+  { href: "/dashboard/costs", icon: Globe, label: "Lebenskosten", color: "#22d3ee" },
+  { href: "/dashboard/newsletter", icon: Newspaper, label: "Newsletter", color: "#f87171" },
+  { href: "/dashboard/settings", icon: Settings, label: "Einstellungen", color: "#94a3b8" },
 ];
 
 export default function Sidebar({ user }: { user: { name: string; email: string; isAdmin?: boolean } }) {
@@ -33,7 +33,7 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
     : user.email[0].toUpperCase();
 
   const nav = user.isAdmin
-    ? [...NAV, { href: "https://abroad-finance-admin.vercel.app", icon: Shield, label: "Admin", external: true }]
+    ? [...NAV, { href: "https://abroad-finance-admin.vercel.app", icon: Shield, label: "Admin", color: "#fbbf24", external: true }]
     : NAV;
 
   return (
@@ -50,12 +50,15 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {nav.map((item) => {
           const active = pathname === item.href;
-          const className = `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+          const className = `group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
             active ? "bg-white/15 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
           }`;
           const content = (
             <>
-              <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
+              <item.icon
+                className={`w-[18px] h-[18px] flex-shrink-0 transition-opacity ${active ? "opacity-100" : "opacity-60 group-hover:opacity-90"}`}
+                style={{ color: item.color }}
+              />
               {item.label}
               {item.badge && (
                 <span className="ml-auto bg-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">

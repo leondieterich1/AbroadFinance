@@ -25,6 +25,10 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   Streaming: Tv, Musik: Music, Software: Laptop2, Fitness: Dumbbell,
   News: Newspaper, Gaming: Gamepad2, Cloud: Cloud, Sonstiges: Package,
 };
+const CATEGORY_ICON_COLORS: Record<string, string> = {
+  Streaming: "#E50914", Musik: "#1DB954", Software: "#0078d4", Fitness: "#f97316",
+  News: "#64748b", Gaming: "#9333ea", Cloud: "#0891b2", Sonstiges: "#d97706",
+};
 const COLORS = ["#0d1f3c", "#E50914", "#1DB954", "#0078d4", "#FF6B35", "#9333ea", "#0891b2", "#f59e0b"];
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF"];
 
@@ -140,7 +144,7 @@ export default function SubscriptionsPage() {
       {subs.length === 0 ? (
         <div>
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center mb-6">
-            <Package className="w-10 h-10 mb-4 mx-auto text-[#0d1f3c]/20" />
+            <Package className="w-10 h-10 mb-4 mx-auto" style={{ color: "#d97706" }} />
             <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Abos</h3>
             <p className="text-[#0d1f3c]/40 text-sm mb-6">Füge deine Abonnements hinzu und sieh wie viel du monatlich ausgibst.</p>
           </div>
@@ -184,7 +188,7 @@ export default function SubscriptionsPage() {
               <div key={cat} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-3 border-b border-gray-50">
                   <span className="text-sm font-extrabold text-[#0d1f3c] inline-flex items-center gap-1.5">
-                    {(() => { const Icon = CATEGORY_ICONS[cat]; return <Icon className="w-3.5 h-3.5" />; })()} {cat}
+                    {(() => { const Icon = CATEGORY_ICONS[cat]; return <Icon className="w-3.5 h-3.5" style={{ color: CATEGORY_ICON_COLORS[cat] }} />; })()} {cat}
                   </span>
                   <span className="text-xs font-bold text-[#0d1f3c]/40">{fmt(total)}/Mo</span>
                 </div>
@@ -294,7 +298,7 @@ export default function SubscriptionsPage() {
                     return (
                       <button key={cat} type="button" onClick={() => setCategory(cat)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${category === cat ? "bg-[#0d1f3c] text-white" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}>
-                        <Icon className="w-3.5 h-3.5" /> {cat}
+                        <Icon className="w-3.5 h-3.5" style={{ color: category === cat ? undefined : CATEGORY_ICON_COLORS[cat] }} /> {cat}
                       </button>
                     );
                   })}

@@ -267,7 +267,7 @@ export default function AccountsPage() {
       {/* Account cards */}
       {acc.accounts.length === 0 ? (
         <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center mb-6">
-          <Landmark className="w-12 h-12 mb-4 mx-auto text-[#0d1f3c]/30" />
+          <Landmark className="w-12 h-12 mb-4 mx-auto text-sky-400" />
           <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch kein Konto verknüpft</h3>
           <p className="text-[#0d1f3c]/40 text-sm mb-6 max-w-sm mx-auto">Gib einfach deine IBAN ein — wir erkennen deine Bank automatisch und stellen die Verbindung her.</p>
           <button onClick={openConnect} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">Bank verbinden <ArrowRight className="w-4 h-4" /></button>
@@ -421,7 +421,7 @@ export default function AccountsPage() {
                     {connectError && <p className="text-xs text-rose-500 mt-1.5">{connectError}</p>}
                   </div>
                   <div className="bg-gray-50 rounded-xl p-3 flex items-start gap-2">
-                    <Lightbulb className="w-4 h-4 flex-shrink-0 text-[#0d1f3c]/40 mt-px" />
+                    <Lightbulb className="w-4 h-4 flex-shrink-0 text-amber-500 mt-px" />
                     <p className="text-xs text-[#0d1f3c]/50">Deine IBAN findest du auf deiner Bankkarte oder im Online-Banking unter Kontodetails.</p>
                   </div>
                   <button onClick={handleIbanSubmit} disabled={!ibanValid}
@@ -571,7 +571,7 @@ export default function AccountsPage() {
                 </select>
               </div>
               <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-[#0d1f3c]/30 transition-colors mb-4">
-                <Upload className="w-8 h-8 mb-3 mx-auto text-[#0d1f3c]/30" />
+                <Upload className="w-8 h-8 mb-3 mx-auto text-violet-400" />
                 <p className="font-bold text-[#0d1f3c] mb-1">CSV-Datei hier ablegen</p>
                 <p className="text-xs text-[#0d1f3c]/40">Sparkasse · DKB · ING · Commerzbank · Deutsche Bank</p>
                 <input ref={fileRef} type="file" accept=".csv,.txt" onChange={handleFileChange} className="hidden" />

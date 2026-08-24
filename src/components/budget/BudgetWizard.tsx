@@ -21,17 +21,17 @@ const BENCHMARK: Record<ExpenseCategory, number> = {
 
 type Priority = "ausgewogen" | "sparen" | "geniessen" | "sicherheit";
 
-const PRIORITIES: { id: Priority; label: string; icon: LucideIcon; desc: string; adjust: Partial<Record<ExpenseCategory, number>> }[] = [
-  { id: "ausgewogen", label: "Ausgewogen", icon: Scale, desc: "Ein bisschen von allem", adjust: {} },
-  { id: "sparen", label: "Mehr sparen", icon: Sprout, desc: "Rücklagen aufbauen", adjust: { freizeit: -5, sonstiges: 5 } },
-  { id: "geniessen", label: "Leben genießen", icon: PartyPopper, desc: "Freizeit hat Priorität", adjust: { freizeit: 5, sonstiges: -5 } },
-  { id: "sicherheit", label: "Sicherheit", icon: Shield, desc: "Puffer für Unerwartetes", adjust: { freizeit: -5, gesundheit: 2, sonstiges: 3 } },
+const PRIORITIES: { id: Priority; label: string; icon: LucideIcon; color: string; desc: string; adjust: Partial<Record<ExpenseCategory, number>> }[] = [
+  { id: "ausgewogen", label: "Ausgewogen", icon: Scale, color: "#3b82f6", desc: "Ein bisschen von allem", adjust: {} },
+  { id: "sparen", label: "Mehr sparen", icon: Sprout, color: "#10b981", desc: "Rücklagen aufbauen", adjust: { freizeit: -5, sonstiges: 5 } },
+  { id: "geniessen", label: "Leben genießen", icon: PartyPopper, color: "#ec4899", desc: "Freizeit hat Priorität", adjust: { freizeit: 5, sonstiges: -5 } },
+  { id: "sicherheit", label: "Sicherheit", icon: Shield, color: "#f59e0b", desc: "Puffer für Unerwartetes", adjust: { freizeit: -5, gesundheit: 2, sonstiges: 3 } },
 ];
 
 const REFLECTIONS = [
-  { id: "eng", label: "Fühlt sich eng an", icon: Frown, note: "Vielleicht lohnt sich ein zweiter Blick auf die größten Posten – oder das Ziel etwas lockerer angehen." },
-  { id: "passt", label: "Passt gut", icon: Smile, note: "Guter Rahmen. Schau in ein paar Wochen nochmal rein, ob die Realität mit dem Plan übereinstimmt." },
-  { id: "luft", label: "Viel Luft", icon: Laugh, note: "Du hast Spielraum – vielleicht ein gutes Zeichen, mehr davon Richtung Sparen oder Ziele zu verschieben." },
+  { id: "eng", label: "Fühlt sich eng an", icon: Frown, color: "#f43f5e", note: "Vielleicht lohnt sich ein zweiter Blick auf die größten Posten – oder das Ziel etwas lockerer angehen." },
+  { id: "passt", label: "Passt gut", icon: Smile, color: "#10b981", note: "Guter Rahmen. Schau in ein paar Wochen nochmal rein, ob die Realität mit dem Plan übereinstimmt." },
+  { id: "luft", label: "Viel Luft", icon: Laugh, color: "#3b82f6", note: "Du hast Spielraum – vielleicht ein gutes Zeichen, mehr davon Richtung Sparen oder Ziele zu verschieben." },
 ] as const;
 
 type Step = "income" | "priority" | "allocate" | "reflect";
@@ -96,7 +96,7 @@ export default function BudgetWizard({
           {/* Step 1: Income */}
           {step === "income" && (
             <div>
-              <Wallet className="w-9 h-9 text-[#0d1f3c] mb-4" />
+              <Wallet className="w-9 h-9 text-emerald-500 mb-4" />
               <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Wie viel Geld hast du monatlich?</h2>
               <p className="text-[#0d1f3c]/50 text-sm mb-6">
                 Dein Netto-Budget – nach Steuern, inkl. BAföG/Stipendium/Nebenjob. Das ist die Basis für alles Weitere.
@@ -138,7 +138,7 @@ export default function BudgetWizard({
           {/* Step 2: Priority */}
           {step === "priority" && (
             <div>
-              <Compass className="w-9 h-9 text-[#0d1f3c] mb-4" />
+              <Compass className="w-9 h-9 text-blue-500 mb-4" />
               <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Was ist dir gerade am wichtigsten?</h2>
               <p className="text-[#0d1f3c]/50 text-sm mb-6">
                 Es gibt kein falsches Ziel – das hilft nur, einen sinnvollen Startpunkt für deine Verteilung zu finden.
@@ -152,7 +152,7 @@ export default function BudgetWizard({
                       priority === p.id ? "border-[#0d1f3c] bg-[#0d1f3c]/5" : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
-                    <div className="mb-2"><p.icon className="w-6 h-6 text-[#0d1f3c]" /></div>
+                    <div className="mb-2"><p.icon className="w-6 h-6" style={{ color: p.color }} /></div>
                     <p className="font-bold text-sm text-[#0d1f3c]">{p.label}</p>
                     <p className="text-xs text-[#0d1f3c]/40">{p.desc}</p>
                   </button>
@@ -245,7 +245,7 @@ export default function BudgetWizard({
           {/* Step 4: Reflect + save */}
           {step === "reflect" && (
             <div>
-              <MessageCircle className="w-9 h-9 text-[#0d1f3c] mb-4" />
+              <MessageCircle className="w-9 h-9 text-violet-500 mb-4" />
               <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Wie fühlt sich dieses Budget an?</h2>
               <p className="text-[#0d1f3c]/50 text-sm mb-6">Kurz und ehrlich – das hilft dir mehr als jede Formel.</p>
 
@@ -258,7 +258,7 @@ export default function BudgetWizard({
                       reflection === r.id ? "border-[#0d1f3c] bg-[#0d1f3c]/5" : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
-                    <r.icon className="w-6 h-6 text-[#0d1f3c]" />
+                    <r.icon className="w-6 h-6" style={{ color: r.color }} />
                     <span className="font-semibold text-sm text-[#0d1f3c]">{r.label}</span>
                   </button>
                 ))}

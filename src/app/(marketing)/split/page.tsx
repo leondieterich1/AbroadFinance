@@ -20,31 +20,35 @@ const DEMO_EXPENSES = [
 const FEATURES = [
   {
     icon: Globe,
+    color: "#10b981",
     title: "Jede Währung, kein Problem",
     desc: "Ausgabe in JPY, Miete in EUR, Taxi in GBP – Splittr rechnet alles fair um und teilt in eurer Gruppenswährung auf.",
   },
   {
     icon: Calculator,
+    color: "#8b5cf6",
     title: "Smart Settlement",
     desc: "Unser Algorithmus minimiert die Anzahl der Überweisungen. Statt 10 Transfers nur noch 3 – weniger Stress, mehr Zeit.",
   },
   {
     icon: Zap,
+    color: "#f59e0b",
     title: "Gruppe in 10 Sekunden",
     desc: "Einfach Gruppennamen eingeben, Mitglieder hinzufügen, fertig. Keine App-Installation für deine Freunde nötig.",
   },
   {
     icon: BarChart3,
+    color: "#3b82f6",
     title: "Immer den Überblick",
     desc: "Sieh auf einen Blick, wer noch wem etwas schuldet. Kein peinliches Nachfragen mehr nach dem Urlaub.",
   },
 ];
 
-const SCENARIOS: { icon: LucideIcon; label: string; example: string }[] = [
-  { icon: Home, label: "WG-Kosten", example: "Miete, Einkauf, Nebenkosten fair aufteilen" },
-  { icon: Plane, label: "Reisegruppe", example: "Hotels, Ausflüge, Restaurants – alles in einer Gruppe" },
-  { icon: GraduationCap, label: "Uni-Projekte", example: "Materialkosten und Auslagen fürs Semesterprojekt" },
-  { icon: PartyPopper, label: "Partys & Events", example: "Wer kauft das Bier? Wer zahlt die Location?" },
+const SCENARIOS: { icon: LucideIcon; color: string; label: string; example: string }[] = [
+  { icon: Home, color: "#f97316", label: "WG-Kosten", example: "Miete, Einkauf, Nebenkosten fair aufteilen" },
+  { icon: Plane, color: "#0ea5e9", label: "Reisegruppe", example: "Hotels, Ausflüge, Restaurants – alles in einer Gruppe" },
+  { icon: GraduationCap, color: "#8b5cf6", label: "Uni-Projekte", example: "Materialkosten und Auslagen fürs Semesterprojekt" },
+  { icon: PartyPopper, color: "#ec4899", label: "Partys & Events", example: "Wer kauft das Bier? Wer zahlt die Location?" },
 ];
 
 export default function SplitPage() {
@@ -133,7 +137,7 @@ export default function SplitPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {SCENARIOS.map((s) => (
             <div key={s.label} className="bg-gray-50 rounded-2xl p-6 text-center hover:bg-[#0d1f3c] hover:text-white group transition-all cursor-default">
-              <s.icon className="w-8 h-8 mb-3 mx-auto text-[#0d1f3c] group-hover:text-white" />
+              <s.icon className="w-8 h-8 mb-3 mx-auto" style={{ color: s.color }} />
               <div className="font-bold text-[#0d1f3c] group-hover:text-white mb-1">{s.label}</div>
               <div className="text-xs text-[#0d1f3c]/50 group-hover:text-white/60">{s.example}</div>
             </div>
@@ -149,7 +153,7 @@ export default function SplitPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {FEATURES.map((f) => (
               <div key={f.title} className="bg-white rounded-2xl p-6 border border-gray-100 flex gap-5">
-                <div className="w-12 h-12 rounded-full bg-[#0d1f3c] flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: f.color }}>
                   <f.icon className="w-5 h-5 text-white" />
                 </div>
                 <div>
