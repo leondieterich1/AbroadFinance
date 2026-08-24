@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useSplit } from "@/hooks/useSplit";
 import type { SplitGroup } from "@/types";
 import type { Settlement } from "@/hooks/useSplit";
@@ -32,11 +33,13 @@ function GroupIcon({ id, className = "w-5 h-5", colored = true }: { id: string; 
 }
 
 function QRShare({ group, settlements }: { group: SplitGroup; settlements: Settlement[] }) {
+  const t = useTranslations("Split");
+  const locale = useLocale();
   const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
-  const lines = settlements.map((s) => `${s.fromName} → ${s.toName}: ${new Intl.NumberFormat("de-DE", { style: "currency", currency: group.currency }).format(s.amount)}`).join("\n");
-  const text = `${GROUP_EMOJI_FOR_SHARE[group.emoji] ?? "✈️"} ${group.name} – Abrechnung\n\n${lines || "Alle quitt! 🎉"}\n\nErstellt mit FinanceAbroad`;
+  const lines = settlements.map((s) => `${s.fromName} → ${s.toName}: ${new Intl.NumberFormat(locale, { style: "currency", currency: group.currency }).format(s.amount)}`).join("\n");
+  const text = `${GROUP_EMOJI_FOR_SHARE[group.emoji] ?? "✈️"} ${group.name} – ${t("shareTextTitle")}\n\n${lines || `${t("shareTextSettled")} 🎉`}\n\n${t("createdWith")}`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(text)}&bgcolor=ffffff&color=0d1f3c&margin=10`;
 
   async function handleCopy() {
@@ -47,23 +50,23 @@ function QRShare({ group, settlements }: { group: SplitGroup; settlements: Settl
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
-      <h3 className="font-extrabold text-[#0d1f3c] mb-1">Abrechnung teilen</h3>
-      <p className="text-xs text-[#0d1f3c]/40 mb-4">Teile die Abrechnung als QR-Code – kein Account nötig</p>
+      <h3 className="font-extrabold text-[#0d1f3c] mb-1">{t("shareTitle")}</h3>
+      <p className="text-xs text-[#0d1f3c]/40 mb-4">{t("shareDesc")}</p>
       <div className="flex gap-3">
         <button onClick={() => setShowQR((v) => !v)}
           className="flex-1 flex items-center justify-center gap-2 bg-[#0d1f3c] text-white rounded-xl py-3 text-sm font-bold hover:bg-[#162d54] transition-colors">
-          <QrCode className="w-4 h-4" /> {showQR ? "QR ausblenden" : "QR-Code anzeigen"}
+          <QrCode className="w-4 h-4" /> {showQR ? t("hideQr") : t("showQr")}
         </button>
         <button onClick={handleCopy}
           className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all border ${copied ? "bg-emerald-50 border-emerald-200 text-emerald-600" : "border-gray-200 text-[#0d1f3c]/60 hover:bg-gray-50"}`}>
-          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? "Kopiert!" : "Text kopieren"}
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? t("copied") : t("copyText")}
         </button>
       </div>
       {showQR && (
         <div className="mt-4 flex flex-col items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={qrUrl} alt="QR-Code Abrechnung" className="rounded-2xl border border-gray-100 shadow-sm" width={220} height={220} />
-          <p className="text-xs text-[#0d1f3c]/30 text-center">Scannen zum Anzeigen der Abrechnung</p>
+          <img src={qrUrl} alt={t("qrAlt")} className="rounded-2xl border border-gray-100 shadow-sm" width={220} height={220} />
+          <p className="text-xs text-[#0d1f3c]/30 text-center">{t("scanHint")}</p>
         </div>
       )}
     </div>
@@ -71,10 +74,6 @@ function QRShare({ group, settlements }: { group: SplitGroup; settlements: Settl
 }
 
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "JPY", "AUD", "CAD", "SEK", "NOK", "DKK", "CNY", "SGD"];
-
-function fmt(amount: number, currency: string) {
-  return new Intl.NumberFormat("de-DE", { style: "currency", currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
-}
 
 function initials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
@@ -86,6 +85,13 @@ const AVATAR_COLORS = [
 ];
 
 export default function SplitPage() {
+  const t = useTranslations("Split");
+  const locale = useLocale();
+
+  function fmt(amount: number, currency: string) {
+    return new Intl.NumberFormat(locale, { style: "currency", currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+  }
+
   const split = useSplit();
   const [view, setView] = useState<"list" | "group" | "create">("list");
   const [activeGroup, setActiveGroup] = useState<SplitGroup | null>(null);
@@ -165,27 +171,27 @@ export default function SplitPage() {
       <div className="p-6 md:p-8 max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Splittr</h1>
-            <p className="text-[#0d1f3c]/40 text-sm">Ausgaben fair teilen mit Freunden im Ausland</p>
+            <h1 className="text-2xl font-extrabold text-[#0d1f3c]">{t("title")}</h1>
+            <p className="text-[#0d1f3c]/40 text-sm">{t("subtitle")}</p>
           </div>
           <button
             onClick={() => setView("create")}
             className="bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex items-center gap-2"
           >
-            <Plus className="w-4 h-4" /> Neue Gruppe
+            <Plus className="w-4 h-4" /> {t("newGroup")}
           </button>
         </div>
 
         {split.groups.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
             <Handshake className="w-10 h-10 mb-4 mx-auto text-pink-400" />
-            <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Gruppe</h3>
-            <p className="text-[#0d1f3c]/40 text-sm mb-6">Erstelle deine erste Gruppe – für den Urlaub, die WG oder das nächste Event.</p>
+            <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">{t("noGroupTitle")}</h3>
+            <p className="text-[#0d1f3c]/40 text-sm mb-6">{t("noGroupDesc")}</p>
             <button
               onClick={() => setView("create")}
               className="bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors"
             >
-              Erste Gruppe erstellen
+              {t("createFirstGroup")}
             </button>
           </div>
         ) : (
@@ -207,18 +213,18 @@ export default function SplitPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-extrabold text-[#0d1f3c]">{group.name}</span>
-                        <span className="text-xs text-[#0d1f3c]/30">· {group.members.length} Personen</span>
+                        <span className="text-xs text-[#0d1f3c]/30">· {t("people", { count: group.members.length })}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-[#0d1f3c]/50">{fmt(total, group.currency)} gesamt</span>
+                        <span className="text-sm text-[#0d1f3c]/50">{fmt(total, group.currency)} {t("total")}</span>
                         {settlements.length > 0 && (
                           <span className="text-xs bg-amber-50 text-amber-600 font-semibold px-2 py-0.5 rounded-full">
-                            {settlements.length} offene Zahlung{settlements.length > 1 ? "en" : ""}
+                            {t("openPayments", { count: settlements.length })}
                           </span>
                         )}
                         {settlements.length === 0 && total > 0 && (
                           <span className="text-xs bg-emerald-50 text-emerald-600 font-semibold px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                            Alle quitt <Check className="w-3 h-3" />
+                            {t("allSettled")} <Check className="w-3 h-3" />
                           </span>
                         )}
                       </div>
@@ -253,15 +259,15 @@ export default function SplitPage() {
     return (
       <div className="p-6 md:p-8 max-w-xl mx-auto">
         <button onClick={() => setView("list")} className="text-sm text-[#0d1f3c]/40 hover:text-[#0d1f3c] mb-6 flex items-center gap-1">
-          <ArrowLeft className="w-4 h-4" /> Zurück
+          <ArrowLeft className="w-4 h-4" /> {t("back")}
         </button>
-        <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-1">Neue Gruppe</h1>
-        <p className="text-[#0d1f3c]/40 text-sm mb-8">Reise, WG, Event – lege los.</p>
+        <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-1">{t("newGroupTitle")}</h1>
+        <p className="text-[#0d1f3c]/40 text-sm mb-8">{t("newGroupSubtitle")}</p>
 
         <form onSubmit={handleCreateGroup} className="space-y-6">
           {/* Emoji */}
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <label className="block text-sm font-bold text-[#0d1f3c] mb-3">Symbol</label>
+            <label className="block text-sm font-bold text-[#0d1f3c] mb-3">{t("symbol")}</label>
             <div className="flex flex-wrap gap-2">
               {GROUP_ICON_IDS.map((id) => (
                 <button
@@ -279,18 +285,18 @@ export default function SplitPage() {
           {/* Name + Currency */}
           <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
             <div>
-              <label className="block text-sm font-bold text-[#0d1f3c] mb-1.5">Gruppenname</label>
+              <label className="block text-sm font-bold text-[#0d1f3c] mb-1.5">{t("groupName")}</label>
               <input
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                placeholder="z.B. Barcelona Trip 🇪🇸"
+                placeholder={`${t("groupNamePlaceholder")} 🇪🇸`}
                 required
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#0d1f3c] mb-1.5">Hauptwährung</label>
+              <label className="block text-sm font-bold text-[#0d1f3c] mb-1.5">{t("mainCurrency")}</label>
               <select
                 value={newCurrency}
                 onChange={(e) => setNewCurrency(e.target.value)}
@@ -303,7 +309,7 @@ export default function SplitPage() {
 
           {/* Members */}
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <label className="block text-sm font-bold text-[#0d1f3c] mb-3">Mitglieder <span className="text-[#0d1f3c]/30 font-normal">(mind. 2)</span></label>
+            <label className="block text-sm font-bold text-[#0d1f3c] mb-3">{t("members")} <span className="text-[#0d1f3c]/30 font-normal">{t("minTwo")}</span></label>
             <div className="space-y-2.5">
               {newMembers.map((m, i) => (
                 <div key={i} className="flex gap-2">
@@ -315,7 +321,7 @@ export default function SplitPage() {
                       next[i] = e.target.value;
                       setNewMembers(next);
                     }}
-                    placeholder={`Person ${i + 1}${i === 0 ? " (du)" : ""}`}
+                    placeholder={`${t("personPlaceholder", { n: i + 1 })}${i === 0 ? t("you") : ""}`}
                     className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
                   />
                   {newMembers.length > 2 && (
@@ -334,7 +340,7 @@ export default function SplitPage() {
                 onClick={() => setNewMembers([...newMembers, ""])}
                 className="w-full border border-dashed border-gray-200 rounded-xl py-2.5 text-sm text-[#0d1f3c]/40 hover:border-[#0d1f3c]/40 hover:text-[#0d1f3c]/60 transition-colors inline-flex items-center justify-center gap-1.5"
               >
-                <Plus className="w-4 h-4" /> Person hinzufügen
+                <Plus className="w-4 h-4" /> {t("addPerson")}
               </button>
             </div>
           </div>
@@ -343,7 +349,7 @@ export default function SplitPage() {
             type="submit"
             className="w-full inline-flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white font-bold py-3.5 rounded-xl hover:bg-[#162d54] transition-colors"
           >
-            Gruppe erstellen <ArrowRight className="w-4 h-4" />
+            {t("createGroup")} <ArrowRight className="w-4 h-4" />
           </button>
         </form>
       </div>
@@ -362,13 +368,13 @@ export default function SplitPage() {
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => setView("list")} className="text-sm text-[#0d1f3c]/40 hover:text-[#0d1f3c] inline-flex items-center gap-1"><ArrowLeft className="w-4 h-4" /> Zurück</button>
+        <button onClick={() => setView("list")} className="text-sm text-[#0d1f3c]/40 hover:text-[#0d1f3c] inline-flex items-center gap-1"><ArrowLeft className="w-4 h-4" /> {t("back")}</button>
         <div className="flex-1" />
         <button
-          onClick={() => { if (confirm("Gruppe wirklich löschen?")) { split.deleteGroup(group.id); setView("list"); } }}
+          onClick={() => { if (confirm(t("deleteConfirm"))) { split.deleteGroup(group.id); setView("list"); } }}
           className="text-xs text-rose-400 hover:text-rose-600 font-medium"
         >
-          Löschen
+          {t("delete")}
         </button>
       </div>
 
@@ -376,13 +382,13 @@ export default function SplitPage() {
         <span className="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-xl text-[#0d1f3c]"><GroupIcon id={group.emoji} className="w-6 h-6" /></span>
         <div>
           <h1 className="text-2xl font-extrabold text-[#0d1f3c]">{group.name}</h1>
-          <p className="text-[#0d1f3c]/40 text-sm">{group.members.length} Personen · {fmt(total, group.currency)} gesamt</p>
+          <p className="text-[#0d1f3c]/40 text-sm">{t("people", { count: group.members.length })} · {fmt(total, group.currency)} {t("total")}</p>
         </div>
         <button
           onClick={() => { setShowExpenseForm(true); setExpenseView("expenses"); }}
           className="ml-auto inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors"
         >
-          <Plus className="w-4 h-4" /> Ausgabe
+          <Plus className="w-4 h-4" /> {t("addExpense")}
         </button>
       </div>
 
@@ -394,7 +400,7 @@ export default function SplitPage() {
             onClick={() => { setExpenseView(tab); setShowExpenseForm(false); }}
             className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${expenseView === tab ? "bg-white text-[#0d1f3c] shadow-sm" : "text-[#0d1f3c]/40 hover:text-[#0d1f3c]/60"}`}
           >
-            {tab === "expenses" ? "Ausgaben" : tab === "balances" ? "Bilanzen" : "Abrechnen"}
+            {tab === "expenses" ? t("tabExpenses") : tab === "balances" ? t("tabBalances") : t("tabSettle")}
           </button>
         ))}
       </div>
@@ -403,7 +409,7 @@ export default function SplitPage() {
       {showExpenseForm && (
         <div className="bg-white rounded-2xl border border-[#0d1f3c]/10 p-5 mb-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-extrabold text-[#0d1f3c]">Neue Ausgabe</h3>
+            <h3 className="font-extrabold text-[#0d1f3c]">{t("newExpense")}</h3>
             <button onClick={() => setShowExpenseForm(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
           </div>
           <form onSubmit={handleAddExpense} className="space-y-3">
@@ -411,7 +417,7 @@ export default function SplitPage() {
               type="text"
               value={expTitle}
               onChange={(e) => setExpTitle(e.target.value)}
-              placeholder="Wofür? z.B. Abendessen, Taxi…"
+              placeholder={t("whatFor")}
               required
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
             />
@@ -420,7 +426,7 @@ export default function SplitPage() {
                 type="number"
                 value={expAmount}
                 onChange={(e) => setExpAmount(e.target.value)}
-                placeholder="Betrag"
+                placeholder={t("amount")}
                 min="0.01"
                 step="0.01"
                 required
@@ -435,7 +441,7 @@ export default function SplitPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#0d1f3c]/50 mb-1.5 uppercase tracking-wide">Bezahlt von</label>
+              <label className="block text-xs font-bold text-[#0d1f3c]/50 mb-1.5 uppercase tracking-wide">{t("paidBy")}</label>
               <div className="flex flex-wrap gap-2">
                 {group.members.map((m, i) => (
                   <button
@@ -453,7 +459,7 @@ export default function SplitPage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#0d1f3c]/50 mb-1.5 uppercase tracking-wide">Aufteilung</label>
+              <label className="block text-xs font-bold text-[#0d1f3c]/50 mb-1.5 uppercase tracking-wide">{t("split")}</label>
               <div className="flex gap-2 mb-2">
                 {(["equal", "custom"] as const).map((mode) => (
                   <button
@@ -462,13 +468,13 @@ export default function SplitPage() {
                     onClick={() => setExpSplitMode(mode)}
                     className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${expSplitMode === mode ? "bg-[#0d1f3c] text-white" : "bg-gray-100 text-[#0d1f3c]"}`}
                   >
-                    {mode === "equal" ? "Gleichmäßig" : "Individuell"}
+                    {mode === "equal" ? t("equal") : t("custom")}
                   </button>
                 ))}
               </div>
               {expSplitMode === "equal" && expAmount && (
                 <p className="text-xs text-[#0d1f3c]/40">
-                  Jeder zahlt {fmt(parseFloat(expAmount) / group.members.length || 0, expCurrency)}
+                  {t("everyonePays", { amount: fmt(parseFloat(expAmount) / group.members.length || 0, expCurrency) })}
                 </p>
               )}
               {expSplitMode === "custom" && (
@@ -494,7 +500,7 @@ export default function SplitPage() {
               type="submit"
               className="w-full bg-[#0d1f3c] text-white font-bold py-3 rounded-xl hover:bg-[#162d54] transition-colors text-sm"
             >
-              Ausgabe hinzufügen
+              {t("addExpenseButton")}
             </button>
           </form>
         </div>
@@ -506,7 +512,7 @@ export default function SplitPage() {
           {groupExps.length === 0 ? (
             <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
               <NotebookText className="w-9 h-9 mb-3 mx-auto text-sky-400" />
-              <p className="text-[#0d1f3c]/40 text-sm">Noch keine Ausgaben. Füge die erste hinzu!</p>
+              <p className="text-[#0d1f3c]/40 text-sm">{t("noExpensesTitle")}</p>
             </div>
           ) : (
             groupExps.map((exp) => {
@@ -520,7 +526,7 @@ export default function SplitPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-[#0d1f3c] truncate">{exp.title}</p>
                     <p className="text-xs text-[#0d1f3c]/40">
-                      {payer?.name} hat bezahlt · {new Date(exp.date).toLocaleDateString("de-DE", { day: "2-digit", month: "short" })}
+                      {payer?.name} {t("paid")} · {new Date(exp.date).toLocaleDateString(locale, { day: "2-digit", month: "short" })}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
@@ -551,7 +557,7 @@ export default function SplitPage() {
               <div className="flex-1">
                 <p className="font-bold text-[#0d1f3c]">{b.name}</p>
                 <p className="text-xs text-[#0d1f3c]/40">
-                  {b.balance > 0.01 ? "bekommt zurück" : b.balance < -0.01 ? "schuldet noch" : "ist quitt"}
+                  {b.balance > 0.01 ? t("getsBack") : b.balance < -0.01 ? t("owes") : t("settled")}
                 </p>
               </div>
               <div className={`text-right font-extrabold text-lg ${b.balance > 0.01 ? "text-emerald-500" : b.balance < -0.01 ? "text-rose-500" : "text-gray-300"}`}>
@@ -568,13 +574,13 @@ export default function SplitPage() {
           {settlements.length === 0 ? (
             <div className="bg-emerald-50 rounded-2xl border border-emerald-100 p-10 text-center">
               <PartyPopper className="w-9 h-9 mb-3 mx-auto text-emerald-400" />
-              <h3 className="font-extrabold text-emerald-700 mb-1">Alle quitt!</h3>
-              <p className="text-emerald-600/70 text-sm">Keine offenen Schulden in dieser Gruppe.</p>
+              <h3 className="font-extrabold text-emerald-700 mb-1">{t("allSettledTitle")}</h3>
+              <p className="text-emerald-600/70 text-sm">{t("noDebts")}</p>
             </div>
           ) : (
             <div className="space-y-3">
               <p className="text-xs text-[#0d1f3c]/40 mb-4">
-                Unser Algorithmus hat die Überweisungen minimiert – nur <strong className="text-[#0d1f3c]/60">{settlements.length} Zahlung{settlements.length > 1 ? "en" : ""}</strong> nötig, um alle Schulden zu begleichen.
+                {t("minimizedTransfers")} <strong className="text-[#0d1f3c]/60">{t("paymentsNeeded", { count: settlements.length })}</strong> {t("toSettleAllDebts")}
               </p>
               {settlements.map((s, i) => {
                 const fromIdx = group.members.findIndex((m) => m.id === s.from);
@@ -587,7 +593,7 @@ export default function SplitPage() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm text-[#0d1f3c]/60">
-                          <strong className="text-[#0d1f3c]">{s.fromName}</strong> zahlt an <strong className="text-[#0d1f3c]">{s.toName}</strong>
+                          <strong className="text-[#0d1f3c]">{s.fromName}</strong> {t("paysTo")} <strong className="text-[#0d1f3c]">{s.toName}</strong>
                         </p>
                         <p className="text-2xl font-extrabold text-[#0d1f3c] mt-0.5">{fmt(s.amount, group.currency)}</p>
                       </div>
