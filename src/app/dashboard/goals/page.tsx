@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Plane, Home, GraduationCap, Car, Laptop, Palmtree, Gem, Backpack,
   Dumbbell, Smartphone, Guitar, Globe, Check, ArrowRight, Target, Plus,
@@ -37,11 +38,14 @@ function GoalIcon({ id, className = "w-5 h-5", style }: { id: string; className?
   return <Icon className={className} style={style} />;
 }
 
-function fmt(n: number, cur = "EUR") {
-  return new Intl.NumberFormat("de-DE", { style: "currency", currency: cur, maximumFractionDigits: cur === "JPY" ? 0 : 2 }).format(n);
-}
-
 export default function GoalsPage() {
+  const t = useTranslations("Goals");
+  const locale = useLocale();
+
+  function fmt(n: number, cur = "EUR") {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: cur, maximumFractionDigits: cur === "JPY" ? 0 : 2 }).format(n);
+  }
+
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [modal, setModal] = useState<"none" | "create" | "deposit">("none");
@@ -100,11 +104,11 @@ export default function GoalsPage() {
 
       <div className="flex items-start justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Sparziele</h1>
-          <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{goals.length} Ziel{goals.length !== 1 ? "e" : ""} · {fmt(totalSaved)} gespart</p>
+          <h1 className="text-2xl font-extrabold text-[#0d1f3c]">{t("title")}</h1>
+          <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{t("subtitle", { count: goals.length, saved: fmt(totalSaved) })}</p>
         </div>
-        <button onClick={() => setModal("create")} className="bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
-          + Neues Ziel
+        <button onClick={() => setModal("create")} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
+          <span className="leading-none">+</span> {t("newGoal")}
         </button>
       </div>
 
@@ -113,9 +117,9 @@ export default function GoalsPage() {
         <div className="bg-[#0d1f3c] text-white rounded-2xl p-5 mb-6">
           <div className="flex items-end justify-between mb-3">
             <div>
-              <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-1">Gesamt gespart</p>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-1">{t("totalSaved")}</p>
               <p className="text-3xl font-extrabold">{fmt(totalSaved)}</p>
-              <p className="text-white/40 text-xs mt-0.5">von {fmt(totalTarget)} Ziel</p>
+              <p className="text-white/40 text-xs mt-0.5">{t("ofTarget", { total: fmt(totalTarget) })}</p>
             </div>
             <p className="text-4xl font-extrabold text-white/20">{Math.round((totalSaved / totalTarget) * 100)}%</p>
           </div>
@@ -130,10 +134,10 @@ export default function GoalsPage() {
       {goals.length === 0 ? (
         <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-16 text-center">
           <Target className="w-10 h-10 mb-4 mx-auto text-emerald-400" />
-          <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch kein Sparziel</h3>
-          <p className="text-[#0d1f3c]/40 text-sm mb-6">Setze dir ein Ziel — Reise, Wohnung, Laptop — und tracke deinen Fortschritt.</p>
+          <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">{t("emptyTitle")}</h3>
+          <p className="text-[#0d1f3c]/40 text-sm mb-6">{t("emptyDesc")}</p>
           <button onClick={() => setModal("create")} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors">
-            Erstes Ziel erstellen <ArrowRight className="w-4 h-4" />
+            {t("createFirst")} <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       ) : (
@@ -146,7 +150,7 @@ export default function GoalsPage() {
 
             return (
               <div key={goal.id} className="bg-white rounded-2xl border border-gray-100 p-5 relative overflow-hidden">
-                {done && <div className="absolute top-3 right-3 bg-emerald-50 text-emerald-600 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1"><Check className="w-3 h-3" /> Erreicht!</div>}
+                {done && <div className="absolute top-3 right-3 bg-emerald-50 text-emerald-600 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1"><Check className="w-3 h-3" /> {t("achieved")}</div>}
                 <div className="flex items-start gap-3 mb-4">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
                     style={{ background: `${goal.color}15` }}>
@@ -155,8 +159,8 @@ export default function GoalsPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-extrabold text-[#0d1f3c] truncate">{goal.name}</p>
                     <p className="text-xs text-[#0d1f3c]/40">
-                      {fmt(goal.currentAmount, goal.currency)} von {fmt(goal.targetAmount, goal.currency)}
-                      {daysLeft !== null && <span className="ml-2">{daysLeft > 0 ? `· ${daysLeft} Tage` : "· Fällig"}</span>}
+                      {fmt(goal.currentAmount, goal.currency)} {t("of")} {fmt(goal.targetAmount, goal.currency)}
+                      {daysLeft !== null && <span className="ml-2">{daysLeft > 0 ? t("days", { days: daysLeft }) : t("due")}</span>}
                     </p>
                   </div>
                   <button onClick={() => removeGoal(goal.id)} className="text-gray-200 hover:text-rose-400 transition-colors text-xl leading-none">×</button>
@@ -170,11 +174,11 @@ export default function GoalsPage() {
 
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-bold" style={{ color: goal.color }}>{Math.round(pct)}%</p>
-                  {!done && <p className="text-xs text-[#0d1f3c]/40">Noch {fmt(remaining, goal.currency)}</p>}
+                  {!done && <p className="text-xs text-[#0d1f3c]/40">{t("remaining", { amount: fmt(remaining, goal.currency) })}</p>}
                   <button onClick={() => { setActiveGoal(goal); setDepositAmount(""); setModal("deposit"); }}
                     className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-colors"
                     style={{ background: goal.color }}>
-                    <Plus className="w-3 h-3" /> Einzahlen
+                    <Plus className="w-3 h-3" /> {t("deposit")}
                   </button>
                 </div>
               </div>
@@ -189,13 +193,13 @@ export default function GoalsPage() {
           onClick={(e) => { if (e.target === e.currentTarget) setModal("none"); }}>
           <div className="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h2 className="font-extrabold text-[#0d1f3c] text-lg">Neues Sparziel</h2>
+              <h2 className="font-extrabold text-[#0d1f3c] text-lg">{t("newGoalModalTitle")}</h2>
               <button onClick={() => setModal("none")} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
             </div>
             <form onSubmit={handleCreate} className="p-5 space-y-4">
               {/* Icon picker */}
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Symbol</label>
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("symbol")}</label>
                 <div className="flex flex-wrap gap-2">
                   {ICONS.map((i) => (
                     <button key={i} type="button" onClick={() => setIcon(i)}
@@ -206,18 +210,18 @@ export default function GoalsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Name</label>
-                <input autoFocus type="text" placeholder="z. B. Flug nach Japan" value={name} onChange={(e) => setName(e.target.value)} required
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("name")}</label>
+                <input autoFocus type="text" placeholder={t("namePlaceholder")} value={name} onChange={(e) => setName(e.target.value)} required
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
               </div>
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Zielbetrag</label>
+                  <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("targetAmount")}</label>
                   <input type="text" inputMode="decimal" placeholder="1.000" value={target} onChange={(e) => setTarget(e.target.value.replace(/[^0-9.,]/g, ""))} required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
                 </div>
                 <div className="w-24">
-                  <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Währung</label>
+                  <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("currency")}</label>
                   <select value={currency} onChange={(e) => setCurrency(e.target.value)}
                     className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm text-[#0d1f3c] bg-white focus:outline-none">
                     {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -225,12 +229,12 @@ export default function GoalsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Zieldatum (optional)</label>
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("targetDate")}</label>
                 <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Farbe</label>
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("color")}</label>
                 <div className="flex gap-2">
                   {COLORS.map((c) => (
                     <button key={c} type="button" onClick={() => setColor(c)}
@@ -240,7 +244,7 @@ export default function GoalsPage() {
                 </div>
               </div>
               <button type="submit" className="w-full inline-flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3.5 font-bold text-sm hover:bg-[#162d54] transition-colors">
-                Ziel erstellen <ArrowRight className="w-4 h-4" />
+                {t("createGoal")} <ArrowRight className="w-4 h-4" />
               </button>
             </form>
           </div>
@@ -258,7 +262,7 @@ export default function GoalsPage() {
               </div>
               <div>
                 <h2 className="font-extrabold text-[#0d1f3c]">{activeGoal.name}</h2>
-                <p className="text-xs text-[#0d1f3c]/40">{fmt(activeGoal.currentAmount, activeGoal.currency)} von {fmt(activeGoal.targetAmount, activeGoal.currency)}</p>
+                <p className="text-xs text-[#0d1f3c]/40">{fmt(activeGoal.currentAmount, activeGoal.currency)} {t("of")} {fmt(activeGoal.targetAmount, activeGoal.currency)}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 border-2 border-gray-100 rounded-2xl px-4 py-3 mb-4 focus-within:border-[#0d1f3c]/20">
@@ -279,7 +283,7 @@ export default function GoalsPage() {
             <button onClick={handleDeposit} disabled={!depositAmount}
               className="w-full inline-flex items-center justify-center gap-1.5 py-3.5 rounded-xl font-bold text-white text-sm transition-colors disabled:opacity-30"
               style={{ background: activeGoal.color }}>
-              Einzahlen <ArrowRight className="w-4 h-4" />
+              {t("deposit")} <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

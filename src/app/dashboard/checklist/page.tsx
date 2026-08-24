@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   ClipboardList, Landmark, GraduationCap, Home, FileText,
   Lightbulb, PartyPopper, Flame, Check, ChevronUp, ChevronDown, Plus, X,
@@ -8,78 +9,63 @@ import {
 } from "lucide-react";
 
 type CheckItem = { id: string; label: string; hint?: string; link?: string; custom?: boolean };
-type Section = { title: string; icon: LucideIcon; color: string; items: CheckItem[] };
+type SectionDef = { id: string; icon: LucideIcon; color: string; itemIds: string[] };
+type Section = { id: string; title: string; icon: LucideIcon; color: string; items: CheckItem[] };
 
-const CHECKLIST: Section[] = [
+const SECTION_DEFS: SectionDef[] = [
   {
-    title: "Vor der Abreise", icon: ClipboardList, color: "#0d1f3c",
-    items: [
-      { id: "passport", label: "Reisepass / Ausweis gültig (mind. 6 Monate)", hint: "Viele Länder verlangen mind. 6 Monate Restgültigkeit" },
-      { id: "visa", label: "Visum beantragt (falls nötig)", link: "https://www.auswaertiges-amt.de", hint: "Auswärtiges Amt: Einreise- und Visabestimmungen nach Zielland" },
-      { id: "insurance", label: "Auslandskrankenversicherung abgeschlossen", link: "https://www.verbraucherzentrale.de", hint: "Verbraucherzentrale: Vergleich & Beratung zu Auslandskrankenversicherungen" },
-      { id: "ehic", label: "Europäische Krankenversicherungskarte (EHIC) beantragt", hint: "Für EU-Länder, kostenlos bei deiner Krankenkasse", link: "https://europa.eu/youreurope/citizens/health/unplanned-healthcare/temporary-stays/index_de.htm" },
-      { id: "liability", label: "Haftpflichtversicherung gilt im Ausland (prüfen)", link: "https://www.test.de", hint: "Stiftung Warentest: unabhängige Versicherungstests" },
-      { id: "deregister", label: "Wohnsitz abmelden (bei dauerhaftem Wegzug)", hint: "Spart GEZ-Beitrag und kann steuerliche Vorteile bringen" },
-      { id: "gez", label: "Rundfunkbeitrag abgemeldet", link: "https://www.rundfunkbeitrag.de" },
-      { id: "taxid", label: "Steuer-ID notiert (bleibt lebenslang gültig)", link: "https://www.bzst.de", hint: "Bundeszentralamt für Steuern" },
-      { id: "vaccinations", label: "Impfungen aufgefrischt (falls nötig)", link: "https://www.auswaertiges-amt.de", hint: "Auswärtiges Amt: länderspezifische Gesundheitshinweise" },
-    ],
+    id: "pre", icon: ClipboardList, color: "#0d1f3c",
+    itemIds: ["passport", "visa", "insurance", "ehic", "liability", "deregister", "gez", "taxid", "vaccinations"],
   },
   {
-    title: "Banking & Geld", icon: Landmark, color: "#4285F4",
-    items: [
-      { id: "bank_foreign", label: "Konto mit kostenloser Auslands-VISA eröffnet", hint: "z. B. DKB oder ING", link: "https://www.test.de" },
-      { id: "bank_notify", label: "Bank über Auslandsaufenthalt informiert", hint: "Verhindert Sperrung der Karte" },
-      { id: "cash", label: "Etwas Bargeld in Lokalwährung besorgt", hint: "Für Ankunft und Notfälle" },
-      { id: "emergency_fund", label: "Notgroschen (3 Monate Ausgaben) auf separatem Konto", link: "https://www.verbraucherzentrale.de", hint: "Verbraucherzentrale: warum und wie viel sparen" },
-      { id: "wise", label: "Wise / Revolut-Karte für günstige Auslandsüberweisungen", link: "https://www.test.de", hint: "Stiftung Warentest: Geldtransfer-Anbieter im Vergleich" },
-      { id: "pin", label: "PIN aller Karten auswendig gewusst (kein Foto davon!)" },
-      { id: "backupcard", label: "Zweite Karte als Backup eingepackt" },
-    ],
+    id: "banking", icon: Landmark, color: "#4285F4",
+    itemIds: ["bank_foreign", "bank_notify", "cash", "emergency_fund", "wise", "pin", "backupcard"],
   },
   {
-    title: "Studium & Arbeit", icon: GraduationCap, color: "#34A853",
-    items: [
-      { id: "bafög", label: "BAföG-Auslandsantrag gestellt (falls zutreffend)", link: "https://www.bafög.de", hint: "Offizielles BAföG-Portal mit Förderrechner" },
-      { id: "stipendium", label: "Stipendien recherchiert (DAAD, Erasmus, etc.)", link: "https://www.daad.de", hint: "DAAD-Stipendiendatenbank" },
-      { id: "erasmus", label: "Erasmus-Formular ausgefüllt (falls zutreffend)", link: "https://www.daad.de", hint: "DAAD: Erasmus+ Informationen" },
-      { id: "creditrecognition", label: "Leistungsanerkennung mit Heimathochschule geklärt" },
-      { id: "workvisa", label: "Arbeitserlaubnis geprüft (Stunden-Limits beachten)" },
-      { id: "socialsecurity", label: "Sozialversicherung im Zielland recherchiert" },
-      { id: "taxabroad", label: "Doppelbesteuerungsabkommen geprüft", link: "https://www.bundesfinanzministerium.de", hint: "Bundesfinanzministerium: internationales Steuerrecht" },
-    ],
+    id: "study", icon: GraduationCap, color: "#34A853",
+    itemIds: ["bafoeg", "stipendium", "erasmus", "creditrecognition", "workvisa", "socialsecurity", "taxabroad"],
   },
   {
-    title: "Wohnen", icon: Home, color: "#FF6200",
-    items: [
-      { id: "housing", label: "Unterkunft für die ersten Wochen gesichert" },
-      { id: "deposit", label: "Mietkaution-Regeln im Zielland geprüft", link: "https://www.verbraucherzentrale.de", hint: "Verbraucherzentrale: wie viel Mietkaution zulässig ist" },
-      { id: "rentalcontract", label: "Mietvertrag vollständig gelesen und verstanden" },
-      { id: "inventory", label: "Übergabeprotokoll erstellt (Fotos machen!)" },
-      { id: "internet", label: "Internet / SIM-Karte organisiert" },
-      { id: "registration", label: "Anmeldung beim Einwohnermeldeamt (lokale Pflicht prüfen)" },
-    ],
+    id: "housing", icon: Home, color: "#FF6200",
+    itemIds: ["housing", "deposit", "rentalcontract", "inventory", "internet", "registration"],
   },
   {
-    title: "Dokumente & Digitales", icon: FileText, color: "#9333ea",
-    items: [
-      { id: "copies", label: "Alle wichtigen Dokumente digital gesichert (Cloud)", hint: "Pass, Versicherungen, Verträge" },
-      { id: "embassy", label: "Deutsche Botschaft im Zielland notiert", link: "https://www.auswaertiges-amt.de", hint: "Auswärtiges Amt: Botschaften und Konsulate weltweit" },
-      { id: "emergency_contacts", label: "Notfallkontakte gespeichert (Familie, Botschaft, Arzt)" },
-      { id: "vpn", label: "VPN installiert (für sicheres Banking in fremden WLANs)" },
-      { id: "elster", label: "ELSTER-Zugang eingerichtet (für Steuererklärung)", link: "https://www.elster.de" },
-      { id: "roaming", label: "EU-Roaming aktiviert oder lokale SIM geplant" },
-    ],
+    id: "docs", icon: FileText, color: "#9333ea",
+    itemIds: ["copies", "embassy", "emergency_contacts", "vpn", "elster", "roaming"],
   },
 ];
 
+const ITEM_LINKS: Record<string, string> = {
+  visa: "https://www.auswaertiges-amt.de",
+  insurance: "https://www.verbraucherzentrale.de",
+  ehic: "https://europa.eu/youreurope/citizens/health/unplanned-healthcare/temporary-stays/index_de.htm",
+  liability: "https://www.test.de",
+  taxid: "https://www.bzst.de",
+  vaccinations: "https://www.auswaertiges-amt.de",
+  bank_foreign: "https://www.test.de",
+  emergency_fund: "https://www.verbraucherzentrale.de",
+  wise: "https://www.test.de",
+  bafoeg: "https://www.bafög.de",
+  stipendium: "https://www.daad.de",
+  erasmus: "https://www.daad.de",
+  taxabroad: "https://www.bundesfinanzministerium.de",
+  deposit: "https://www.verbraucherzentrale.de",
+  embassy: "https://www.auswaertiges-amt.de",
+  elster: "https://www.elster.de",
+  gez: "https://www.rundfunkbeitrag.de",
+};
+
 export default function ChecklistPage() {
+  const t = useTranslations("Checklist");
+  const tSections = useTranslations("ChecklistSections");
+  const tItems = useTranslations("ChecklistItems");
+
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [customItems, setCustomItems] = useState<Record<string, CheckItem[]>>({});
   const [removedDefaults, setRemovedDefaults] = useState<Set<string>>(new Set());
   const [newTaskInputs, setNewTaskInputs] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
-  const [openSections, setOpenSections] = useState<Set<string>>(new Set(CHECKLIST.map((s) => s.title)));
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set(SECTION_DEFS.map((s) => s.id)));
 
   useEffect(() => {
     try {
@@ -116,27 +102,27 @@ export default function ChecklistPage() {
     });
   }
 
-  function toggleSection(title: string) {
+  function toggleSection(id: string) {
     setOpenSections((prev) => {
       const next = new Set(prev);
-      next.has(title) ? next.delete(title) : next.add(title);
+      next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   }
 
-  function addCustomTask(sectionTitle: string) {
-    const label = (newTaskInputs[sectionTitle] ?? "").trim();
+  function addCustomTask(sectionId: string) {
+    const label = (newTaskInputs[sectionId] ?? "").trim();
     if (!label) return;
     const item: CheckItem = { id: `custom-${crypto.randomUUID()}`, label, custom: true };
-    setCustomItems((prev) => ({ ...prev, [sectionTitle]: [...(prev[sectionTitle] ?? []), item] }));
-    setNewTaskInputs((prev) => ({ ...prev, [sectionTitle]: "" }));
+    setCustomItems((prev) => ({ ...prev, [sectionId]: [...(prev[sectionId] ?? []), item] }));
+    setNewTaskInputs((prev) => ({ ...prev, [sectionId]: "" }));
   }
 
-  function removeItem(sectionTitle: string, item: CheckItem) {
+  function removeItem(sectionId: string, item: CheckItem) {
     if (item.custom) {
       setCustomItems((prev) => ({
         ...prev,
-        [sectionTitle]: (prev[sectionTitle] ?? []).filter((i) => i.id !== item.id),
+        [sectionId]: (prev[sectionId] ?? []).filter((i) => i.id !== item.id),
       }));
     } else {
       setRemovedDefaults((prev) => new Set(prev).add(item.id));
@@ -148,11 +134,21 @@ export default function ChecklistPage() {
     });
   }
 
-  const sections: Section[] = CHECKLIST.map((s) => ({
-    ...s,
+  const sections: Section[] = SECTION_DEFS.map((s) => ({
+    id: s.id,
+    title: tSections(s.id),
+    icon: s.icon,
+    color: s.color,
     items: [
-      ...s.items.filter((i) => !removedDefaults.has(i.id)),
-      ...(customItems[s.title] ?? []),
+      ...s.itemIds
+        .filter((id) => !removedDefaults.has(id))
+        .map((id) => ({
+          id,
+          label: tItems(`${id}.label`),
+          hint: tItems(`${id}.hint`) || undefined,
+          link: ITEM_LINKS[id],
+        })),
+      ...(customItems[s.id] ?? []),
     ],
   }));
 
@@ -164,10 +160,10 @@ export default function ChecklistPage() {
     <div className="p-4 md:p-8 max-w-2xl mx-auto">
 
       <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Auslands-Checkliste</h1>
-        <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{doneItems} von {totalItems} erledigt</p>
+        <h1 className="text-2xl font-extrabold text-[#0d1f3c]">{t("pageTitle")}</h1>
+        <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{t("itemsCompleted", { done: doneItems, total: totalItems })}</p>
         <p className="text-[#0d1f3c]/40 text-xs mt-2 bg-[#0d1f3c]/5 rounded-lg px-3 py-2 flex items-start gap-1.5">
-          <Lightbulb className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#d97706" }} /> Diese Liste ist nur ein Vorschlag und erhebt keinen Anspruch auf Vollständigkeit. Ergänze unten eigene Aufgaben, die für deine Situation wichtig sind.
+          <Lightbulb className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#d97706" }} /> {t("disclaimer")}
         </p>
       </div>
 
@@ -175,7 +171,7 @@ export default function ChecklistPage() {
       <div className="bg-[#0d1f3c] text-white rounded-2xl p-5 mb-6">
         <div className="flex items-end justify-between mb-3">
           <div>
-            <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-1">Fortschritt</p>
+            <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-1">{t("progress")}</p>
             <p className="text-3xl font-extrabold">{pct}%</p>
           </div>
           <div className="opacity-40">
@@ -185,28 +181,28 @@ export default function ChecklistPage() {
         <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
           <div className="h-full bg-white/70 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
         </div>
-        {pct >= 100 && <p className="text-emerald-300 text-sm font-bold mt-3 flex items-center gap-1.5"><Check className="w-4 h-4" /> Alles erledigt — viel Erfolg im Ausland!</p>}
+        {pct >= 100 && <p className="text-emerald-300 text-sm font-bold mt-3 flex items-center gap-1.5"><Check className="w-4 h-4" /> {t("allDone")}</p>}
       </div>
 
       {/* Sections */}
       <div className="space-y-3">
         {sections.map((section) => {
           const sectionDone = section.items.filter((i) => checked.has(i.id)).length;
-          const isOpen = openSections.has(section.title);
+          const isOpen = openSections.has(section.id);
           const allDone = sectionDone === section.items.length;
 
           return (
-            <div key={section.title} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <button onClick={() => toggleSection(section.title)}
+            <div key={section.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <button onClick={() => toggleSection(section.id)}
                 className="w-full flex items-center gap-3 px-5 py-4 hover:bg-gray-50/60 transition-colors">
                 <section.icon className="w-5 h-5 flex-shrink-0" style={{ color: section.color }} />
                 <div className="flex-1 text-left">
                   <p className="font-extrabold text-[#0d1f3c]">{section.title}</p>
-                  <p className="text-xs text-[#0d1f3c]/40">{sectionDone}/{section.items.length} erledigt</p>
+                  <p className="text-xs text-[#0d1f3c]/40">{t("sectionDone", { done: sectionDone, total: section.items.length })}</p>
                 </div>
                 {allDone && (
                   <span className="text-xs bg-emerald-50 text-emerald-600 font-bold px-2.5 py-1 rounded-full border border-emerald-200 inline-flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Fertig
+                    <Check className="w-3 h-3" /> {t("finished")}
                   </span>
                 )}
                 {isOpen ? <ChevronUp className="w-4 h-4 text-gray-300" /> : <ChevronDown className="w-4 h-4 text-gray-300" />}
@@ -233,9 +229,9 @@ export default function ChecklistPage() {
                           {item.hint && <p className="text-xs text-[#0d1f3c]/30 mt-0.5">{item.hint}</p>}
                         </div>
                         <button
-                          onClick={(e) => { e.preventDefault(); removeItem(section.title, item); }}
+                          onClick={(e) => { e.preventDefault(); removeItem(section.id, item); }}
                           className="flex-shrink-0 text-[#0d1f3c]/20 hover:text-rose-500 transition-colors"
-                          title="Löschen"
+                          title={t("delete")}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -247,17 +243,17 @@ export default function ChecklistPage() {
                   <div className="flex items-center gap-2 px-5 py-3">
                     <input
                       type="text"
-                      placeholder="Eigene Aufgabe hinzufügen…"
-                      value={newTaskInputs[section.title] ?? ""}
-                      onChange={(e) => setNewTaskInputs((prev) => ({ ...prev, [section.title]: e.target.value }))}
-                      onKeyDown={(e) => { if (e.key === "Enter") addCustomTask(section.title); }}
+                      placeholder={t("addTaskPlaceholder")}
+                      value={newTaskInputs[section.id] ?? ""}
+                      onChange={(e) => setNewTaskInputs((prev) => ({ ...prev, [section.id]: e.target.value }))}
+                      onKeyDown={(e) => { if (e.key === "Enter") addCustomTask(section.id); }}
                       className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#0d1f3c] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
                     />
                     <button
-                      onClick={() => addCustomTask(section.title)}
+                      onClick={() => addCustomTask(section.id)}
                       className="flex-shrink-0 inline-flex items-center gap-1 text-sm font-semibold text-white bg-[#0d1f3c] rounded-lg px-3 py-2 hover:bg-[#162d54] transition-colors"
                     >
-                      <Plus className="w-4 h-4" /> Hinzufügen
+                      <Plus className="w-4 h-4" /> {t("add")}
                     </button>
                   </div>
                 </div>
@@ -270,12 +266,12 @@ export default function ChecklistPage() {
       <div className="mt-4 text-center space-x-4">
         <button onClick={() => setChecked(new Set())}
           className="text-xs text-[#0d1f3c]/20 hover:text-[#0d1f3c]/40 transition-colors">
-          Häkchen zurücksetzen
+          {t("resetChecks")}
         </button>
         {removedDefaults.size > 0 && (
           <button onClick={() => setRemovedDefaults(new Set())}
             className="text-xs text-[#0d1f3c]/20 hover:text-[#0d1f3c]/40 transition-colors">
-            Gelöschte Vorschläge wiederherstellen ({removedDefaults.size})
+            {t("restoreRemoved", { count: removedDefaults.size })}
           </button>
         )}
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Tv, Music, Laptop2, Dumbbell, Newspaper, Gamepad2, Cloud, Package,
   Plus, X, ArrowRight, Lightbulb, type LucideIcon,
@@ -41,10 +42,6 @@ const POPULAR: Partial<Subscription>[] = [
   { name: "Amazon Prime", color: "#FF9900", category: "Streaming", amount: 8.99, currency: "EUR", cycle: "monthly", logo: "https://logo.clearbit.com/amazon.de" },
 ];
 
-function fmt(n: number, cur = "EUR") {
-  return new Intl.NumberFormat("de-DE", { style: "currency", currency: cur, minimumFractionDigits: 2 }).format(n);
-}
-
 function toMonthly(amount: number, cycle: Cycle): number {
   if (cycle === "yearly") return amount / 12;
   if (cycle === "weekly") return amount * 4.33;
@@ -52,6 +49,14 @@ function toMonthly(amount: number, cycle: Cycle): number {
 }
 
 export default function SubscriptionsPage() {
+  const t = useTranslations("Subscriptions");
+  const tCat = useTranslations("SubCategory");
+  const locale = useLocale();
+
+  function fmt(n: number, cur = "EUR") {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: cur, minimumFractionDigits: 2 }).format(n);
+  }
+
   const [subs, setSubs] = useState<Subscription[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [modal, setModal] = useState<"none" | "create">("none");
@@ -117,11 +122,11 @@ export default function SubscriptionsPage() {
 
       <div className="flex items-start justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0d1f3c]">Abo-Tracker</h1>
-          <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{subs.length} Abonnement{subs.length !== 1 ? "s" : ""} · {fmt(monthlyTotal)}/Monat</p>
+          <h1 className="text-2xl font-extrabold text-[#0d1f3c]">{t("title")}</h1>
+          <p className="text-[#0d1f3c]/40 text-sm mt-0.5">{t("subtitle", { count: subs.length, total: fmt(monthlyTotal) })}</p>
         </div>
         <button onClick={() => setModal("create")} className="inline-flex items-center gap-1.5 bg-[#0d1f3c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#162d54] transition-colors flex-shrink-0">
-          <Plus className="w-4 h-4" /> Abo hinzufügen
+          <Plus className="w-4 h-4" /> {t("addSub")}
         </button>
       </div>
 
@@ -129,14 +134,14 @@ export default function SubscriptionsPage() {
       {subs.length > 0 && (
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="bg-[#0d1f3c] text-white rounded-2xl p-5">
-            <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-1">Pro Monat</p>
+            <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-1">{t("perMonth")}</p>
             <p className="text-3xl font-extrabold">{fmt(monthlyTotal)}</p>
-            <p className="text-white/30 text-xs mt-1">{subs.length} aktive Abos</p>
+            <p className="text-white/30 text-xs mt-1">{t("activeSubs", { count: subs.length })}</p>
           </div>
           <div className="bg-white border border-gray-100 rounded-2xl p-5">
-            <p className="text-[#0d1f3c]/40 text-xs font-semibold uppercase tracking-widest mb-1">Pro Jahr</p>
+            <p className="text-[#0d1f3c]/40 text-xs font-semibold uppercase tracking-widest mb-1">{t("perYear")}</p>
             <p className="text-3xl font-extrabold text-[#0d1f3c]">{fmt(yearlyTotal)}</p>
-            <p className="text-[#0d1f3c]/30 text-xs mt-1">Hochgerechnet</p>
+            <p className="text-[#0d1f3c]/30 text-xs mt-1">{t("extrapolated")}</p>
           </div>
         </div>
       )}
@@ -145,11 +150,11 @@ export default function SubscriptionsPage() {
         <div>
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center mb-6">
             <Package className="w-10 h-10 mb-4 mx-auto" style={{ color: "#d97706" }} />
-            <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">Noch keine Abos</h3>
-            <p className="text-[#0d1f3c]/40 text-sm mb-6">Füge deine Abonnements hinzu und sieh wie viel du monatlich ausgibst.</p>
+            <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">{t("emptyTitle")}</h3>
+            <p className="text-[#0d1f3c]/40 text-sm mb-6">{t("emptyDesc")}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-[#0d1f3c]/40 uppercase tracking-widest mb-3">Schnell hinzufügen</p>
+            <p className="text-xs font-bold text-[#0d1f3c]/40 uppercase tracking-widest mb-3">{t("quickAdd")}</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {POPULAR.map((p) => (
                 <button key={p.name} onClick={() => addPopular(p)}
@@ -158,7 +163,7 @@ export default function SubscriptionsPage() {
                   <img src={p.logo} alt={p.name} className="w-8 h-8 rounded-lg object-contain" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                   <div>
                     <p className="text-sm font-bold text-[#0d1f3c]">{p.name}</p>
-                    <p className="text-xs text-[#0d1f3c]/40">{fmt(p.amount!, p.currency!)}/Monat</p>
+                    <p className="text-xs text-[#0d1f3c]/40">{fmt(p.amount!, p.currency!)}{t("perMonthShort")}</p>
                   </div>
                 </button>
               ))}
@@ -170,7 +175,7 @@ export default function SubscriptionsPage() {
           <div className="space-y-4">
             {/* Popular quick-add */}
             <div>
-              <p className="text-xs font-bold text-[#0d1f3c]/40 uppercase tracking-widest mb-3">Schnell hinzufügen</p>
+              <p className="text-xs font-bold text-[#0d1f3c]/40 uppercase tracking-widest mb-3">{t("quickAdd")}</p>
               <div className="flex gap-2 flex-wrap">
                 {POPULAR.filter((p) => !subs.some((s) => s.name === p.name)).map((p) => (
                   <button key={p.name} onClick={() => addPopular(p)}
@@ -188,9 +193,9 @@ export default function SubscriptionsPage() {
               <div key={cat} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-3 border-b border-gray-50">
                   <span className="text-sm font-extrabold text-[#0d1f3c] inline-flex items-center gap-1.5">
-                    {(() => { const Icon = CATEGORY_ICONS[cat]; return <Icon className="w-3.5 h-3.5" style={{ color: CATEGORY_ICON_COLORS[cat] }} />; })()} {cat}
+                    {(() => { const Icon = CATEGORY_ICONS[cat]; return <Icon className="w-3.5 h-3.5" style={{ color: CATEGORY_ICON_COLORS[cat] }} />; })()} {tCat(cat)}
                   </span>
-                  <span className="text-xs font-bold text-[#0d1f3c]/40">{fmt(total)}/Mo</span>
+                  <span className="text-xs font-bold text-[#0d1f3c]/40">{fmt(total)}{t("perMoShort")}</span>
                 </div>
                 <div className="divide-y divide-gray-50">
                   {catSubs.map((sub) => (
@@ -205,13 +210,13 @@ export default function SubscriptionsPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-[#0d1f3c]">{sub.name}</p>
                         <p className="text-xs text-[#0d1f3c]/40">
-                          {sub.cycle === "monthly" ? "Monatlich" : sub.cycle === "yearly" ? "Jährlich" : "Wöchentlich"}
-                          {sub.nextDate && ` · nächste Zahlung ${new Date(sub.nextDate).toLocaleDateString("de-DE", { day: "2-digit", month: "short" })}`}
+                          {sub.cycle === "monthly" ? t("monthly") : sub.cycle === "yearly" ? t("yearly") : t("weekly")}
+                          {sub.nextDate && ` ${t("nextPayment", { date: new Date(sub.nextDate).toLocaleDateString(locale, { day: "2-digit", month: "short" }) })}`}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-bold text-[#0d1f3c]">{fmt(sub.amount, sub.currency)}</p>
-                        <p className="text-xs text-[#0d1f3c]/30">{fmt(toMonthly(sub.amount, sub.cycle))}/Mo</p>
+                        <p className="text-xs text-[#0d1f3c]/30">{fmt(toMonthly(sub.amount, sub.cycle))}{t("perMoShort")}</p>
                       </div>
                       <button onClick={() => setSubs((p) => p.filter((s) => s.id !== sub.id))}
                         className="opacity-0 group-hover:opacity-100 text-gray-200 hover:text-rose-400 transition-all ml-1">
@@ -228,7 +233,7 @@ export default function SubscriptionsPage() {
           <div className="space-y-4">
             {upcoming.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-100 p-5">
-                <h3 className="font-extrabold text-[#0d1f3c] mb-3">Nächste Zahlungen</h3>
+                <h3 className="font-extrabold text-[#0d1f3c] mb-3">{t("upcomingPayments")}</h3>
                 <div className="space-y-2.5">
                   {upcoming.map((sub) => (
                     <div key={sub.id} className="flex items-center justify-between">
@@ -243,8 +248,8 @@ export default function SubscriptionsPage() {
               </div>
             )}
             <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4">
-              <p className="text-amber-700 text-xs font-bold mb-1 inline-flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5" /> Wusstest du?</p>
-              <p className="text-amber-700 text-sm">Im Durchschnitt vergessen Menschen 2–3 aktive Abos. Das sind bis zu {fmt(monthlyTotal * 0.2)}/Monat die man einsparen könnte.</p>
+              <p className="text-amber-700 text-xs font-bold mb-1 inline-flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5" /> {t("knowThat")}</p>
+              <p className="text-amber-700 text-sm">{t("tip", { amount: fmt(monthlyTotal * 0.2) })}</p>
             </div>
           </div>
         </div>
@@ -256,23 +261,23 @@ export default function SubscriptionsPage() {
           onClick={(e) => { if (e.target === e.currentTarget) { setModal("none"); resetForm(); } }}>
           <div className="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 flex-shrink-0">
-              <h2 className="font-extrabold text-[#0d1f3c] text-lg">Abo hinzufügen</h2>
+              <h2 className="font-extrabold text-[#0d1f3c] text-lg">{t("addSubModalTitle")}</h2>
               <button onClick={() => { setModal("none"); resetForm(); }} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleAdd} className="overflow-y-auto flex-1 p-5 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Name</label>
-                <input autoFocus type="text" placeholder="z. B. Spotify" value={name} onChange={(e) => setName(e.target.value)} required
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("name")}</label>
+                <input autoFocus type="text" placeholder={t("namePlaceholder")} value={name} onChange={(e) => setName(e.target.value)} required
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
               </div>
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Betrag</label>
+                  <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("amount")}</label>
                   <input type="text" inputMode="decimal" placeholder="9,99" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9.,]/g, ""))} required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20" />
                 </div>
                 <div className="w-24">
-                  <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Währung</label>
+                  <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("currency")}</label>
                   <select value={currency} onChange={(e) => setCurrency(e.target.value)}
                     className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm text-[#0d1f3c] bg-white focus:outline-none">
                     {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -280,37 +285,37 @@ export default function SubscriptionsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Zyklus</label>
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("cycle")}</label>
                 <div className="flex gap-2">
                   {(["weekly", "monthly", "yearly"] as Cycle[]).map((c) => (
                     <button key={c} type="button" onClick={() => setCycle(c)}
                       className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${cycle === c ? "bg-[#0d1f3c] text-white" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}>
-                      {c === "weekly" ? "Wöchentlich" : c === "monthly" ? "Monatlich" : "Jährlich"}
+                      {c === "weekly" ? t("weekly") : c === "monthly" ? t("monthly") : t("yearly")}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Kategorie</label>
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("category")}</label>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.map((cat) => {
                     const Icon = CATEGORY_ICONS[cat];
                     return (
                       <button key={cat} type="button" onClick={() => setCategory(cat)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${category === cat ? "bg-[#0d1f3c] text-white" : "bg-gray-50 text-[#0d1f3c]/60 hover:bg-gray-100"}`}>
-                        <Icon className="w-3.5 h-3.5" style={{ color: category === cat ? undefined : CATEGORY_ICON_COLORS[cat] }} /> {cat}
+                        <Icon className="w-3.5 h-3.5" style={{ color: category === cat ? undefined : CATEGORY_ICON_COLORS[cat] }} /> {tCat(cat)}
                       </button>
                     );
                   })}
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Nächste Zahlung</label>
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("nextPaymentLabel")}</label>
                 <input type="date" value={nextDate} onChange={(e) => setNextDate(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] focus:outline-none" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">Farbe</label>
+                <label className="block text-xs font-bold text-[#0d1f3c]/50 uppercase tracking-widest mb-2">{t("color")}</label>
                 <div className="flex gap-2">
                   {COLORS.map((c) => (
                     <button key={c} type="button" onClick={() => setColor(c)}
@@ -320,7 +325,7 @@ export default function SubscriptionsPage() {
                 </div>
               </div>
               <button type="submit" className="w-full inline-flex items-center justify-center gap-1.5 bg-[#0d1f3c] text-white rounded-xl py-3.5 font-bold text-sm hover:bg-[#162d54] transition-colors">
-                Abo speichern <ArrowRight className="w-4 h-4" />
+                {t("saveSub")} <ArrowRight className="w-4 h-4" />
               </button>
             </form>
           </div>
