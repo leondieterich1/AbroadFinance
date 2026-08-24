@@ -1,21 +1,27 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { usePlanner } from "@/hooks/usePlanner";
-import { formatCurrency, CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/utils";
+import { useCategoryLabels } from "@/hooks/useCategoryLabels";
+import { formatCurrency, CATEGORY_COLORS } from "@/lib/utils";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 import BudgetRing from "@/components/ui/BudgetRing";
 import DotPattern from "@/components/ui/DotPattern";
 import { ArrowRight, Receipt, Plus, TrendingUp, Settings, Coins, User } from "lucide-react";
 
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 12) return "Guten Morgen";
-  if (h < 18) return "Guten Tag";
-  return "Guten Abend";
-}
-
 export default function DashboardOverview({ userName }: { userName: string }) {
+  const t = useTranslations("DashboardOverview");
+  const locale = useLocale();
+  const CATEGORY_LABELS = useCategoryLabels();
+
+  function getGreeting() {
+    const h = new Date().getHours();
+    if (h < 12) return t("greetingMorning");
+    if (h < 18) return t("greetingDay");
+    return t("greetingEvening");
+  }
+
   const planner = usePlanner();
   const currency = planner.budgets[0]?.currency ?? "EUR";
   const totalBudget = planner.totalBudget();
@@ -23,7 +29,7 @@ export default function DashboardOverview({ userName }: { userName: string }) {
   const remaining = totalBudget - totalSpent;
   const pct = totalBudget > 0 ? Math.min((totalSpent / totalBudget) * 100, 100) : 0;
 
-  const today = new Date().toLocaleDateString("de-DE", {
+  const today = new Date().toLocaleDateString(locale, {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
 
@@ -52,7 +58,7 @@ export default function DashboardOverview({ userName }: { userName: string }) {
         <h1 className="text-3xl font-extrabold text-[#0d1f3c]">
           {getGreeting()}, {userName.split(" ")[0]} 👋
         </h1>
-        <p className="text-[#0d1f3c]/50 mt-1">Hier ist deine Finanzübersicht für diesen Monat.</p>
+        <p className="text-[#0d1f3c]/50 mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Budget overview */}
@@ -65,15 +71,15 @@ export default function DashboardOverview({ userName }: { userName: string }) {
           </div>
           <div className="flex flex-wrap gap-x-10 gap-y-3">
             <div>
-              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Gesamtbudget</p>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">{t("totalBudget")}</p>
               <p className="text-2xl font-extrabold">{formatCurrency(totalBudget, currency)}</p>
             </div>
             <div>
-              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Ausgegeben</p>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">{t("spent")}</p>
               <p className="text-2xl font-extrabold text-rose-300">{formatCurrency(totalSpent, currency)}</p>
             </div>
             <div>
-              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Verbleibend</p>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">{t("remaining")}</p>
               <p className={`text-2xl font-extrabold ${remaining < 0 ? "text-rose-300" : "text-emerald-300"}`}>
                 {formatCurrency(remaining, currency)}
               </p>
@@ -86,13 +92,13 @@ export default function DashboardOverview({ userName }: { userName: string }) {
         {/* Top categories */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-extrabold text-[#0d1f3c]">Top Kategorien</h2>
+            <h2 className="font-extrabold text-[#0d1f3c]">{t("topCategories")}</h2>
             <Link href="/dashboard/budget" className="text-xs text-[#0d1f3c]/40 hover:text-[#0d1f3c] transition-colors">
-              <span className="inline-flex items-center gap-0.5">Alle <ArrowRight className="w-3 h-3" /></span>
+              <span className="inline-flex items-center gap-0.5">{t("all")} <ArrowRight className="w-3 h-3" /></span>
             </Link>
           </div>
           {topCategories.every((c) => c.spent === 0) ? (
-            <p className="text-[#0d1f3c]/30 text-sm py-4 text-center">Noch keine Ausgaben.</p>
+            <p className="text-[#0d1f3c]/30 text-sm py-4 text-center">{t("noExpensesYet")}</p>
           ) : (
             <div className="space-y-4">
               {topCategories.map((cat) => {
@@ -123,20 +129,20 @@ export default function DashboardOverview({ userName }: { userName: string }) {
         {/* Recent Expenses */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-extrabold text-[#0d1f3c]">Letzte Ausgaben</h2>
+            <h2 className="font-extrabold text-[#0d1f3c]">{t("recentExpenses")}</h2>
             <Link href="/dashboard/transactions" className="text-xs text-[#0d1f3c]/40 hover:text-[#0d1f3c] transition-colors">
-              <span className="inline-flex items-center gap-0.5">Alle <ArrowRight className="w-3 h-3" /></span>
+              <span className="inline-flex items-center gap-0.5">{t("all")} <ArrowRight className="w-3 h-3" /></span>
             </Link>
           </div>
           {recentExpenses.length === 0 ? (
             <div className="text-center py-6">
               <Receipt className="w-6 h-6 mx-auto mb-2 text-orange-300" />
-              <p className="text-[#0d1f3c]/30 text-sm">Noch keine Ausgaben.</p>
+              <p className="text-[#0d1f3c]/30 text-sm">{t("noExpensesYet")}</p>
               <Link
                 href="/dashboard/transactions"
                 className="inline-block mt-3 text-xs font-semibold text-[#0d1f3c] border border-[#0d1f3c]/20 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors"
               >
-                Erste Ausgabe hinzufügen
+                {t("addFirstExpense")}
               </Link>
             </div>
           ) : (
@@ -166,11 +172,11 @@ export default function DashboardOverview({ userName }: { userName: string }) {
       {/* Quick Links */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-6">
         {[
-          { href: "/dashboard/transactions", icon: Plus, label: "Ausgabe hinzufügen", color: "#f97316" },
-          { href: "/dashboard/analytics", icon: TrendingUp, label: "Budget-Analyse", color: "#8b5cf6" },
-          { href: "/dashboard/budget", icon: Settings, label: "Budget anpassen", color: "#10b981" },
-          { href: "/dashboard/converter", icon: Coins, label: "Währung umrechnen", color: "#f59e0b" },
-          { href: "/dashboard/settings", icon: User, label: "Profil bearbeiten", color: "#64748b" },
+          { href: "/dashboard/transactions", icon: Plus, label: t("addExpense"), color: "#f97316" },
+          { href: "/dashboard/analytics", icon: TrendingUp, label: t("budgetAnalysis"), color: "#8b5cf6" },
+          { href: "/dashboard/budget", icon: Settings, label: t("adjustBudget"), color: "#10b981" },
+          { href: "/dashboard/converter", icon: Coins, label: t("convertCurrency"), color: "#f59e0b" },
+          { href: "/dashboard/settings", icon: User, label: t("editProfile"), color: "#64748b" },
         ].map((link) => (
           <Link
             key={link.href}

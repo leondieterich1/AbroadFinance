@@ -78,6 +78,14 @@
     "alreadyRegistered": "Bereits registriert?",
     "loginLink": "Anmelden"
   },
+  "Category": {
+    "miete": "Miete & Unterkunft",
+    "essen": "Essen & Trinken",
+    "transport": "Transport",
+    "freizeit": "Freizeit",
+    "gesundheit": "Gesundheit",
+    "sonstiges": "Sonstiges"
+  },
   "Sidebar": {
     "overview": "Übersicht",
     "budget": "Budget",
@@ -104,6 +112,44 @@
     "goals": "Ziele",
     "checklist": "Check",
     "logout": "Logout"
+  },
+  "DashboardOverview": {
+    "greetingMorning": "Guten Morgen",
+    "greetingDay": "Guten Tag",
+    "greetingEvening": "Guten Abend",
+    "subtitle": "Hier ist deine Finanzübersicht für diesen Monat.",
+    "totalBudget": "Gesamtbudget",
+    "spent": "Ausgegeben",
+    "remaining": "Verbleibend",
+    "topCategories": "Top Kategorien",
+    "all": "Alle",
+    "noExpensesYet": "Noch keine Ausgaben.",
+    "recentExpenses": "Letzte Ausgaben",
+    "addFirstExpense": "Erste Ausgabe hinzufügen",
+    "addExpense": "Ausgabe hinzufügen",
+    "budgetAnalysis": "Budget-Analyse",
+    "adjustBudget": "Budget anpassen",
+    "convertCurrency": "Währung umrechnen",
+    "editProfile": "Profil bearbeiten"
+  },
+  "Settings": {
+    "title": "Einstellungen",
+    "subtitle": "Passe dein Profil und deine Präferenzen an.",
+    "account": "Konto",
+    "noName": "–",
+    "profile": "Profil",
+    "displayName": "Anzeigename",
+    "namePlaceholder": "Dein Name",
+    "homeCountry": "Heimatland",
+    "homeCountryPlaceholder": "z.B. Deutschland",
+    "destinationCountry": "Zielland",
+    "destinationCountryPlaceholder": "z.B. Japan",
+    "financePrefs": "Finanzpräferenzen",
+    "homeCurrency": "Heimatwährung",
+    "destinationCurrency": "Zielwährung",
+    "monthlyIncome": "Monatliches Einkommen",
+    "saved": "Einstellungen gespeichert!",
+    "save": "Einstellungen speichern"
   },
   "Verify": {
     "loadingTitle": "Wird bestätigt…",

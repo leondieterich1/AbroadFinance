@@ -78,6 +78,14 @@
     "alreadyRegistered": "Already registered?",
     "loginLink": "Log in"
   },
+  "Category": {
+    "miete": "Rent & Housing",
+    "essen": "Food & Drinks",
+    "transport": "Transport",
+    "freizeit": "Leisure",
+    "gesundheit": "Health",
+    "sonstiges": "Other"
+  },
   "Sidebar": {
     "overview": "Overview",
     "budget": "Budget",
@@ -104,6 +112,44 @@
     "goals": "Goals",
     "checklist": "Check",
     "logout": "Logout"
+  },
+  "DashboardOverview": {
+    "greetingMorning": "Good morning",
+    "greetingDay": "Good day",
+    "greetingEvening": "Good evening",
+    "subtitle": "Here's your financial overview for this month.",
+    "totalBudget": "Total budget",
+    "spent": "Spent",
+    "remaining": "Remaining",
+    "topCategories": "Top categories",
+    "all": "All",
+    "noExpensesYet": "No expenses yet.",
+    "recentExpenses": "Recent expenses",
+    "addFirstExpense": "Add your first expense",
+    "addExpense": "Add expense",
+    "budgetAnalysis": "Budget analytics",
+    "adjustBudget": "Adjust budget",
+    "convertCurrency": "Convert currency",
+    "editProfile": "Edit profile"
+  },
+  "Settings": {
+    "title": "Settings",
+    "subtitle": "Adjust your profile and preferences.",
+    "account": "Account",
+    "noName": "–",
+    "profile": "Profile",
+    "displayName": "Display name",
+    "namePlaceholder": "Your name",
+    "homeCountry": "Home country",
+    "homeCountryPlaceholder": "e.g. Germany",
+    "destinationCountry": "Destination country",
+    "destinationCountryPlaceholder": "e.g. Japan",
+    "financePrefs": "Finance preferences",
+    "homeCurrency": "Home currency",
+    "destinationCurrency": "Destination currency",
+    "monthlyIncome": "Monthly income",
+    "saved": "Settings saved!",
+    "save": "Save settings"
   },
   "Verify": {
     "loadingTitle": "Confirming…",
