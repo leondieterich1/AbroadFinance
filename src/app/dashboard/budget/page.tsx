@@ -1,8 +1,10 @@
 "use client";
 
 import { usePlanner } from "@/hooks/usePlanner";
-import { formatCurrency, CATEGORY_LABELS, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
+import { formatCurrency, CATEGORY_COLORS, CURRENCIES } from "@/lib/utils";
+import { useCategoryLabels } from "@/hooks/useCategoryLabels";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { ExpenseCategory } from "@/types";
 import BudgetWizard from "@/components/budget/BudgetWizard";
 import CategoryIcon from "@/components/ui/CategoryIcon";
@@ -11,6 +13,8 @@ import { Compass, ArrowRight, Check } from "lucide-react";
 const CATEGORIES: ExpenseCategory[] = ["miete", "essen", "transport", "freizeit", "gesundheit", "sonstiges"];
 
 export default function BudgetPage() {
+  const t = useTranslations("Budget");
+  const CATEGORY_LABELS = useCategoryLabels();
   const planner = usePlanner();
   const currency = planner.budgets[0]?.currency ?? "EUR";
   const [cur, setCur] = useState(currency);
@@ -39,8 +43,8 @@ export default function BudgetPage() {
 
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-1">Budget verwalten</h1>
-      <p className="text-[#0d1f3c]/40 text-sm mb-6">Lege dein monatliches Budget pro Kategorie fest.</p>
+      <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-1">{t("title")}</h1>
+      <p className="text-[#0d1f3c]/40 text-sm mb-6">{t("subtitle")}</p>
 
       {/* Wizard CTA */}
       <button
@@ -49,15 +53,15 @@ export default function BudgetPage() {
       >
         <Compass className="w-7 h-7 flex-shrink-0" />
         <div className="flex-1">
-          <p className="font-extrabold">Budget-Kompass</p>
-          <p className="text-white/50 text-sm">In 4 kurzen Schritten dein Budget durchdenken statt nur eintippen.</p>
+          <p className="font-extrabold">{t("wizardTitle")}</p>
+          <p className="text-white/50 text-sm">{t("wizardDesc")}</p>
         </div>
         <ArrowRight className="w-4 h-4 text-white/40 flex-shrink-0" />
       </button>
 
       {/* Category bars */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-        <h2 className="font-extrabold text-[#0d1f3c] mb-5">Aktueller Stand</h2>
+        <h2 className="font-extrabold text-[#0d1f3c] mb-5">{t("currentStatus")}</h2>
         <div className="space-y-5">
           {planner.budgets.map((b) => {
             const spent = planner.spentFor(b.category);
@@ -68,7 +72,7 @@ export default function BudgetPage() {
                 <div className="flex justify-between mb-1.5">
                   <span className="text-sm font-semibold text-[#0d1f3c] flex items-center gap-1.5">
                     <CategoryIcon category={b.category} className="w-4 h-4" /> {CATEGORY_LABELS[b.category]}
-                    {over && <span className="text-xs bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full ml-1">Überzogen</span>}
+                    {over && <span className="text-xs bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full ml-1">{t("overBudget")}</span>}
                   </span>
                   <span className="text-xs text-[#0d1f3c]/50">
                     {formatCurrency(spent, currency)} / {formatCurrency(b.limit, currency)}
@@ -88,10 +92,10 @@ export default function BudgetPage() {
 
       {/* Edit budget */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h2 className="font-extrabold text-[#0d1f3c] mb-5">Budget bearbeiten</h2>
+        <h2 className="font-extrabold text-[#0d1f3c] mb-5">{t("editBudget")}</h2>
 
         <div className="mb-5">
-          <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">Hauptwährung</label>
+          <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">{t("mainCurrency")}</label>
           <select
             value={cur}
             onChange={(e) => setCur(e.target.value)}
@@ -121,7 +125,7 @@ export default function BudgetPage() {
         </div>
 
         <div className="flex justify-between items-center py-4 border-t border-gray-100 mb-5">
-          <span className="font-semibold text-[#0d1f3c]">Gesamt</span>
+          <span className="font-semibold text-[#0d1f3c]">{t("total")}</span>
           <span className="text-xl font-extrabold text-[#0d1f3c]">{formatCurrency(total, cur)}</span>
         </div>
 
@@ -129,7 +133,7 @@ export default function BudgetPage() {
           onClick={handleSave}
           className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all ${saved ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"}`}
         >
-          {saved ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Budget gespeichert!</span> : "Budget speichern"}
+          {saved ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> {t("saved")}</span> : t("save")}
         </button>
       </div>
 

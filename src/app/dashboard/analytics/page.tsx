@@ -1,19 +1,15 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { usePlanner } from "@/hooks/usePlanner";
-import { formatCurrency, CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/utils";
+import { useCategoryLabels } from "@/hooks/useCategoryLabels";
+import { formatCurrency, CATEGORY_COLORS } from "@/lib/utils";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 import { forecastCurrentMonth, forecastByCategory, monthlyTotals, generateInsights } from "@/lib/analytics";
 import BudgetRing from "@/components/ui/BudgetRing";
 import DonutChart from "@/components/ui/DonutChart";
 import DotPattern from "@/components/ui/DotPattern";
 import { Lightbulb } from "lucide-react";
-
-const STATUS_LABEL: Record<string, string> = {
-  ok: "Im Plan",
-  warning: "Nah am Limit",
-  over: "Über Budget",
-};
 
 const STATUS_COLOR: Record<string, string> = {
   ok: "text-emerald-600 bg-emerald-50 border-emerald-200",
@@ -22,6 +18,15 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 export default function AnalyticsPage() {
+  const t = useTranslations("Analytics");
+  const tInsights = useTranslations("Insights");
+  const locale = useLocale();
+  const CATEGORY_LABELS = useCategoryLabels();
+  const STATUS_LABEL: Record<string, string> = {
+    ok: t("statusOk"),
+    warning: t("statusWarning"),
+    over: t("statusOver"),
+  };
   const planner = usePlanner();
   const currency = planner.budgets[0]?.currency ?? "EUR";
   const totalBudget = planner.totalBudget();
@@ -38,8 +43,8 @@ export default function AnalyticsPage() {
   const catForecasts = forecastByCategory(planner.expenses, planner.budgets).filter(
     (c) => c.spent > 0 || c.limit > 0
   );
-  const months = monthlyTotals(planner.expenses, 6);
-  const insights = generateInsights(planner.expenses, planner.budgets, currency);
+  const months = monthlyTotals(planner.expenses, 6, new Date(), locale);
+  const insights = generateInsights(planner.expenses, planner.budgets, currency, CATEGORY_LABELS, tInsights, new Date(), locale);
   const maxMonth = Math.max(...months.map((m) => m.total), 1);
 
   const forecastPct = totalBudget > 0 ? (forecast.projectedTotal / totalBudget) * 100 : 0;
@@ -52,8 +57,8 @@ export default function AnalyticsPage() {
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-[#0d1f3c]">Budget-Analyse</h1>
-        <p className="text-[#0d1f3c]/50 mt-1">Trends, Kategorien-Aufteilung und Hochrechnung für diesen Monat.</p>
+        <h1 className="text-3xl font-extrabold text-[#0d1f3c]">{t("title")}</h1>
+        <p className="text-[#0d1f3c]/50 mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Forecast */}
@@ -66,16 +71,16 @@ export default function AnalyticsPage() {
           </div>
           <div className="flex flex-wrap gap-x-10 gap-y-3 flex-1">
             <div>
-              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Prognose Monatsende</p>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">{t("forecastEndOfMonth")}</p>
               <p className="text-2xl font-extrabold">{formatCurrency(forecast.projectedTotal, currency)}</p>
             </div>
             <div>
-              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">Bisher ausgegeben</p>
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">{t("spentSoFar")}</p>
               <p className="text-2xl font-extrabold">{formatCurrency(forecast.spentSoFar, currency)}</p>
             </div>
             <div>
               <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">
-                {forecast.projectedDelta > 0 ? "Voraussichtliche Überschreitung" : "Voraussichtlich gespart"}
+                {forecast.projectedDelta > 0 ? t("projectedOverrun") : t("projectedSaved")}
               </p>
               <p className={`text-2xl font-extrabold ${forecast.projectedDelta > 0 ? "text-rose-300" : "text-emerald-300"}`}>
                 {formatCurrency(Math.abs(forecast.projectedDelta), currency)}
@@ -83,15 +88,14 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <p className="text-white/30 text-xs w-full relative">
-            Basierend auf deinem bisherigen Tempo von {formatCurrency(forecast.dailyRate, currency)}/Tag ·
-            Tag {forecast.daysElapsed} von {forecast.daysInMonth}
+            {t("basedOnRate", { rate: formatCurrency(forecast.dailyRate, currency), elapsed: forecast.daysElapsed, total: forecast.daysInMonth })}
           </p>
         </div>
       </div>
 
       {/* Insights */}
       <div className="bg-white rounded-2xl p-5 shadow-sm mb-8">
-        <h2 className="font-extrabold text-[#0d1f3c] mb-4">Erkenntnisse</h2>
+        <h2 className="font-extrabold text-[#0d1f3c] mb-4">{t("insightsTitle")}</h2>
         <ul className="space-y-3">
           {insights.map((text, i) => (
             <li key={i} className="flex items-start gap-2.5 text-sm text-[#0d1f3c]/70">
@@ -105,7 +109,7 @@ export default function AnalyticsPage() {
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         {/* Monthly trend */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-extrabold text-[#0d1f3c] mb-6">Ausgaben der letzten Monate</h2>
+          <h2 className="font-extrabold text-[#0d1f3c] mb-6">{t("monthlyTrendTitle")}</h2>
           <div className="flex items-end gap-3" style={{ height: 140 }}>
             {months.map((m, i) => {
               const h = maxMonth > 0 ? (m.total / maxMonth) * 100 : 0;
@@ -126,9 +130,9 @@ export default function AnalyticsPage() {
 
         {/* Category breakdown */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-extrabold text-[#0d1f3c] mb-6">Kategorien-Aufteilung (dieser Monat)</h2>
+          <h2 className="font-extrabold text-[#0d1f3c] mb-6">{t("categoryBreakdownTitle")}</h2>
           {donutData.length === 0 ? (
-            <p className="text-[#0d1f3c]/30 text-sm py-8 text-center">Noch keine Ausgaben diesen Monat.</p>
+            <p className="text-[#0d1f3c]/30 text-sm py-8 text-center">{t("noExpensesThisMonth")}</p>
           ) : (
             <div className="flex items-center gap-6">
               <DonutChart data={donutData} />
@@ -150,9 +154,9 @@ export default function AnalyticsPage() {
 
       {/* Category forecast */}
       <div className="bg-white rounded-2xl p-5 shadow-sm">
-        <h2 className="font-extrabold text-[#0d1f3c] mb-4">Prognose nach Kategorie</h2>
+        <h2 className="font-extrabold text-[#0d1f3c] mb-4">{t("categoryForecastTitle")}</h2>
         {catForecasts.length === 0 ? (
-          <p className="text-[#0d1f3c]/30 text-sm py-4 text-center">Noch keine Budgets oder Ausgaben erfasst.</p>
+          <p className="text-[#0d1f3c]/30 text-sm py-4 text-center">{t("noBudgetsYet")}</p>
         ) : (
           <div className="space-y-4">
             {catForecasts.map((c) => {
@@ -174,8 +178,7 @@ export default function AnalyticsPage() {
                     />
                   </div>
                   <p className="text-xs text-[#0d1f3c]/40 mt-1.5">
-                    {formatCurrency(c.spent, currency)} bisher · Prognose {formatCurrency(c.projected, currency)} von{" "}
-                    {formatCurrency(c.limit, currency)}
+                    {t("spentSoFarOf", { spent: formatCurrency(c.spent, currency), projected: formatCurrency(c.projected, currency), limit: formatCurrency(c.limit, currency) })}
                   </p>
                 </div>
               );
