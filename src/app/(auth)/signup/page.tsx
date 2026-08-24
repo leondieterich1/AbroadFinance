@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { MailCheck, ArrowRight } from "lucide-react";
 
 const MIN_SIGNUP_AGE = 16;
@@ -13,6 +14,7 @@ function maxBirthDate(): string {
 }
 
 export default function SignupPage() {
+  const t = useTranslations("Signup");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,15 +28,15 @@ export default function SignupPage() {
     setError("");
 
     if (password.length < 8) {
-      setError("Passwort muss mindestens 8 Zeichen lang sein.");
+      setError(t("errorPasswordLength"));
       return;
     }
     if (!birthDate) {
-      setError("Bitte gib dein Geburtsdatum an.");
+      setError(t("errorBirthDateRequired"));
       return;
     }
     if (birthDate > maxBirthDate()) {
-      setError(`Du musst mindestens ${MIN_SIGNUP_AGE} Jahre alt sein, um ein Konto zu erstellen.`);
+      setError(t("errorMinAge", { age: MIN_SIGNUP_AGE }));
       return;
     }
 
@@ -50,7 +52,7 @@ export default function SignupPage() {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Fehler beim Senden. Bitte versuche es erneut.");
+      setError(data.error ?? t("errorGeneric"));
     } else {
       setSent(true);
     }
@@ -60,18 +62,18 @@ export default function SignupPage() {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 w-full max-w-md text-center">
         <MailCheck className="w-10 h-10 mb-5 mx-auto text-emerald-400" />
-        <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">Schau in dein Postfach!</h1>
+        <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">{t("sentTitle")}</h1>
         <p className="text-[#0d1f3c]/50 text-sm mb-1">
-          Wir haben einen Bestätigungslink an
+          {t("sentDesc")}
         </p>
         <p className="font-bold text-[#0d1f3c] mb-6">{email}</p>
         <p className="text-[#0d1f3c]/40 text-xs">
-          Der Link ist 24 Stunden gültig. Kein E-Mail bekommen?{" "}
+          {t("sentHint")}{" "}
           <button
             onClick={() => setSent(false)}
             className="text-[#0d1f3c] font-semibold hover:underline"
           >
-            Erneut senden
+            {t("resend")}
           </button>
         </p>
       </div>
@@ -80,8 +82,8 @@ export default function SignupPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md">
-      <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">Konto erstellen</h1>
-      <p className="text-[#0d1f3c]/50 text-sm mb-8">Kostenlos starten – keine Kreditkarte nötig.</p>
+      <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">{t("title")}</h1>
+      <p className="text-[#0d1f3c]/50 text-sm mb-8">{t("subtitle")}</p>
 
       {error && (
         <div className="bg-rose-50 text-rose-600 text-sm rounded-xl px-4 py-3 mb-5">
@@ -91,10 +93,10 @@ export default function SignupPage() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">Name</label>
+          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">{t("name")}</label>
           <input
             type="text"
-            placeholder="Dein Name"
+            placeholder={t("namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -102,10 +104,10 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">E-Mail</label>
+          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">{t("email")}</label>
           <input
             type="email"
-            placeholder="du@beispiel.de"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -113,10 +115,10 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">Passwort</label>
+          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">{t("password")}</label>
           <input
             type="password"
-            placeholder="Mindestens 8 Zeichen"
+            placeholder={t("passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -124,7 +126,7 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">Geburtsdatum</label>
+          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">{t("birthDate")}</label>
           <input
             type="date"
             value={birthDate}
@@ -142,18 +144,18 @@ export default function SignupPage() {
           {loading ? (
             <>
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Wird gesendet…
+              {t("submitLoading")}
             </>
           ) : (
-            <>Bestätigungsmail senden <ArrowRight className="w-4 h-4" /></>
+            <>{t("submit")} <ArrowRight className="w-4 h-4" /></>
           )}
         </button>
       </form>
 
       <p className="text-center text-sm text-[#0d1f3c]/50 mt-6">
-        Bereits registriert?{" "}
+        {t("alreadyRegistered")}{" "}
         <Link href="/login" className="text-[#0d1f3c] font-semibold hover:underline">
-          Anmelden
+          {t("loginLink")}
         </Link>
       </p>
     </div>

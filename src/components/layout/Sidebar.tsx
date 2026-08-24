@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import {
   LayoutDashboard, Wallet, TrendingUp, Receipt, Landmark, Handshake, Coins,
   Target, Package, ListChecks, Settings, Shield, ExternalLink, LogOut,
@@ -11,29 +12,30 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const NAV: { href: string; icon: LucideIcon; label: string; color: string; badge?: string; external?: boolean }[] = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Übersicht", color: "#60a5fa" },
-  { href: "/dashboard/budget", icon: Wallet, label: "Budget", color: "#34d399" },
-  { href: "/dashboard/spartipps", icon: PiggyBank, label: "Spar-Check", color: "#10b981", badge: "NEU" },
-  { href: "/dashboard/analytics", icon: TrendingUp, label: "Analyse", color: "#a78bfa" },
-  { href: "/dashboard/transactions", icon: Receipt, label: "Ausgaben", color: "#fb923c" },
-  { href: "/dashboard/accounts", icon: Landmark, label: "Konten", color: "#38bdf8" },
-  { href: "/dashboard/split", icon: Handshake, label: "Splittr", color: "#f472b6" },
-  { href: "/dashboard/converter", icon: Coins, label: "Währungen", color: "#fbbf24" },
-  { href: "/dashboard/goals", icon: Target, label: "Sparziele", color: "#4ade80" },
-  { href: "/dashboard/subscriptions", icon: Package, label: "Abos", color: "#c084fc" },
-  { href: "/dashboard/checklist", icon: ListChecks, label: "Checkliste", color: "#2dd4bf" },
-  { href: "/dashboard/settings", icon: Settings, label: "Einstellungen", color: "#94a3b8" },
-];
-
 export default function Sidebar({ user }: { user: { name: string; email: string; isAdmin?: boolean } }) {
   const pathname = usePathname();
+  const t = useTranslations("Sidebar");
   const initials = user.name
     ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : user.email[0].toUpperCase();
 
+  const NAV: { href: string; icon: LucideIcon; label: string; color: string; badge?: string; external?: boolean }[] = [
+    { href: "/dashboard", icon: LayoutDashboard, label: t("overview"), color: "#60a5fa" },
+    { href: "/dashboard/budget", icon: Wallet, label: t("budget"), color: "#34d399" },
+    { href: "/dashboard/spartipps", icon: PiggyBank, label: t("sparCheck"), color: "#10b981", badge: t("new") },
+    { href: "/dashboard/analytics", icon: TrendingUp, label: t("analytics"), color: "#a78bfa" },
+    { href: "/dashboard/transactions", icon: Receipt, label: t("transactions"), color: "#fb923c" },
+    { href: "/dashboard/accounts", icon: Landmark, label: t("accounts"), color: "#38bdf8" },
+    { href: "/dashboard/split", icon: Handshake, label: t("splittr"), color: "#f472b6" },
+    { href: "/dashboard/converter", icon: Coins, label: t("converter"), color: "#fbbf24" },
+    { href: "/dashboard/goals", icon: Target, label: t("goals"), color: "#4ade80" },
+    { href: "/dashboard/subscriptions", icon: Package, label: t("subscriptions"), color: "#c084fc" },
+    { href: "/dashboard/checklist", icon: ListChecks, label: t("checklist"), color: "#2dd4bf" },
+    { href: "/dashboard/settings", icon: Settings, label: t("settings"), color: "#94a3b8" },
+  ];
+
   const nav = user.isAdmin
-    ? [...NAV, { href: "https://abroad-finance-admin.vercel.app", icon: Shield, label: "Admin", color: "#fbbf24", external: true }]
+    ? [...NAV, { href: "https://abroad-finance-admin.vercel.app", icon: Shield, label: t("admin"), color: "#fbbf24", external: true }]
     : NAV;
 
   return (
@@ -87,7 +89,7 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
             {initials}
           </div>
           <div className="min-w-0">
-            <p className="text-white text-sm font-semibold truncate">{user.name || "Nutzer"}</p>
+            <p className="text-white text-sm font-semibold truncate">{user.name || t("userFallback")}</p>
             <p className="text-white/40 text-xs truncate">{user.email}</p>
           </div>
         </div>
@@ -96,7 +98,7 @@ export default function Sidebar({ user }: { user: { name: string; email: string;
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/8 transition-all"
         >
           <LogOut className="w-[18px] h-[18px] flex-shrink-0" />
-          Abmelden
+          {t("logout")}
         </button>
       </div>
     </aside>

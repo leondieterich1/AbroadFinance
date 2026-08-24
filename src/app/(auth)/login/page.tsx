@@ -4,9 +4,11 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations("Login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,7 +28,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (res?.error) {
-      setError("E-Mail oder Passwort ungültig.");
+      setError(t("errorInvalid"));
     } else {
       router.push("/dashboard");
     }
@@ -34,8 +36,8 @@ export default function LoginPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md">
-      <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">Willkommen zurück</h1>
-      <p className="text-[#0d1f3c]/50 text-sm mb-8">Melde dich bei deinem Konto an.</p>
+      <h1 className="text-2xl font-extrabold text-[#0d1f3c] mb-2">{t("title")}</h1>
+      <p className="text-[#0d1f3c]/50 text-sm mb-8">{t("subtitle")}</p>
 
       {error && (
         <div className="bg-rose-50 text-rose-600 text-sm rounded-xl px-4 py-3 mb-5">
@@ -45,10 +47,10 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">E-Mail</label>
+          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">{t("email")}</label>
           <input
             type="email"
-            placeholder="du@beispiel.de"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -56,10 +58,10 @@ export default function LoginPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">Passwort</label>
+          <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">{t("password")}</label>
           <input
             type="password"
-            placeholder="Passwort"
+            placeholder={t("password")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -71,14 +73,14 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full bg-[#0d1f3c] text-white font-semibold py-3 rounded-xl hover:bg-[#162d54] transition-colors mt-2 disabled:opacity-50"
         >
-          {loading ? "Wird angemeldet…" : "Anmelden"}
+          {loading ? t("submitLoading") : t("submit")}
         </button>
       </form>
 
       <p className="text-center text-sm text-[#0d1f3c]/50 mt-6">
-        Noch kein Konto?{" "}
+        {t("noAccount")}{" "}
         <Link href="/signup" className="text-[#0d1f3c] font-semibold hover:underline">
-          Kostenlos registrieren
+          {t("signupLink")}
         </Link>
       </p>
     </div>

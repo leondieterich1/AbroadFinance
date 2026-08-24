@@ -4,11 +4,13 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Check, X } from "lucide-react";
 
 function VerifyContent() {
   const params = useSearchParams();
   const router = useRouter();
+  const t = useTranslations("Verify");
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
 
   useEffect(() => {
@@ -30,29 +32,29 @@ function VerifyContent() {
       {status === "loading" && (
         <>
           <div className="w-14 h-14 border-4 border-[#0d1f3c]/10 border-t-[#0d1f3c] rounded-full animate-spin mx-auto mb-5" />
-          <h1 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Wird bestätigt…</h1>
-          <p className="text-[#0d1f3c]/40 text-sm">Einen Moment bitte.</p>
+          <h1 className="text-xl font-extrabold text-[#0d1f3c] mb-2">{t("loadingTitle")}</h1>
+          <p className="text-[#0d1f3c]/40 text-sm">{t("loadingDesc")}</p>
         </>
       )}
       {status === "success" && (
         <>
           <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5"><Check className="w-8 h-8 text-emerald-500" /></div>
-          <h1 className="text-xl font-extrabold text-[#0d1f3c] mb-2">E-Mail bestätigt!</h1>
-          <p className="text-[#0d1f3c]/40 text-sm">Du wirst zum Dashboard weitergeleitet…</p>
+          <h1 className="text-xl font-extrabold text-[#0d1f3c] mb-2">{t("successTitle")}</h1>
+          <p className="text-[#0d1f3c]/40 text-sm">{t("successDesc")}</p>
         </>
       )}
       {status === "error" && (
         <>
           <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-5"><X className="w-8 h-8 text-rose-500" /></div>
-          <h1 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Link ungültig</h1>
+          <h1 className="text-xl font-extrabold text-[#0d1f3c] mb-2">{t("errorTitle")}</h1>
           <p className="text-[#0d1f3c]/40 text-sm mb-6">
-            Der Link ist abgelaufen oder ungültig. Bitte registriere dich erneut.
+            {t("errorDesc")}
           </p>
           <Link
             href="/signup"
             className="inline-block bg-[#0d1f3c] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#162d54] transition-colors text-sm"
           >
-            Erneut registrieren
+            {t("errorAction")}
           </Link>
         </>
       )}
@@ -61,12 +63,13 @@ function VerifyContent() {
 }
 
 export default function VerifyPage() {
+  const t = useTranslations("Verify");
   return (
     <Suspense
       fallback={
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 w-full max-w-md text-center">
           <div className="w-14 h-14 border-4 border-[#0d1f3c]/10 border-t-[#0d1f3c] rounded-full animate-spin mx-auto mb-5" />
-          <p className="text-[#0d1f3c]/40 text-sm">Wird geladen…</p>
+          <p className="text-[#0d1f3c]/40 text-sm">{t("loadingFallback")}</p>
         </div>
       }
     >
