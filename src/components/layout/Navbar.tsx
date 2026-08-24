@@ -3,18 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Wallet, Coins, Handshake, type LucideIcon } from "lucide-react";
-
-const LINKS: { href: string; label: string; icon?: LucideIcon; color?: string; badge?: string }[] = [
-  { href: "/#features", label: "Features" },
-  { href: "/#how", label: "Wie es funktioniert" },
-  { href: "/planner", label: "Planer", icon: Wallet, color: "#10b981" },
-  { href: "/converter", label: "Währungen", icon: Coins, color: "#f59e0b" },
-  { href: "/split", label: "Splittr", icon: Handshake, color: "#ec4899", badge: "NEU" },
-];
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("Nav");
+
+  const LINKS: { href: string; label: string; icon?: LucideIcon; color?: string; badge?: string }[] = [
+    { href: "/#features", label: t("features") },
+    { href: "/#how", label: t("how") },
+    { href: "/planner", label: t("planner"), icon: Wallet, color: "#10b981" },
+    { href: "/converter", label: t("converter"), icon: Coins, color: "#f59e0b" },
+    { href: "/split", label: t("splittr"), icon: Handshake, color: "#ec4899", badge: t("new") },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
@@ -38,15 +41,16 @@ export default function Navbar() {
 
         {/* Desktop auth */}
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/login" className="text-sm font-medium text-[#0d1f3c]/70 hover:text-[#0d1f3c] px-4 py-2">Anmelden</Link>
-          <Link href="/signup" className="bg-[#0d1f3c] text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-[#162d54] transition-colors">Kostenlos starten</Link>
+          <LanguageSwitcher />
+          <Link href="/login" className="text-sm font-medium text-[#0d1f3c]/70 hover:text-[#0d1f3c] px-4 py-2">{t("login")}</Link>
+          <Link href="/signup" className="bg-[#0d1f3c] text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-[#162d54] transition-colors">{t("signup")}</Link>
         </div>
 
         {/* Mobile hamburger */}
         <button
           onClick={() => setOpen(!open)}
           className="md:hidden flex flex-col gap-1.5 p-2 rounded-xl hover:bg-gray-50 transition-colors"
-          aria-label="Menü"
+          aria-label={t("menuLabel")}
         >
           <span className={`block w-5 h-0.5 bg-[#0d1f3c] transition-all duration-200 ${open ? "rotate-45 translate-y-2" : ""}`} />
           <span className={`block w-5 h-0.5 bg-[#0d1f3c] transition-all duration-200 ${open ? "opacity-0" : ""}`} />
@@ -68,9 +72,12 @@ export default function Navbar() {
               {l.badge && <span className="bg-[#0d1f3c] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{l.badge}</span>}
             </Link>
           ))}
+          <div className="flex justify-center pt-3">
+            <LanguageSwitcher />
+          </div>
           <div className="pt-3 border-t border-gray-100 grid grid-cols-2 gap-2 mt-2">
-            <Link href="/login" onClick={() => setOpen(false)} className="text-center py-3 rounded-xl border border-gray-200 text-sm font-semibold text-[#0d1f3c] hover:bg-gray-50 transition-colors">Anmelden</Link>
-            <Link href="/signup" onClick={() => setOpen(false)} className="text-center py-3 rounded-xl bg-[#0d1f3c] text-white text-sm font-semibold hover:bg-[#162d54] transition-colors">Kostenlos starten</Link>
+            <Link href="/login" onClick={() => setOpen(false)} className="text-center py-3 rounded-xl border border-gray-200 text-sm font-semibold text-[#0d1f3c] hover:bg-gray-50 transition-colors">{t("login")}</Link>
+            <Link href="/signup" onClick={() => setOpen(false)} className="text-center py-3 rounded-xl bg-[#0d1f3c] text-white text-sm font-semibold hover:bg-[#162d54] transition-colors">{t("signup")}</Link>
           </div>
         </div>
       )}
