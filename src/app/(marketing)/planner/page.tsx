@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { usePlanner } from "@/hooks/usePlanner";
 import {
   formatCurrency,
   formatDate,
-  CATEGORY_LABELS,
   CATEGORY_COLORS,
   CURRENCIES,
 } from "@/lib/utils";
+import { useCategoryLabels } from "@/hooks/useCategoryLabels";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 import type { ExpenseCategory } from "@/types";
 import { Plane, BarChart3, Plus, Settings, Receipt, Check, type LucideIcon } from "lucide-react";
@@ -20,6 +21,7 @@ const CATEGORIES: ExpenseCategory[] = [
 ];
 
 export default function PlannerPage() {
+  const t = useTranslations("MarketingPlanner");
   const [tab, setTab] = useState<Tab>("overview");
   const planner = usePlanner();
 
@@ -42,21 +44,21 @@ export default function PlannerPage() {
       {/* Header */}
       <div className="bg-[#0d1f3c] text-white px-5 md:px-6 py-8 md:py-10">
         <div className="max-w-4xl mx-auto">
-          <p className="text-white/50 text-sm font-medium uppercase tracking-widest mb-1 inline-flex items-center gap-1.5"><Plane className="w-3.5 h-3.5" /> FinanceAbroad</p>
-          <h1 className="text-2xl md:text-3xl font-extrabold mb-5 md:mb-6">Finanzplaner</h1>
+          <p className="text-white/50 text-sm font-medium uppercase tracking-widest mb-1 inline-flex items-center gap-1.5"><Plane className="w-3.5 h-3.5" /> {t("brand")}</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold mb-5 md:mb-6">{t("title")}</h1>
 
           {/* Summary Cards */}
           <div className="grid grid-cols-3 gap-2 md:gap-4">
             <div className="bg-white/10 rounded-xl md:rounded-2xl p-3 md:p-5">
-              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">Budget</p>
+              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">{t("budget")}</p>
               <p className="text-base md:text-2xl font-extrabold">{formatCurrency(totalBudget, currency)}</p>
             </div>
             <div className="bg-white/10 rounded-xl md:rounded-2xl p-3 md:p-5">
-              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">Ausgaben</p>
+              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">{t("expenses")}</p>
               <p className="text-base md:text-2xl font-extrabold text-rose-300">{formatCurrency(totalSpent, currency)}</p>
             </div>
             <div className={`rounded-xl md:rounded-2xl p-3 md:p-5 ${totalRemaining < 0 ? "bg-rose-500/30" : "bg-emerald-500/20"}`}>
-              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">Rest</p>
+              <p className="text-white/50 text-[10px] md:text-xs font-medium uppercase tracking-wider mb-1">{t("remaining")}</p>
               <p className={`text-base md:text-2xl font-extrabold ${totalRemaining < 0 ? "text-rose-300" : "text-emerald-300"}`}>
                 {formatCurrency(totalRemaining, currency)}
               </p>
@@ -66,8 +68,8 @@ export default function PlannerPage() {
           {/* Overall progress bar */}
           <div className="mt-5">
             <div className="flex justify-between text-xs text-white/50 mb-2">
-              <span>{totalPct.toFixed(0)}% des Budgets verbraucht</span>
-              <span>{planner.expenses.length} Ausgaben</span>
+              <span>{t("budgetUsed", { pct: totalPct.toFixed(0) })}</span>
+              <span>{t("expensesCount", { count: planner.expenses.length })}</span>
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <div
@@ -83,20 +85,20 @@ export default function PlannerPage() {
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto flex">
           {([
-            { id: "overview", label: "Übersicht", icon: BarChart3 },
-            { id: "add", label: "Ausgabe hinzufügen", icon: Plus },
-            { id: "budget", label: "Budget einrichten", icon: Settings },
-          ] as { id: Tab; label: string; icon: LucideIcon }[]).map((t) => (
+            { id: "overview", label: t("tabOverview"), icon: BarChart3 },
+            { id: "add", label: t("tabAdd"), icon: Plus },
+            { id: "budget", label: t("tabBudget"), icon: Settings },
+          ] as { id: Tab; label: string; icon: LucideIcon }[]).map((tabDef) => (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={tabDef.id}
+              onClick={() => setTab(tabDef.id)}
               className={`px-6 py-4 text-sm font-semibold border-b-2 transition-colors inline-flex items-center gap-1.5 ${
-                tab === t.id
+                tab === tabDef.id
                   ? "border-[#0d1f3c] text-[#0d1f3c]"
                   : "border-transparent text-[#0d1f3c]/40 hover:text-[#0d1f3c]/70"
               }`}
             >
-              <t.icon className="w-4 h-4" /> {t.label}
+              <tabDef.icon className="w-4 h-4" /> {tabDef.label}
             </button>
           ))}
         </div>
@@ -114,11 +116,14 @@ export default function PlannerPage() {
 
 /* ── Overview Tab ─────────────────────────────────────────── */
 function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlanner>; currency: string }) {
+  const t = useTranslations("MarketingPlanner");
+  const locale = useLocale();
+  const CATEGORY_LABELS = useCategoryLabels();
   return (
     <div className="space-y-8">
       {/* Category progress */}
       <div>
-        <h2 className="text-lg font-extrabold text-[#0d1f3c] mb-4">Budget nach Kategorie</h2>
+        <h2 className="text-lg font-extrabold text-[#0d1f3c] mb-4">{t("budgetByCategory")}</h2>
         <div className="grid gap-4">
           {planner.budgets.map((b) => {
             const spent = planner.spentFor(b.category);
@@ -132,7 +137,7 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
                     <CategoryIcon category={b.category} className="w-5 h-5 text-[#0d1f3c]/70" />
                     <span className="font-semibold text-[#0d1f3c]">{CATEGORY_LABELS[b.category]}</span>
                     {over && (
-                      <span className="text-xs bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full font-medium">Überzogen</span>
+                      <span className="text-xs bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full font-medium">{t("overBudget")}</span>
                     )}
                   </div>
                   <div className="text-right">
@@ -153,8 +158,8 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
                 </div>
                 <p className="text-xs text-[#0d1f3c]/40 mt-1.5">
                   {over
-                    ? `${formatCurrency(spent - b.limit, currency)} über Budget`
-                    : `${formatCurrency(b.limit - spent, currency)} verbleibend`}
+                    ? t("overBudgetAmount", { amount: formatCurrency(spent - b.limit, currency) })
+                    : t("remainingAmount", { amount: formatCurrency(b.limit - spent, currency) })}
                 </p>
               </div>
             );
@@ -164,12 +169,12 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
 
       {/* Recent expenses */}
       <div>
-        <h2 className="text-lg font-extrabold text-[#0d1f3c] mb-4">Letzte Ausgaben</h2>
+        <h2 className="text-lg font-extrabold text-[#0d1f3c] mb-4">{t("recentExpenses")}</h2>
         {planner.expenses.length === 0 ? (
           <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
             <Receipt className="w-9 h-9 mb-3 mx-auto text-orange-300" />
-            <p className="text-[#0d1f3c]/50 font-medium">Noch keine Ausgaben eingetragen.</p>
-            <p className="text-[#0d1f3c]/30 text-sm mt-1">Klicke auf „Ausgabe hinzufügen" um zu starten.</p>
+            <p className="text-[#0d1f3c]/50 font-medium">{t("noExpensesTitle")}</p>
+            <p className="text-[#0d1f3c]/30 text-sm mt-1">{t("noExpensesHint")}</p>
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm divide-y divide-gray-50">
@@ -184,7 +189,7 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
                   </div>
                   <div>
                     <p className="font-semibold text-[#0d1f3c] text-sm">{e.title}</p>
-                    <p className="text-[#0d1f3c]/40 text-xs">{CATEGORY_LABELS[e.category]} · {formatDate(e.date)}</p>
+                    <p className="text-[#0d1f3c]/40 text-xs">{CATEGORY_LABELS[e.category]} · {formatDate(e.date, locale)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -192,7 +197,7 @@ function OverviewTab({ planner, currency }: { planner: ReturnType<typeof usePlan
                   <button
                     onClick={() => planner.deleteExpense(e.id)}
                     className="opacity-0 group-hover:opacity-100 text-[#0d1f3c]/20 hover:text-rose-500 transition-all text-lg leading-none"
-                    title="Löschen"
+                    title={t("delete")}
                   >
                     ×
                   </button>
@@ -214,6 +219,8 @@ function AddExpenseTab({
   currency: string;
   onAdded: () => void;
 }) {
+  const t = useTranslations("MarketingPlanner");
+  const CATEGORY_LABELS = useCategoryLabels();
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<ExpenseCategory>("essen");
@@ -240,14 +247,14 @@ function AddExpenseTab({
   return (
     <div className="max-w-lg mx-auto">
       <div className="bg-white rounded-2xl shadow-sm p-8">
-        <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-6">Neue Ausgabe</h2>
+        <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-6">{t("newExpense")}</h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Title */}
           <div>
-            <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">Bezeichnung</label>
+            <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">{t("label")}</label>
             <input
               type="text"
-              placeholder="z.B. Supermarkt, Miete, U-Bahn…"
+              placeholder={t("labelPlaceholder")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -257,7 +264,7 @@ function AddExpenseTab({
 
           {/* Amount + Currency */}
           <div>
-            <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">Betrag</label>
+            <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">{t("amount")}</label>
             <div className="flex gap-2">
               <input
                 type="number"
@@ -281,7 +288,7 @@ function AddExpenseTab({
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-semibold text-[#0d1f3c] mb-2">Kategorie</label>
+            <label className="block text-sm font-semibold text-[#0d1f3c] mb-2">{t("category")}</label>
             <div className="grid grid-cols-3 gap-2">
               {CATEGORIES.map((cat) => (
                 <button
@@ -303,7 +310,7 @@ function AddExpenseTab({
 
           {/* Date */}
           <div>
-            <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">Datum</label>
+            <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">{t("date")}</label>
             <input
               type="date"
               value={date}
@@ -320,7 +327,7 @@ function AddExpenseTab({
                 : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"
             }`}
           >
-            {success ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Gespeichert!</span> : "Ausgabe speichern"}
+            {success ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> {t("saved")}</span> : t("saveExpense")}
           </button>
         </form>
       </div>
@@ -330,6 +337,8 @@ function AddExpenseTab({
 
 /* ── Budget Tab ───────────────────────────────────────────── */
 function BudgetTab({ planner, currency }: { planner: ReturnType<typeof usePlanner>; currency: string }) {
+  const t = useTranslations("MarketingPlanner");
+  const CATEGORY_LABELS = useCategoryLabels();
   const [cur, setCurLocal] = useState(currency);
   const [saved, setSaved] = useState(false);
   const [values, setValues] = useState<Record<ExpenseCategory, string>>(
@@ -351,12 +360,12 @@ function BudgetTab({ planner, currency }: { planner: ReturnType<typeof usePlanne
   return (
     <div className="max-w-lg mx-auto">
       <div className="bg-white rounded-2xl shadow-sm p-8">
-        <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-2">Monatsbudget einrichten</h2>
-        <p className="text-[#0d1f3c]/40 text-sm mb-6">Lege fest, wie viel du pro Kategorie im Monat ausgeben möchtest.</p>
+        <h2 className="text-xl font-extrabold text-[#0d1f3c] mb-2">{t("setupBudgetTitle")}</h2>
+        <p className="text-[#0d1f3c]/40 text-sm mb-6">{t("setupBudgetDesc")}</p>
 
         {/* Currency selector */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">Hauptwährung</label>
+          <label className="block text-sm font-semibold text-[#0d1f3c] mb-1.5">{t("mainCurrency")}</label>
           <select
             value={cur}
             onChange={(e) => setCurLocal(e.target.value)}
@@ -391,7 +400,7 @@ function BudgetTab({ planner, currency }: { planner: ReturnType<typeof usePlanne
 
         {/* Total */}
         <div className="flex justify-between items-center py-4 border-t border-gray-100 mb-5">
-          <span className="font-semibold text-[#0d1f3c]">Gesamt</span>
+          <span className="font-semibold text-[#0d1f3c]">{t("total")}</span>
           <span className="text-xl font-extrabold text-[#0d1f3c]">{formatCurrency(total, cur)}</span>
         </div>
 
@@ -401,7 +410,7 @@ function BudgetTab({ planner, currency }: { planner: ReturnType<typeof usePlanne
             saved ? "bg-emerald-500 text-white" : "bg-[#0d1f3c] text-white hover:bg-[#162d54]"
           }`}
         >
-          {saved ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Budget gespeichert!</span> : "Budget speichern"}
+          {saved ? <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> {t("budgetSaved")}</span> : t("saveBudget")}
         </button>
       </div>
     </div>

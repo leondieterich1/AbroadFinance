@@ -1,29 +1,30 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Plane, AlertTriangle, ArrowLeftRight } from "lucide-react";
 
-const CURRENCIES: Record<string, { name: string; symbol: string; flag: string }> = {
-  EUR: { name: "Euro", symbol: "€", flag: "🇪🇺" },
-  USD: { name: "US-Dollar", symbol: "$", flag: "🇺🇸" },
-  GBP: { name: "Britisches Pfund", symbol: "£", flag: "🇬🇧" },
-  CHF: { name: "Schweizer Franken", symbol: "Fr.", flag: "🇨🇭" },
-  JPY: { name: "Japanischer Yen", symbol: "¥", flag: "🇯🇵" },
-  AUD: { name: "Australischer Dollar", symbol: "A$", flag: "🇦🇺" },
-  CAD: { name: "Kanadischer Dollar", symbol: "C$", flag: "🇨🇦" },
-  SEK: { name: "Schwedische Krone", symbol: "kr", flag: "🇸🇪" },
-  NOK: { name: "Norwegische Krone", symbol: "kr", flag: "🇳🇴" },
-  DKK: { name: "Dänische Krone", symbol: "kr", flag: "🇩🇰" },
-  CNY: { name: "Chinesischer Yuan", symbol: "¥", flag: "🇨🇳" },
-  INR: { name: "Indische Rupie", symbol: "₹", flag: "🇮🇳" },
-  BRL: { name: "Brasilianischer Real", symbol: "R$", flag: "🇧🇷" },
-  MXN: { name: "Mexikanischer Peso", symbol: "$", flag: "🇲🇽" },
-  SGD: { name: "Singapur-Dollar", symbol: "S$", flag: "🇸🇬" },
-  HKD: { name: "Hongkong-Dollar", symbol: "HK$", flag: "🇭🇰" },
-  KRW: { name: "Südkoreanischer Won", symbol: "₩", flag: "🇰🇷" },
-  TRY: { name: "Türkische Lira", symbol: "₺", flag: "🇹🇷" },
-  PLN: { name: "Polnischer Zloty", symbol: "zł", flag: "🇵🇱" },
-  ZAR: { name: "Südafrikanischer Rand", symbol: "R", flag: "🇿🇦" },
+const CURRENCIES: Record<string, { symbol: string; flag: string }> = {
+  EUR: { symbol: "€", flag: "🇪🇺" },
+  USD: { symbol: "$", flag: "🇺🇸" },
+  GBP: { symbol: "£", flag: "🇬🇧" },
+  CHF: { symbol: "Fr.", flag: "🇨🇭" },
+  JPY: { symbol: "¥", flag: "🇯🇵" },
+  AUD: { symbol: "A$", flag: "🇦🇺" },
+  CAD: { symbol: "C$", flag: "🇨🇦" },
+  SEK: { symbol: "kr", flag: "🇸🇪" },
+  NOK: { symbol: "kr", flag: "🇳🇴" },
+  DKK: { symbol: "kr", flag: "🇩🇰" },
+  CNY: { symbol: "¥", flag: "🇨🇳" },
+  INR: { symbol: "₹", flag: "🇮🇳" },
+  BRL: { symbol: "R$", flag: "🇧🇷" },
+  MXN: { symbol: "$", flag: "🇲🇽" },
+  SGD: { symbol: "S$", flag: "🇸🇬" },
+  HKD: { symbol: "HK$", flag: "🇭🇰" },
+  KRW: { symbol: "₩", flag: "🇰🇷" },
+  TRY: { symbol: "₺", flag: "🇹🇷" },
+  PLN: { symbol: "zł", flag: "🇵🇱" },
+  ZAR: { symbol: "R", flag: "🇿🇦" },
 };
 
 const POPULAR_PAIRS = [
@@ -33,15 +34,19 @@ const POPULAR_PAIRS = [
 
 const QUICK_CURRENCIES = ["USD", "GBP", "CHF", "JPY", "AUD", "CAD", "SEK", "CNY", "INR", "SGD"];
 
-function fmt(amount: number, currency: string) {
-  return new Intl.NumberFormat("de-DE", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: currency === "JPY" || currency === "KRW" ? 0 : 4,
-  }).format(amount);
-}
-
 export default function ConverterPage() {
+  const t = useTranslations("Converter");
+  const tCurrency = useTranslations("CurrencyNames");
+  const locale = useLocale();
+
+  function fmt(amount: number, currency: string) {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: currency === "JPY" || currency === "KRW" ? 0 : 4,
+    }).format(amount);
+  }
+
   const [from, setFrom] = useState("EUR");
   const [to, setTo] = useState("USD");
   const [amount, setAmount] = useState("1");
@@ -102,11 +107,11 @@ export default function ConverterPage() {
       {/* Header */}
       <div className="bg-[#0d1f3c] text-white px-6 py-12">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5"><Plane className="w-3.5 h-3.5" /> FinanceAbroad</p>
-          <h1 className="text-4xl font-extrabold mb-2">Währungsrechner</h1>
+          <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5"><Plane className="w-3.5 h-3.5" /> {t("brand")}</p>
+          <h1 className="text-4xl font-extrabold mb-2">{t("title")}</h1>
           <p className="text-white/50 text-sm">
-            Live-Wechselkurse · täglich aktualisiert
-            {date && <span className="ml-2 text-white/30">· Stand: {new Date(date).toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" })}</span>}
+            {t("liveRates")}
+            {date && <span className="ml-2 text-white/30">{t("asOf", { date: new Date(date).toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" }) })}</span>}
           </p>
         </div>
       </div>
@@ -117,13 +122,13 @@ export default function ConverterPage() {
         <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
           {error && (
             <div className="bg-rose-50 text-rose-600 text-sm rounded-xl px-4 py-3 mb-6 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 flex-shrink-0" /> Kurse konnten nicht geladen werden. Bitte Seite neu laden.
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" /> {t("ratesError")}
             </div>
           )}
 
           {/* Amount */}
           <div className="mb-5">
-            <label className="block text-xs font-semibold text-[#0d1f3c]/50 uppercase tracking-wider mb-2">Betrag</label>
+            <label className="block text-xs font-semibold text-[#0d1f3c]/50 uppercase tracking-wider mb-2">{t("amount")}</label>
             <input
               type="number"
               min="0"
@@ -138,14 +143,14 @@ export default function ConverterPage() {
           {/* From / Swap / To */}
           <div className="grid grid-cols-[1fr_auto_1fr] gap-2 md:gap-3 items-end mb-6">
             <div>
-              <label className="block text-xs font-semibold text-[#0d1f3c]/50 uppercase tracking-wider mb-2">Von</label>
+              <label className="block text-xs font-semibold text-[#0d1f3c]/50 uppercase tracking-wider mb-2">{t("from")}</label>
               <select
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20 appearance-none cursor-pointer"
               >
                 {Object.entries(CURRENCIES).map(([code, c]) => (
-                  <option key={code} value={code}>{c.flag} {code} – {c.name}</option>
+                  <option key={code} value={code}>{c.flag} {code} – {tCurrency(code)}</option>
                 ))}
               </select>
             </div>
@@ -153,20 +158,20 @@ export default function ConverterPage() {
             <button
               onClick={swap}
               className="w-11 h-11 rounded-full bg-[#0d1f3c] text-white flex items-center justify-center hover:bg-[#162d54] transition-colors mb-0.5 flex-shrink-0"
-              title="Tauschen"
+              title={t("swap")}
             >
               <ArrowLeftRight className="w-4 h-4" />
             </button>
 
             <div>
-              <label className="block text-xs font-semibold text-[#0d1f3c]/50 uppercase tracking-wider mb-2">Nach</label>
+              <label className="block text-xs font-semibold text-[#0d1f3c]/50 uppercase tracking-wider mb-2">{t("to")}</label>
               <select
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-[#0d1f3c] focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20 appearance-none cursor-pointer"
               >
                 {Object.entries(CURRENCIES).map(([code, c]) => (
-                  <option key={code} value={code}>{c.flag} {code} – {c.name}</option>
+                  <option key={code} value={code}>{c.flag} {code} – {tCurrency(code)}</option>
                 ))}
               </select>
             </div>
@@ -177,7 +182,7 @@ export default function ConverterPage() {
             {loading ? (
               <div className="flex items-center justify-center gap-3 py-2">
                 <div className="w-5 h-5 border-2 border-[#0d1f3c]/20 border-t-[#0d1f3c] rounded-full animate-spin" />
-                <span className="text-[#0d1f3c]/40 text-sm">Kurse werden geladen…</span>
+                <span className="text-[#0d1f3c]/40 text-sm">{t("ratesLoading")}</span>
               </div>
             ) : (
               <>
@@ -199,7 +204,7 @@ export default function ConverterPage() {
         {/* Quick currency grid */}
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <h2 className="text-sm font-extrabold text-[#0d1f3c] uppercase tracking-wider mb-4">
-            {amountNum > 0 ? `${fmt(amountNum, from)} in anderen Währungen` : "Schnellübersicht"}
+            {amountNum > 0 ? t("otherCurrencies", { amount: fmt(amountNum, from) }) : t("quickOverview")}
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {QUICK_CURRENCIES.filter((c) => c !== from).map((code) => {
@@ -229,24 +234,24 @@ export default function ConverterPage() {
 
         {/* Popular pairs */}
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h2 className="text-sm font-extrabold text-[#0d1f3c] uppercase tracking-wider mb-4">Beliebte Paare</h2>
+          <h2 className="text-sm font-extrabold text-[#0d1f3c] uppercase tracking-wider mb-4">{t("popularPairs")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {POPULAR_PAIRS.map(([f, t]) => (
+            {POPULAR_PAIRS.map(([pf, pt]) => (
               <button
-                key={`${f}-${t}`}
-                onClick={() => { setFrom(f); setTo(t); }}
+                key={`${pf}-${pt}`}
+                onClick={() => { setFrom(pf); setTo(pt); }}
                 className={`flex items-center justify-between rounded-xl px-4 py-3 border text-sm transition-all ${
-                  from === f && to === t
+                  from === pf && to === pt
                     ? "border-[#0d1f3c] bg-[#0d1f3c] text-white"
                     : "border-gray-100 hover:border-[#0d1f3c]/30"
                 }`}
               >
-                <span className={`font-bold ${from === f && to === t ? "text-white" : "text-[#0d1f3c]"}`}>
-                  {CURRENCIES[f]?.flag} {f} → {CURRENCIES[t]?.flag} {t}
+                <span className={`font-bold ${from === pf && to === pt ? "text-white" : "text-[#0d1f3c]"}`}>
+                  {CURRENCIES[pf]?.flag} {pf} → {CURRENCIES[pt]?.flag} {pt}
                 </span>
-                {!loading && rates[t] !== undefined && from === f && (
-                  <span className={`text-xs ${from === f && to === t ? "text-white/70" : "text-[#0d1f3c]/40"}`}>
-                    {(1 * (rates[t] ?? 0)).toFixed(4)}
+                {!loading && rates[pt] !== undefined && from === pf && (
+                  <span className={`text-xs ${from === pf && to === pt ? "text-white/70" : "text-[#0d1f3c]/40"}`}>
+                    {(1 * (rates[pt] ?? 0)).toFixed(4)}
                   </span>
                 )}
               </button>
@@ -256,7 +261,7 @@ export default function ConverterPage() {
 
         {/* Info */}
         <p className="text-center text-xs text-[#0d1f3c]/30 pb-4">
-          Kurse von <strong>Frankfurter</strong> (Europäische Zentralbank) · täglich aktualisiert · nur zur Information
+          {t.rich("infoText", { b: (chunks) => <strong>{chunks}</strong> })}
         </p>
       </div>
     </div>
