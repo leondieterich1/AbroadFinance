@@ -7,13 +7,15 @@ import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Wallet, TrendingUp, Receipt, Landmark, Handshake, Coins,
   Target, Package, ListChecks, Globe, Newspaper, Settings, Shield, ExternalLink, LogOut,
+  PiggyBank,
   type LucideIcon,
 } from "lucide-react";
 
 const NAV: { href: string; icon: LucideIcon; label: string; color: string; badge?: string; external?: boolean }[] = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Übersicht", color: "#60a5fa" },
   { href: "/dashboard/budget", icon: Wallet, label: "Budget", color: "#34d399" },
-  { href: "/dashboard/analytics", icon: TrendingUp, label: "Analyse", color: "#a78bfa", badge: "NEU" },
+  { href: "/dashboard/spartipps", icon: PiggyBank, label: "Spar-Check", color: "#10b981", badge: "NEU" },
+  { href: "/dashboard/analytics", icon: TrendingUp, label: "Analyse", color: "#a78bfa" },
   { href: "/dashboard/transactions", icon: Receipt, label: "Ausgaben", color: "#fb923c" },
   { href: "/dashboard/accounts", icon: Landmark, label: "Konten", color: "#38bdf8" },
   { href: "/dashboard/split", icon: Handshake, label: "Splittr", color: "#f472b6" },

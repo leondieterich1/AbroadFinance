@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { RefreshCw, AlertTriangle, Newspaper, ArrowRight, Lightbulb, Link2 } from "lucide-react";
+import Link from "next/link";
+import { RefreshCw, AlertTriangle, Newspaper, ArrowRight, Lightbulb, Link2, TrendingUp, TrendingDown, Minus, PiggyBank } from "lucide-react";
 
 type ExchangeRate = { code: string; rate: number; change: number };
 type Article = { title: string; summary: string; link: string; source: { name: string; url: string; hint: string } };
@@ -131,22 +132,26 @@ export default function NewsletterPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {newsletter.exchangeRates.map((r) => (
-                <div key={r.code} className="bg-white/10 rounded-xl px-3 py-2.5">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm">{CURRENCY_FLAGS[r.code] ?? "🏳️"}</span>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                      r.change > 0 ? "bg-emerald-500/20 text-emerald-300" :
-                      r.change < 0 ? "bg-rose-500/20 text-rose-300" :
-                      "bg-white/10 text-white/40"
-                    }`}>
-                      {r.change > 0 ? "+" : ""}{r.change}%
-                    </span>
+              {newsletter.exchangeRates.map((r) => {
+                const TrendIcon = r.change > 0 ? TrendingUp : r.change < 0 ? TrendingDown : Minus;
+                return (
+                  <div key={r.code} className="bg-white/10 rounded-xl px-3 py-2.5">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm">{CURRENCY_FLAGS[r.code] ?? "🏳️"}</span>
+                      <span className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                        r.change > 0 ? "bg-emerald-500/20 text-emerald-300" :
+                        r.change < 0 ? "bg-rose-500/20 text-rose-300" :
+                        "bg-white/10 text-white/40"
+                      }`}>
+                        <TrendIcon className="w-2.5 h-2.5" />
+                        {r.change > 0 ? "+" : ""}{r.change}%
+                      </span>
+                    </div>
+                    <p className="text-white/50 text-xs font-semibold">{r.code}</p>
+                    <p className="text-white font-extrabold text-sm">{fmt(r.rate, r.code)}</p>
                   </div>
-                  <p className="text-white/50 text-xs font-semibold">{r.code}</p>
-                  <p className="text-white font-extrabold text-sm">{fmt(r.rate, r.code)}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <p className="text-white/20 text-[10px] mt-3 text-center">
               Quelle: Europäische Zentralbank · ecb.europa.eu · Nur zur Information
@@ -200,6 +205,21 @@ export default function NewsletterPage() {
               <span className="underline underline-offset-2">{newsletter.tip.source.name}</span>
             </a>
           </div>
+
+          {/* Savings game CTA */}
+          <Link
+            href="/dashboard/spartipps"
+            className="flex items-center gap-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl p-5 hover:from-emerald-600 hover:to-emerald-700 transition-all"
+          >
+            <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
+              <PiggyBank className="w-6 h-6" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-extrabold">Wo kannst DU sparen?</p>
+              <p className="text-white/70 text-sm">Mach den Spar-Check und finde dein persönliches Sparpotenzial.</p>
+            </div>
+            <ArrowRight className="w-5 h-5 flex-shrink-0" />
+          </Link>
 
           {/* Legal disclaimer */}
           <div className="bg-gray-50 rounded-2xl p-4 text-center">

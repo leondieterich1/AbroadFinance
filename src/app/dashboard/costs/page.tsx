@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Home, Users, ShoppingCart, TrainFront, UtensilsCrossed, Coffee, Dumbbell, Wifi, Lightbulb, Check, type LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { Home, Users, ShoppingCart, TrainFront, UtensilsCrossed, Coffee, Dumbbell, Wifi, Lightbulb, Check, PiggyBank, ArrowRight, type LucideIcon } from "lucide-react";
 
 type City = {
   id: string;
@@ -118,6 +119,21 @@ export default function CostsPage() {
         <p className="text-[#0d1f3c]/40 text-sm mt-0.5">Vergleiche bis zu 3 Städte · Alle Angaben ca.-Werte</p>
       </div>
 
+      {/* Savings game CTA */}
+      <Link
+        href="/dashboard/spartipps"
+        className="flex items-center gap-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl p-5 mb-6 hover:from-emerald-600 hover:to-emerald-700 transition-all"
+      >
+        <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
+          <PiggyBank className="w-6 h-6" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-extrabold">Wo kannst DU sparen?</p>
+          <p className="text-white/70 text-sm">Mach den Spar-Check und finde dein persönliches Sparpotenzial.</p>
+        </div>
+        <ArrowRight className="w-5 h-5 flex-shrink-0" />
+      </Link>
+
       {/* City selector */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6">
         <div className="flex items-center gap-3 mb-4">
@@ -170,8 +186,18 @@ export default function CostsPage() {
           const max = Math.max(...selectedCities.map((c) => c.costs[key]));
           return (
             <div key={key} className={`px-5 py-4 ${i !== 0 ? "border-t border-gray-50" : ""}`}>
-              <div className="flex items-center gap-2 mb-3">
-                {(() => { const Icon = COST_ICONS[key]; return <Icon className="w-4 h-4" style={{ color: COST_ICON_COLORS[key] }} />; })()}
+              <div className="flex items-center gap-2.5 mb-3">
+                {(() => {
+                  const Icon = COST_ICONS[key];
+                  return (
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: `${COST_ICON_COLORS[key]}18` }}
+                    >
+                      <Icon className="w-3.5 h-3.5" style={{ color: COST_ICON_COLORS[key] }} />
+                    </div>
+                  );
+                })()}
                 <span className="text-sm font-bold text-[#0d1f3c]">{COST_LABELS[key]}</span>
                 {key === "eating_out" || key === "coffee"
                   ? <span className="text-xs text-[#0d1f3c]/30">(× 20 Tage/Monat)</span>
