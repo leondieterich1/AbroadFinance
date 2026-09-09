@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import FilterTabs from "@/components/marketing/FilterTabs";
 import {
   Globe, Calculator, Zap, BarChart3, Home, Plane, GraduationCap, PartyPopper,
   Users, NotebookText, CheckCircle2, Sparkles, Handshake, ArrowRight,
@@ -136,42 +137,42 @@ export default async function SplitPage() {
         </div>
       </div>
 
-      {/* Features */}
+      {/* Features & How it works */}
       <div className="bg-gray-50">
         <div className="max-w-6xl mx-auto px-6 py-20">
-          <p className="text-xs font-bold uppercase tracking-widest text-[#0d1f3c]/30 text-center mb-3">{t("featuresLabel")}</p>
-          <h2 className="text-3xl font-extrabold text-[#0d1f3c] text-center mb-12">{t("whySplittr")}</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="bg-white rounded-2xl p-6 border border-gray-100 flex gap-5">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: f.color }}>
-                  <f.icon className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-[#0d1f3c] mb-1">{f.title}</h3>
-                  <p className="text-sm text-[#0d1f3c]/50 leading-relaxed">{f.desc}</p>
-                </div>
+          <FilterTabs
+            featuresLabel={t("whySplittr")}
+            howLabel={t("howItWorksTitle")}
+            featuresContent={
+              <div className="grid md:grid-cols-2 gap-6">
+                {FEATURES.map((f) => (
+                  <div key={f.title} className="bg-white rounded-2xl p-6 border border-gray-100 flex gap-5">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: f.color }}>
+                      <f.icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-[#0d1f3c] mb-1">{f.title}</h3>
+                      <p className="text-sm text-[#0d1f3c]/50 leading-relaxed">{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* How it works */}
-      <div className="max-w-6xl mx-auto px-6 py-20">
-        <p className="text-xs font-bold uppercase tracking-widest text-[#0d1f3c]/30 text-center mb-3">{t("howItWorks")}</p>
-        <h2 className="text-3xl font-extrabold text-[#0d1f3c] text-center mb-12">{t("howItWorksTitle")}</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          {STEPS.map((s) => (
-            <div key={s.step} className="text-center">
-              <div className="w-16 h-16 rounded-2xl bg-[#0d1f3c] text-white flex items-center justify-center mx-auto mb-4">
-                <s.icon className="w-7 h-7" />
+            }
+            howContent={
+              <div className="grid md:grid-cols-3 gap-8">
+                {STEPS.map((s) => (
+                  <div key={s.step} className="text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-[#0d1f3c] text-white flex items-center justify-center mx-auto mb-4">
+                      <s.icon className="w-7 h-7" />
+                    </div>
+                    <div className="text-xs font-bold text-[#0d1f3c]/20 mb-1">{t("step", { n: s.step })}</div>
+                    <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">{s.title}</h3>
+                    <p className="text-sm text-[#0d1f3c]/50">{s.desc}</p>
+                  </div>
+                ))}
               </div>
-              <div className="text-xs font-bold text-[#0d1f3c]/20 mb-1">{t("step", { n: s.step })}</div>
-              <h3 className="font-extrabold text-[#0d1f3c] text-lg mb-2">{s.title}</h3>
-              <p className="text-sm text-[#0d1f3c]/50">{s.desc}</p>
-            </div>
-          ))}
+            }
+          />
         </div>
       </div>
 
