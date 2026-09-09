@@ -4,16 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Wallet, Coins, Handshake, type LucideIcon } from "lucide-react";
+import { Wallet, Coins, Handshake, ChevronDown, type LucideIcon } from "lucide-react";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const t = useTranslations("Nav");
 
-  const LINKS: { href: string; label: string; icon?: LucideIcon; color?: string; badge?: string }[] = [
+  const ABOUT_LINKS: { href: string; label: string }[] = [
     { href: "/#features", label: t("features") },
     { href: "/#how", label: t("how") },
+  ];
+
+  const LINKS: { href: string; label: string; icon?: LucideIcon; color?: string; badge?: string }[] = [
     { href: "/planner", label: t("planner"), icon: Wallet, color: "#10b981" },
     { href: "/converter", label: t("converter"), icon: Coins, color: "#f59e0b" },
     { href: "/split", label: t("splittr"), icon: Handshake, color: "#ec4899", badge: t("new") },
@@ -30,6 +34,37 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-[#0d1f3c]/70">
+          {/* About dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={() => setAboutOpen(true)}
+            onMouseLeave={() => setAboutOpen(false)}
+          >
+            <button
+              onClick={() => setAboutOpen((v) => !v)}
+              aria-expanded={aboutOpen}
+              className="hover:text-[#0d1f3c] transition-colors flex items-center gap-1 font-semibold text-[#0d1f3c]"
+            >
+              {t("about")}
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${aboutOpen ? "rotate-180" : ""}`} />
+            </button>
+            {aboutOpen && (
+              <div className="absolute top-full left-0 pt-2 w-48">
+                <div className="bg-white border border-gray-100 rounded-xl shadow-lg py-2">
+                  {ABOUT_LINKS.map((l) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setAboutOpen(false)}
+                      className="block px-4 py-2.5 text-sm font-semibold text-[#0d1f3c] hover:bg-gray-50 transition-colors"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="hover:text-[#0d1f3c] transition-colors flex items-center gap-1.5 font-semibold text-[#0d1f3c]">
               {l.icon && <l.icon className="w-4 h-4" style={{ color: l.color }} />}
@@ -61,6 +96,17 @@ export default function Navbar() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden border-t border-gray-100 bg-white px-5 py-4 space-y-1">
+          <p className="px-3 pt-1 pb-1 text-xs font-bold uppercase tracking-widest text-[#0d1f3c]/30">{t("about")}</p>
+          {ABOUT_LINKS.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className="flex items-center px-3 py-3 rounded-xl text-sm font-semibold text-[#0d1f3c] hover:bg-gray-50 transition-colors"
+            >
+              {l.label}
+            </Link>
+          ))}
           {LINKS.map((l) => (
             <Link
               key={l.href}
