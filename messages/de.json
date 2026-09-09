@@ -52,6 +52,8 @@
     "errorInvalid": "E-Mail oder Passwort ungültig.",
     "email": "E-Mail",
     "password": "Passwort",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen",
     "submitLoading": "Wird angemeldet…",
     "submit": "Anmelden",
     "noAccount": "Noch kein Konto?",
@@ -103,7 +105,9 @@
     "settings": "Einstellungen",
     "admin": "Admin",
     "userFallback": "Nutzer",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "collapse": "Seitenleiste einklappen",
+    "expand": "Seitenleiste ausklappen"
   },
   "MobileNav": {
     "home": "Home",

@@ -52,6 +52,8 @@
     "errorInvalid": "Invalid email or password.",
     "email": "Email",
     "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "submitLoading": "Logging in…",
     "submit": "Log in",
     "noAccount": "Don't have an account yet?",
@@ -103,7 +105,9 @@
     "settings": "Settings",
     "admin": "Admin",
     "userFallback": "User",
-    "logout": "Log out"
+    "logout": "Log out",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "MobileNav": {
     "home": "Home",
