@@ -7,6 +7,7 @@ import { setLocale } from "@/i18n/actions";
 import { LOCALES, type Locale } from "@/i18n/config";
 
 const LABELS: Record<Locale, string> = { de: "DE", en: "EN" };
+const FLAGS: Record<Locale, string> = { de: "🇩🇪", en: "🇬🇧" };
 
 export default function LanguageSwitcher({ className = "" }: { className?: string }) {
   const locale = useLocale() as Locale;
@@ -28,10 +29,11 @@ export default function LanguageSwitcher({ className = "" }: { className?: strin
           key={l}
           onClick={() => handleChange(l)}
           disabled={pending}
-          className={`px-2.5 py-1 rounded-full text-xs font-bold transition-colors disabled:opacity-50 ${
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-colors disabled:opacity-50 ${
             locale === l ? "bg-[#0d1f3c] text-white" : "text-[#0d1f3c]/50 hover:text-[#0d1f3c]"
           }`}
         >
+          <span aria-hidden="true">{FLAGS[l]}</span>
           {LABELS[l]}
         </button>
       ))}
