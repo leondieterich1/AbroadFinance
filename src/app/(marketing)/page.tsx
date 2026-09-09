@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import BudgetRing from "@/components/ui/BudgetRing";
 import DotPattern from "@/components/ui/DotPattern";
-import FilterTabs from "@/components/marketing/FilterTabs";
 import { Plane, ArrowRight, GraduationCap, Globe, BarChart3, Lock } from "lucide-react";
 
 export default async function Home() {
@@ -94,41 +93,43 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Features & How it works */}
+      {/* Features */}
       <section id="features" className="max-w-6xl mx-auto px-8 py-24">
-        <FilterTabs
-          featuresLabel={t("featuresTitle")}
-          howLabel={t("howTitle")}
-          featuresContent={
-            <>
-              <p className="text-[#0d1f3c]/60 text-lg max-w-xl mx-auto text-center mb-16">
-                {t("featuresDesc")}
-              </p>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {features.map((f) => (
-                  <div key={f.title} className="bg-gray-50 rounded-2xl p-6 hover:bg-[#0d1f3c]/5 transition-colors">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: f.color }}>
-                      <f.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <h3 className="font-bold text-[#0d1f3c] text-lg mb-2">{f.title}</h3>
-                    <p className="text-[#0d1f3c]/60 text-sm leading-relaxed">{f.desc}</p>
-                  </div>
-                ))}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-extrabold text-[#0d1f3c] mb-4">{t("featuresTitle")}</h2>
+          <p className="text-[#0d1f3c]/60 text-lg max-w-xl mx-auto">
+            {t("featuresDesc")}
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((f) => (
+            <div key={f.title} className="bg-gray-50 rounded-2xl p-6 hover:bg-[#0d1f3c]/5 transition-colors">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: f.color }}>
+                <f.icon className="w-5 h-5 text-white" />
               </div>
-            </>
-          }
-          howContent={
-            <div className="grid md:grid-cols-3 gap-10">
-              {steps.map((s) => (
-                <div key={s.step} className="text-center">
-                  <div className="text-6xl font-extrabold text-[#0d1f3c]/10 mb-2">{s.step}</div>
-                  <h3 className="font-bold text-[#0d1f3c] text-xl mb-2">{s.title}</h3>
-                  <p className="text-[#0d1f3c]/60">{s.desc}</p>
-                </div>
-              ))}
+              <h3 className="font-bold text-[#0d1f3c] text-lg mb-2">{f.title}</h3>
+              <p className="text-[#0d1f3c]/60 text-sm leading-relaxed">{f.desc}</p>
             </div>
-          }
-        />
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section id="how" className="bg-gray-50 py-24">
+        <div className="max-w-5xl mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-extrabold text-[#0d1f3c] mb-4">{t("howTitle")}</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-10">
+            {steps.map((s) => (
+              <div key={s.step} className="text-center">
+                <div className="text-6xl font-extrabold text-[#0d1f3c]/10 mb-2">{s.step}</div>
+                <h3 className="font-bold text-[#0d1f3c] text-xl mb-2">{s.title}</h3>
+                <p className="text-[#0d1f3c]/60">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* CTA */}
