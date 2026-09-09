@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { MailCheck, ArrowRight } from "lucide-react";
+import { MailCheck, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 const MIN_SIGNUP_AGE = 16;
 
@@ -18,6 +18,7 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [birthDate, setBirthDate] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -116,14 +117,24 @@ export default function SignupPage() {
         </div>
         <div>
           <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">{t("password")}</label>
-          <input
-            type="password"
-            placeholder={t("passwordPlaceholder")}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#0d1f3c] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder={t("passwordPlaceholder")}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full border border-gray-200 rounded-xl pl-4 pr-11 py-3 text-sm text-[#0d1f3c] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d1f3c]/20"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#0d1f3c]/40 hover:text-[#0d1f3c] transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
+            </button>
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium text-[#0d1f3c] mb-1.5">{t("birthDate")}</label>

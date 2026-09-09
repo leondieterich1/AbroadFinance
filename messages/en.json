@@ -75,6 +75,8 @@
     "email": "Email",
     "password": "Password",
     "passwordPlaceholder": "At least 8 characters",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "birthDate": "Date of birth",
     "submitLoading": "Sending…",
     "submit": "Send confirmation email",
